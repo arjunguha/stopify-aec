@@ -43,12 +43,19 @@
                                     (Listof (Vector String Real)))
                                 pict))
 (define (compare-latency-tranform file title normalize)
+  (: sort-with-intervals (-> (Listof (Vector String Real))
+                             (Listof (Vector String Real))))
+  (define (sort-with-intervals ls)
+    (sort ls
+          (lambda ([x : (Vector String Real)] [y : (Vector String Real)])
+            (> (vector-ref x 1) (vector-ref y 1)))))
   (parameterize ([plot-x-tick-label-anchor 'top-right]
-                 [plot-x-tick-label-angle 30])
+                 [plot-x-tick-label-angle 90])
     (inset (plot-pict
              (discrete-histogram
                (to-plot-type
-                 (normalize (csvfile->list/proc file handle-row) file)))
+                 (sort-with-intervals
+                   (normalize (csvfile->list/proc file handle-row) file))))
              #:y-label "Runtime (in seconds)"
              #:x-label "Yield interval (in function applications)"
              #:width 600 #:height 600
@@ -78,9 +85,9 @@
     (let* ([ files : (Listof String) (cdr args) ]
            [ plot-files : (Listof String) (remove-base files) ]
            [ base-file : String
-             (extract-val
-               (findf (lambda ([f : String])
-                        (regexp-match? #rx"-base-" f)) files)
-               #:err "No basefile found in args") ]
+                       (extract-val
+                         (findf (lambda ([f : String])
+                                  (regexp-match? #rx"-base-" f)) files)
+                         #:err "No basefile found in args") ]
            [ normalize (make-normalization-function base-file) ])
       (draw-plot (car args) (make-plots plot-files normalize)))))

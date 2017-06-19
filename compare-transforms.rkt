@@ -73,7 +73,7 @@
   (define (sort-with-interval fss)
     (sort fss
           (lambda ([xs : (Listof String)] [ys : (Listof String)])
-            (< (extract-num (car xs)) (extract-num (car ys))))))
+            (> (extract-num (car xs)) (extract-num (car ys))))))
   (if (< (length args) 2)
     (raise
       (format "script requires at least 2 arguments, given: ~a" (length args)))
