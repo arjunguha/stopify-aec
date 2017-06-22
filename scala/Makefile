@@ -6,10 +6,10 @@ OBJS = $(patsubst $(BDIR)/%.scala,js-build/%.js,$(SRCS))
 all: $(OBJS)
 
 # Compile all scala programs to JS.
-js-build/%.js: $(BDIR)/%.scala | dir
+js-build/%.js: $(BDIR)/%.scala | js-build
 	$(CC) $^ > $@
 
-dir:
+js-build:
 	mkdir -p js-build
 
 .PHONY: clean
