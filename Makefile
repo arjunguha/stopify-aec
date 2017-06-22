@@ -15,6 +15,8 @@ STOPIFY_DIRS := $(foreach tr,$(TRANSFORMS), \
 .PHONY: all build clean run
 all: $(STOPIFY_DIRS)
 
+build: $(DIRS:%=%/js-build)
+
 # Compile all source language programs to javascript.
 BUILD := $(DIRS:%=%/js-build)
 %/js-build: %
