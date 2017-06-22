@@ -44,9 +44,9 @@
       #:color (+ x-min-val 1) #:line-color (+ x-min-val 1)))
 
   (parameterize ([plot-x-tick-label-anchor 'top-right]
-                 [plot-x-tick-label-angle 30])
+                 [plot-x-tick-label-angle 90])
     (inset (plot-pict (map make-hist files)
-                      #:y-label "Runtime (in seconds)" #:x-label #f
+                      #:y-label "Increase from baseline" #:x-label #f
                       #:width 600 #:height 600
                       #:legend-anchor 'top-right
                       #:title title) 15)))

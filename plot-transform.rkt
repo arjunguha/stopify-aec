@@ -56,7 +56,7 @@
                (to-plot-type
                  (sort-with-intervals
                    (normalize (csvfile->list/proc file handle-row) file))))
-             #:y-label "Runtime (in seconds)"
+             #:y-label "Increase in runtime"
              #:x-label "Yield interval (in function applications)"
              #:width 600 #:height 600
              #:legend-anchor 'top-right
