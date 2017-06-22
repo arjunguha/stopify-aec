@@ -1,0 +1,3 @@
+[submodule "dart/original"]
+	path = dart/original
+	url = https://github.com/dart-lang/ton80
