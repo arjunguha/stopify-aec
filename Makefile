@@ -1,8 +1,9 @@
 # Get all transforms.
 include transform.mk
+include languages.mk
 
 # Get all source language directories.
-DIRS := $(shell find . -maxdepth 1 -mindepth 1 -type d )
+DIRS := $(LANGUAGES)
 
 STOPIFYMK = stopify-Makefile
 RUNNERMK = runner-Makefile
