@@ -17,6 +17,9 @@ to be the case, complain to [@rachitnigam](https://github.com/rachitnigam).
 4. Run `npm run build` and `npm link`. Make sure that the `stopify` executable
    is linked correctly and is available on the path.
 
+5. (For Macs) If you're running the harness on a macbook, install `gnu-time` from
+   homebrew using `brew install gnu-time`.
+
 ## Running the harness
 In `<project-root>/benchmarks $`, run:
 ```
