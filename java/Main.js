@@ -21637,7 +21637,9 @@ var Main = (function () {
     function Main() {
     }
     Main.main = function (args) {
-        new PrintStatement().print("hi");
+        GoogleDriveFileSystem.init(function (name, array) {
+            return;
+        });
     };
     return Main;
 }());

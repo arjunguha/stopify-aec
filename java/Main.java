@@ -1,8 +1,9 @@
-import def.simplemodule.PrintStatement;
+import def.browserfs.GoogleDriveFileSystem;
 public class Main {
 	public static void main(String[] args) {
-		// PrintStatement statement = new PrintStatement();
-		// statement.print("hi");
-		new PrintStatement().print("hi");
+
+		GoogleDriveFileSystem.init((name, array)->{
+			return;
+		});
 	}
 }

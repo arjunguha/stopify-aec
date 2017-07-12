@@ -79,7 +79,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jsweet.candies</groupId>
-			<artifactId>quickstart-sprintf</artifactId>
+			<artifactId>quickstart-googledrive</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
