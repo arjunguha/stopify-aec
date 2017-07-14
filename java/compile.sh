@@ -10,5 +10,5 @@ cp pom.xml $WORKSPACE/pom.xml
 cp $SRCFILE $WORKSPACE/src/main/java
 (cd $WORKSPACE; mvn generate-sources)
 sed -e 's/java.applet.Applet.__static_initialize();//g' $WORKSPACE/webapp/j4ts-0.2.0-SNAPSHOT/bundle.js > $DSTFILE
-cat $WORKSPACE/target/bundle.js >> $DSTFILE
+cat $WORKSPACE/target/Main.ts >> $DSTFILE
 echo $WORKSPACE

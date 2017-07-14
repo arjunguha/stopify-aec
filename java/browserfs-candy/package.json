@@ -1,0 +1,19 @@
+{
+  "name": "browserfs-candy",
+  "version": "1.0.0",
+  "description": "Bridge to BrowserFS",
+  "main": "google-drive.js",
+  "scripts": {
+    "build": "./node_modules/.bin/tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@types/gapi": "0.0.33",
+    "browserfs": "file:../../../browserfs"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^2.3.4"
+  }
+}

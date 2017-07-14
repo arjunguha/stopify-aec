@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jsweet.candies</groupId>
-	<artifactId>quickstart-googledrive</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>plasma</groupId>
+	<artifactId>browserfs</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>jsweet-plugins-release</id>
@@ -56,8 +56,10 @@
 					<verbose>true</verbose>
 					<definitions>true</definitions>
 					<tsOnly>true</tsOnly>
-					<tsOut>src/main/resources/src/typings/${project.artifactId}/${project.version}</tsOut>
+					<tsOut>target/ts</tsOut>
+					<outDir>target/js</outDir>
 					<bundle>true</bundle>
+					<!-- <candiesJsOut>webapp</candiesJsOut> -->
 					<targetVersion>ES3</targetVersion>
 				</configuration>
 				<executions>
@@ -79,9 +81,13 @@
 						<configuration>
 							<target>
 								<echo message="copying JavaScript lib to resources..." />
-								<copy file="google-drive.js"
-									tofile="src/main/resources/META-INF/resources/webjars/${project.artifactId}/${project.version}/bundle.js"
-									verbose="true" />
+								<copy file="target/BrowserFSCandy.d.ts"
+									tofile="src/main/resources/META-INF/resources/webjars/${project.artifactId}/${project.version}/BrowserFSCandy.d.ts"
+									verbose="false" />
+								<copy file="target/BrowserFSCandy.js"
+									tofile="src/main/resources/META-INF/resources/webjars/${project.artifactId}/${project.version}/BrowserFSCandy.js"
+									verbose="false" />
+
 							</target>
 						</configuration>
 						<goals>

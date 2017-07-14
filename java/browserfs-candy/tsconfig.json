@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"outDir": "target",
+		"lib": ["es2016", "dom"],
+		"target": "ES5",
+		"module": "commonjs",
+		"declaration": true,
+		"baseUrl": ".",
+		"paths": {
+			"browserfs/*": ["../../../BrowserFS"]
+		}
+	},
+	"include": [ "src/main/ts" ]
+}
