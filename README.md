@@ -23,8 +23,8 @@ to be the case, complain to [@rachitnigam](https://github.com/rachitnigam).
 ## Running the harness
 In `<project-root>/benchmarks $`, run:
 ```
-make -j8
-make run -j8
+make -j`nproc`
+make run -j`nproc`
 ```
 
 ## Adding a language
