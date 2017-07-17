@@ -26,7 +26,7 @@
     {
       "name": "browserfs",
       "version": "0.0.2-SNAPSHOT",
-      "lastUpdateTimestamp": 1500053742000,
+      "lastUpdateTimestamp": 1500302230000,
       "modelVersion": "unknown",
       "transpilerVersion": "${jsweet.transpiler.version}",
       "jsOutputDirPath": "/Users/nicoleandrews/Documents/PLASMA Lab/stopify-benchmarks/java/example-app/target",

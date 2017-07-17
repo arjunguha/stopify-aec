@@ -15,6 +15,8 @@ export class Main {
         console.info("supports synch is: " + GoogleDriveFileSystem.supportsSynch());
         console.info("supports sym links is: " + GoogleDriveFileSystem.supportsSymlinks());
         console.info("supports links is: " + GoogleDriveFileSystem.supportsLinks());
+        let consumer : (p1: Stats) => void = (Stats) => java.lang.System.out.print(" " + Stats);
+        GoogleDriveFileSystem.stat("foo/empty.txt", false, consumer);
     }
 }
 Main["__class"] = "Main";

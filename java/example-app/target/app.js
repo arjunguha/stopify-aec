@@ -11359,6 +11359,8 @@ var Main = (function () {
         console.info("supports synch is: " + GoogleDriveFileSystem.supportsSynch());
         console.info("supports sym links is: " + GoogleDriveFileSystem.supportsSymlinks());
         console.info("supports links is: " + GoogleDriveFileSystem.supportsLinks());
+        var consumer = function (Stats) { return java.lang.System.out.print(" " + Stats); };
+        GoogleDriveFileSystem.stat("foo/empty.txt", false, consumer);
     };
     return Main;
 }());
@@ -11376,6 +11378,7 @@ Main.main(null);
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = __webpack_require__(22);
+// import {BFSCallback} from "/Users/nicoleandrews/Documents/PLASMA Lab/stopify-benchmarks/java/browserfs-candy/src/main/java/def/browserfs";
 var GoogleDriveFileSystem = index_1.FileSystem.GoogleDrive;
 function init(cb) {
     if (GoogleDriveFileSystem.isAvailable()) {
@@ -11444,6 +11447,47 @@ function supportsLinks() {
     return false;
 }
 exports.supportsLinks = supportsLinks;
+// export function empty(mainCb: BFSOneArgCallback): void {
+//   mainCb();
+// }
+function stat(p, isLstat, cb) {
+    // Ignore lstat case -- GoogleDrive doesn't support symlinks
+    // Stat the file
+    if (p === '/') {
+        // assume the root directory exists
+        var stats = new Stats(FileType.DIRECTORY, 0, 0);
+        return cb(null, stats);
+    }
+    else {
+        var title = path.basename(p);
+        var request = gapi.client.drive.files.list({
+            q: "title = '" + title + "'",
+        });
+        request.execute(function (resp) {
+            if (typeof resp.items !== 'undefined' && typeof resp.items[0] !== 'undefined' && typeof resp.items[0].id !== 'undefined') {
+                var id = resp.items[0].id;
+                var secondRequest = gapi.client.drive.files.get({
+                    fileId: id
+                });
+                secondRequest.execute(function (resp) {
+                    var type = resp.mimeType;
+                    if (type === 'application/vnd.google-apps.folder') {
+                        var stats = new Stats(FileType.DIRECTORY, 0, 0);
+                        return cb(null, stats);
+                    }
+                    else {
+                        var stats = new Stats(FileType.FILE, 0, 0);
+                        return cb(null, stats);
+                    }
+                });
+            }
+            else {
+                return cb(ApiError.ENOENT(p));
+            }
+        });
+    }
+}
+exports.stat = stat;
 
 
 /***/ }),

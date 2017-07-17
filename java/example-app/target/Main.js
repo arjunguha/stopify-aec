@@ -18,6 +18,8 @@ var Main = (function () {
         console.info("supports synch is: " + GoogleDriveFileSystem.supportsSynch());
         console.info("supports sym links is: " + GoogleDriveFileSystem.supportsSymlinks());
         console.info("supports links is: " + GoogleDriveFileSystem.supportsLinks());
+        var consumer = function (Stats) { return java.lang.System.out.print(" " + Stats); };
+        GoogleDriveFileSystem.stat("foo/empty.txt", false, consumer);
     };
     return Main;
 }());
