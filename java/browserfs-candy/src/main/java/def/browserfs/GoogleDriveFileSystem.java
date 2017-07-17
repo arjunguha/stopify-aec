@@ -12,5 +12,5 @@ public class GoogleDriveFileSystem extends jsweet.lang.Object {
     native public static Boolean supportsSymlinks();
     native public static Boolean supportsLinks();
     native public static void empty(BFSOneArgCallback mainCb);
-    native public static void stat(String p, Boolean isLstat, BFSCallback<Stats> cb);
+    native public static void stat(String p, Boolean isLstat, java.util.function.Consumer cb);
 }

@@ -1,9 +1,9 @@
 import { FileSystem } from "browserfs/index";
-// import {BFSCallback} from "/Users/nicoleandrews/Documents/PLASMA Lab/stopify-benchmarks/java/browserfs-candy/src/main/java/def/browserfs";
 import {BFSCallback} from "/Users/nicoleandrews/Documents/PLASMA Lab/BrowserFS/src/core/file_system";
 import {default as Stats, FileType} from "/Users/nicoleandrews/Documents/PLASMA Lab/BrowserFS/src/core/node_fs_stats";
 import {ApiError} from "/Users/nicoleandrews/Documents/PLASMA Lab/BrowserFS/src/core/api_error";
 import * as path from "path";
+// var path = require('path');
 
 const GoogleDriveFileSystem = FileSystem.GoogleDrive;
 
@@ -82,37 +82,6 @@ export function getName(): string {
   //   mainCb();
   // }
 
-   export function stat(p: string, isLstat: boolean | null, cb: BFSCallback<Stats>): void {
-    // Ignore lstat case -- GoogleDrive doesn't support symlinks
-    // Stat the file
-    if (p === '/') {
-      // assume the root directory exists
-      const stats = new Stats(FileType.DIRECTORY, 0, 0);
-      return cb(null, stats);
-    } else {
-      const title = path.basename(p);
-      const request = (<any> (gapi.client)).drive.files.list({
-        q: "title = '" + title + "'",
-      });
-      request.execute((resp: any) => {
-        if (typeof resp.items !== 'undefined' && typeof resp.items[0] !== 'undefined' && typeof resp.items[0].id !== 'undefined') {
-          const id = resp.items[0].id;
-          const secondRequest = (<any> (gapi.client)).drive.files.get({
-            fileId: id
-          });
-          secondRequest.execute(function(resp: any) {
-            const type = resp.mimeType;
-            if (type === 'application/vnd.google-apps.folder') {
-              const stats = new Stats(FileType.DIRECTORY, 0, 0);
-              return cb(null, stats);
-            } else {
-              const stats = new Stats(FileType.FILE, 0, 0);
-              return cb(null, stats);
-            }
-          });
-        } else {
-          return cb(ApiError.ENOENT(p));
-        }
-      });
-    }
+   export function stat(p: string, isLstat: boolean | null, cb: (Stats) => void): void {
+    stat(p, null, cb);
   }

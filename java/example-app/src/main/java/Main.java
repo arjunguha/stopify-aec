@@ -1,6 +1,12 @@
-import def.browserfs.GoogleDriveFileSystem;
+// import def.browserfs.GoogleDriveFileSystem;
+// import def.browserfs.Stats;
 import def.browserfs.BFSCallback;
 import def.browserfs.Stats;
+import def.browserfs.GoogleDriveFileSystem;
+import java.util.function.Consumer;
+
+// import def.browserfs.BFSCallback;
+// import def.browserfs.Stats;
 public class Main {
 	public static void main(String[] args) {
         java.util.HashMap<String,Integer> x = new java.util.HashMap<String,Integer>();
@@ -18,6 +24,7 @@ public class Main {
 		System.out.println("supports synch is: " + GoogleDriveFileSystem.supportsSynch());
 		System.out.println("supports sym links is: " + GoogleDriveFileSystem.supportsSymlinks());
 		System.out.println("supports links is: " + GoogleDriveFileSystem.supportsLinks());
-		GoogleDriveFileSystem.stat("foo/empty.txt", false, );
+		Consumer<Stats> consumer= Stats-> System.out.print(" "+Stats);
+		GoogleDriveFileSystem.stat("foo/empty.txt", false, consumer);
 	}
 }
