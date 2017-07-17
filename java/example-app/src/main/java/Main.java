@@ -1,12 +1,8 @@
-// import def.browserfs.GoogleDriveFileSystem;
-// import def.browserfs.Stats;
 import def.browserfs.BFSCallback;
 import def.browserfs.Stats;
 import def.browserfs.GoogleDriveFileSystem;
 import java.util.function.Consumer;
 
-// import def.browserfs.BFSCallback;
-// import def.browserfs.Stats;
 public class Main {
 	public static void main(String[] args) {
         java.util.HashMap<String,Integer> x = new java.util.HashMap<String,Integer>();
