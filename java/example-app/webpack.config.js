@@ -14,7 +14,7 @@ module.exports = {
   externals: { gapi: "/Users/nicoleandrews/Documents/PLASMA Lab/stopify-benchmarks/java/example-app/gapi.js"},
   plugins: [
   new webpack.ProvidePlugin({
-  	GoogleDriveFileSystem: "../../browserfs-candy/target/BrowserFSCandy.js",
+  	GoogleDriveCandy: "../../browserfs-candy/target/BrowserFSCandy.js",
    
   })
   ]

@@ -1,14 +1,17 @@
 import { FileSystem } from "browserfs/index";
-import {BFSCallback} from "/Users/nicoleandrews/Documents/PLASMA Lab/BrowserFS/src/core/file_system";
-import {default as Stats, FileType} from "/Users/nicoleandrews/Documents/PLASMA Lab/BrowserFS/src/core/node_fs_stats";
-import {ApiError} from "/Users/nicoleandrews/Documents/PLASMA Lab/BrowserFS/src/core/api_error";
+import * as Stats from "browserfs/core/node_fs_stats";
 import * as path from "path";
 // var path = require('path');
 
-const GoogleDriveFileSystem = FileSystem.GoogleDrive;
+var gfs;
 
-export function init(cb: () => void): void {
-    if (GoogleDriveFileSystem.isAvailable()) {
+// export function init(cb: () => void): void {
+
+//     console.log("HI");
+// }
+
+  export function init(cb: () => void): void {
+    if (FileSystem.GoogleDrive.isAvailable()) {
         var oauthToken: any;        
 
         // Use the API Loader script to load google.picker and gapi.auth.
@@ -36,8 +39,8 @@ export function init(cb: () => void): void {
             if (authResult && !authResult.error) {
                 oauthToken = authResult.access_token;
                 gapi.client.load('drive', 'v2', () => {
-                    var fs = new GoogleDriveFileSystem(oauthToken);
-                    fs.empty(() => {
+                    gfs = new FileSystem.GoogleDrive(oauthToken);
+                    gfs.empty(() => {
                         cb();
                     });
                 });
@@ -46,42 +49,48 @@ export function init(cb: () => void): void {
 
         onApiLoad();
     } else {
-        cb();
+        throw new Error("error");
     }
 }
 
-export function isAvailable(): boolean {
+  export function isAvailable(): boolean {
     return true;
-}
-
-export function getName(): string {
-    return 'Google Drive';
+    // isAvailable();
   }
 
-  export function isReadOnly(): boolean {
-    return false;
-  }
+// export function getName(): string {
+//     return 'Google Drive';
+//     // getName();
+//   }
 
-  export function supportsProps(): boolean {
-    return false;
-  }
+//   export function isReadOnly(): boolean {
+//     return false;
+//     // isReadOnly();
+//   }
 
-  export function supportsSynch(): boolean {
-    return false;
-  }
+//   export function supportsProps(): boolean {
+//     return false;
+//     // supportsProps();
+//   }
 
-  export function supportsSymlinks(): boolean {
-    return false;
-  }
+//   export function supportsSynch(): boolean {
+//     return false;
+//     // supportsSynch();
+//   }
 
-  export function supportsLinks(): boolean {
-    return false;
-  }
+//   export function supportsSymlinks(): boolean {
+//     return false;
+//     // supportsSymlinks();
+//   }
+
+//   export function supportsLinks(): boolean {
+//     return false;
+//   }
 
   // export function empty(mainCb: BFSOneArgCallback): void {
   //   mainCb();
   // }
 
    export function stat(p: string, isLstat: boolean | null, cb: (Stats) => void): void {
-    stat(p, null, cb);
+    gfs.stat(p, null, (err, s) => cb(s));
   }

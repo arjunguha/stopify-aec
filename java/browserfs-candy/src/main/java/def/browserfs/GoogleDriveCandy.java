@@ -2,7 +2,7 @@ package def.browserfs;
 
 
 
-public class GoogleDriveFileSystem extends jsweet.lang.Object {
+public class GoogleDriveCandy extends jsweet.lang.Object {
     native public static void init(Runnable cb);
     native public static Boolean isAvailable();
     native public static String getName();
