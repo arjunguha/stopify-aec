@@ -4,7 +4,7 @@ FILES = $(wildcard *.js)
 
 # All the files that will be generated.
 OBJS = $(foreach tr, $(TRANSFORMS), \
-			   $(foreach file, $(FILES), $(tr)/$(file)))
+				 $(foreach file, $(FILES), $(tr)/$(file:%.js=%.html)))
 
 BASE = './base'
 
@@ -18,23 +18,14 @@ endef
 # Template for defining the stopify runner
 # $(1) is the name of the transform
 define stopify_TEMPLATE
-$(1)/%.js: %.js | $(1)
+$(1)/%.html: %.js | $(1)
 	@echo 'stopify $$* with $(1)'
-	@( stopify -i $$< -t $(1) > $$@ ) 2> /dev/null || \
+	@( stopify -i $$< -t $(1) --benchmark -o html > $$@ ) 2> /dev/null || \
 		( printf "\033[0;31mFailed to stopify $$@ \033[0m\n" )
 endef
 
-.PHONY: all move-to-base
-all: move-to-base
-
-# Move all files into base directory
-move-to-base: | base
-ifneq "$(FILES)" ""
-	mv $(FILES) $(BASE)
-endif
-
-base: $(OBJS)
-	mkdir -p $(BASE)
+.PHONY: all
+all: $(OBJS)
 
 # Build rules to create directory for each transform
 $(foreach tr,$(TRANSFORMS), $(eval $(call dir_TEMPLATE,$(tr))))
