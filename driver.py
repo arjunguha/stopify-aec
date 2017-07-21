@@ -6,6 +6,12 @@ from pyvirtualdisplay import Display
 import sys
 import os
 
+# Arg 1 to script is the html file that needs to be run.
+# Arg 2 is the log to which the data is written.
+
+if len(sys.argv) < 3:
+    raise Exception('Not enough arguments')
+
 filename = sys.argv[1]
 loc = os.getcwd()
 html_file = "file://" + os.path.join(loc, filename)
@@ -27,7 +33,12 @@ try:
     # You should see "cheese! - Google Search"
     data = driver.find_element_by_id('data').get_attribute('innerHTML')
 
+    # write data to log file
+    file = open(sys.argv[2], 'a')
     print data
+    file.write(data + "\n")
+
 
 finally:
     driver.quit()
+    display.sendstop()
