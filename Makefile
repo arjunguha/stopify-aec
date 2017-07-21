@@ -42,24 +42,6 @@ run: all $(RUNDEP)
 %/js-build/transform.mk: ./transform.mk | %/js-build
 	cp ./transform.mk $@
 
-%/js-build/engines.mk: ./engines.mk | %/js-build
-	cp ./engines.mk $@
-
-%/js-build/plot-helpers.rkt: ./plot-helpers.rkt | %/js-build
-	cp ./plot-helpers.rkt $@
-
-%/js-build/compare-transforms.rkt: ./compare-transforms.rkt | %/js-build
-	cp ./compare-transforms.rkt $@
-
-%/js-build/plot-transform.rkt: ./plot-transform.rkt %/js-build/plot-helpers.rkt | %/js-build
-	cp ./plot-transform.rkt $@
-
-%/js-build/runner-Makefile: runner-Makefile %/js-build/engines.mk \
-	%/js-build transform.mk %/js-build/plot-helpers.rkt \
-	%/js-build/plot-transform.rkt %/js-build/compare-transforms.rkt \
-	| %/js-build
-	cp $(RUNNERMK) $@;
-
 # Rules for cleanup
 clean:
 	$(foreach d, $(DIRS), $(MAKE) -C $d clean; )
