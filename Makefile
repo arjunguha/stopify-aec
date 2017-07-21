@@ -13,7 +13,7 @@ RUNNERMK = runner-Makefile
 STOPIFY_DIRS := $(foreach tr,$(TRANSFORMS), \
 							   $(foreach d, $(DIRS), $d/js-build/$(tr)))
 
-.PHONY: all build clean run
+.PHONY: all build clean run jobs
 all: $(STOPIFY_DIRS)
 
 build: $(DIRS:%=%/js-build)
@@ -32,9 +32,6 @@ $(TRDIR): %/js-build/stopify-Makefile %/js-build/transform.mk
 # Rules for running the benchmarking harness.
 RUNFILES := runner-Makefile engines.mk transform.mk
 RUNDEP := $(foreach b, $(BUILD), $(foreach r, $(RUNFILES), $b/$r))
-
-run: all $(RUNDEP)
-	$(foreach b, $(BUILD), $(MAKE) -C $b -f $(RUNNERMK); )
 
 %/js-build/stopify-Makefile : ./stopify-Makefile %/js-build/transform.mk | %/js-build
 	cp $(STOPIFYMK) $@;
