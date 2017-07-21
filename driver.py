@@ -13,9 +13,10 @@ html_file = "file://" + os.path.join(loc, filename)
 display = Display(visible=0, size=(800, 600))
 display.start()
 
+# Create a new instance of the Firefox driver
+driver = webdriver.Firefox()
+
 try:
-    # Create a new instance of the Firefox driver
-    driver = webdriver.Firefox()
 
     # go to the google home page
     driver.get(html_file)

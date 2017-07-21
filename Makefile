@@ -42,6 +42,11 @@ run: all $(RUNDEP)
 %/js-build/transform.mk: ./transform.mk | %/js-build
 	cp ./transform.mk $@
 
+jobs: all
+	$(eval TO_RUN := $(foreach l,$(LANGUAGES), \
+		$(shell find $l -name "*html")))
+	@(echo $(TO_RUN) | sed 's/ /\n/g')
+
 # Rules for cleanup
 clean:
 	$(foreach d, $(DIRS), $(MAKE) -C $d clean; )
