@@ -11,7 +11,7 @@ parallel --controlmaster \
    $PWD/job.sh ::: ../scala/js-build/* ::: {0,500,1000} ::: {callcc,yield,baseline} >> data.csv
 
 R --file=plot.r
-mailx -s "Stopify: benchmark results from Swarm 2" -a data.csv -a data.pdf arjun@cs.umass.edu << EOT
-Attached is a plot and the raw data from the latest run of 
-Stopify benchmarks on Swarm 2.
-EOT
+T=`date "+%Y-%m-%dT%H_%M"`
+cp data.csv /mnt/nfs/work1/arjun/data-$T.csv
+cp data.pdf /mnt/nfs/work1/arjun/data-$T.pdf
+ssh swarm2 $/repos/plasma-umass/Stopify/benchmarks/swarm2/send_mail

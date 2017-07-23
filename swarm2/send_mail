@@ -1,0 +1,5 @@
+#!/bin/bash
+cd `dirname $0`
+mailx -s "Stopify: benchmark results from Swarm 2" -a data.csv -a data.pdf arjun@cs.umass.edu << EOT
+Attached is the latest benchmark results from Swarm 2.
+EOT
