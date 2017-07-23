@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+function pad(n) {
+  if (n > 99) {
+    return n.toString();
+  }
+  else if (n > 9) {
+    return '0' + n.toString();
+  }
+  else {
+    return '00' + n.toString();
+  }
+}
+
+function sshlogin() {
+  let nodeList = process.env.SLURM_NODELIST;
+  const x = nodeList.indexOf('[');
+  const prefix = nodeList.slice(0, x);
+  const ranges = nodeList.slice(x + 1, nodeList.length - 1).split(',');
+  const nodes = [];
+  
+  
+  for (const range of ranges) {
+    const elts = range.split('-');
+    if (elts.length === 1) {
+      nodes.push(`${prefix}${range}`);
+    }
+    else {
+      const [ loStr, hiStr ] = elts;
+      const lo = Number(loStr);
+      const hi = Number(hiStr);
+      for (let i = lo; i <= hi; i++) {
+        nodes.push(`${prefix}${pad(i)}`);
+      }
+    }
+  }
+
+  return nodes.join(',');
+}
+process.stdout.write(sshlogin());

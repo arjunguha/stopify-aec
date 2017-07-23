@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --time=1:00:00
+#SBATCH --nodes=10
+#SBATCH --mem=4096
+#SBATCH --mail-type=ALL
+
+echo "Benchmark,Language,Transformation,Interval,Time" > data.csv
+parallel --controlmaster \
+  -j 1 \
+  --sshlogin `./parse_nodelist` \
+   $PWD/job.sh ::: ../scala/js-build/* ::: {0,500,1000} ::: {callcc,yield,baseline} >> data.csv
+
+R --file=plot.r
+mailx -s "Stopify: benchmark results from Swarm 2" -a data.csv -a data.pdf arjun@cs.umass.edu << EOT
+Attached is a plot and the raw data from the latest run of 
+Stopify benchmarks on Swarm 2.
+EOT
