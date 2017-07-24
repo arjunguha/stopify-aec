@@ -45,7 +45,10 @@ run_jobs: all
 	$(eval TO_RUN := $(foreach l,$(LANGUAGES), \
 		$(shell find $l -name "*html")))
 	for i in $(TO_RUN); do \
-	  python driver.py $$i data.log; \
+	  python driver.py $$i data.log chrome; \
+	done
+	for i in $(TO_RUN); do \
+	  python driver.py $$i data.log firefox; \
 	done
 
 # Rules for cleanup
