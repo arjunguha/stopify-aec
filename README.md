@@ -1,22 +1,29 @@
 # Stopify Benchmarking Harness
 ---------
-The stopify benchmarking is a work of art, which means that you must be insane
-to want to hack on it. The system relies on a lot of `make` hackery to work and
-is claimed to "just" work when you add a new language. If this doesn't turn out
-to be the case, complain to [@rachitnigam](https://github.com/rachitnigam).
+The stopify benchmarking harness is used to generate performance graphs. It
+uses selenium web driver to run the benchmarks inside the browsers and
+outputs measurements to `data.log` in project root.
 
 ## Dependencies
 1. Install [GNU make](https://www.gnu.org/software/make/). The system was built
    with version 3.81 but any version above that should work.
+
 2. Install the language compilers as specified
    [here](https://github.com/plasma-umass/stopify#optional-server-dependencies).
-3. Install [Racket](https://racket-lang.org/) and run
-   ```
-   raco pkg install csv-reading plot
-   ```
+
 4. Run `npm run build` and `npm link`. Make sure that the `stopify` executable
    is linked correctly and is available on the path.
 
+4. Install python libraries for selenium runner:
+   ```
+   pip install pyvirtualdisplay selenium
+   ```
+
+6. Add drivers for selenium to the `PATH` by running:
+   ```
+   make -f install.mk
+   export PATH=`pwd`/bin:$PATH
+   ```
 5. (For Macs) If you're running the harness on a macbook, install `gnu-time` from
    homebrew using `brew install gnu-time`.
 
@@ -24,7 +31,7 @@ to be the case, complain to [@rachitnigam](https://github.com/rachitnigam).
 In `<project-root>/benchmarks $`, run:
 ```
 make
-make run
+make run_jobs
 ```
 
 ## Adding a language
@@ -43,8 +50,3 @@ modifies benchmarks together. To this end, make a folder called
    runnable.
 
 3. Add a `clean` rule to the makefile that cleans up the language directory.
-
-4. (optional) Add a `benchmark` rule to the makefile that runs the benchmarks
-   with the source language and produces the file
-   `js-builds/native-base-times.csv` with the filename as the first column and
-   the time in seconds as the second column.
