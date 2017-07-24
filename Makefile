@@ -13,7 +13,7 @@ RUNNERMK = runner-Makefile
 STOPIFY_DIRS := $(foreach tr,$(TRANSFORMS), \
 							   $(foreach d, $(DIRS), $d/js-build/$(tr)))
 
-.PHONY: all build clean run jobs
+.PHONY: all build clean run jobs run_jobs
 all: $(STOPIFY_DIRS)
 
 build: $(DIRS:%=%/js-build)
