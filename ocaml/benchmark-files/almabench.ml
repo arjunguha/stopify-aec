@@ -359,5 +359,10 @@ let run_and_check () =
   let res = run 20 in
   check_1 () res
 
-let _ = Fixture.run_n_times 1000 run_and_check
+(* Benchmark looper *)
+let run_n_times (n : int) (f : unit -> unit) : unit =
+  for _ = 1 to n do
+    f ()
+  done
 
+let _ = run_n_times 10 run_and_check
