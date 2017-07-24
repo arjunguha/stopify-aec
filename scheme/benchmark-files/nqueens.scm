@@ -1,0 +1,36 @@
+(define (app lst1 lst2)
+  (if (pair? lst1)
+    (cons (car lst1) (app (cdr lst1) lst2))
+    lst2))
+
+(define (one-up-to n)
+  (let loop ((i n) (lst '()))
+    (if (= i 0)
+      lst
+      (loop (- i 1) (cons i lst)))))
+
+(define (explore x y placed)
+  (if (pair? x)
+    (+ (if (ok? (car x) 1 placed)
+         (explore (app (cdr x) y)
+                  '()
+                  (cons (car x) placed))
+         0)
+       (explore (cdr x)
+                (cons (car x) y)
+                placed))
+    (if (pair? y) 0 1)))
+
+(define (ok? row dist placed)
+  (if (pair? placed)
+    (and (not (= (car placed) (+ row dist)))
+         (not (= (car placed) (- row dist)))
+         (ok? row (+ dist 1) (cdr placed)))
+    #t))
+
+(define (nqueens n)
+  (explore (one-up-to n)
+           '()
+           '()))
+
+(nqueens 12)
