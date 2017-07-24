@@ -28,7 +28,7 @@ try:
     driver.get(html_file)
 
     # Runner signals completion or failure by changing title to done
-    WebDriverWait(driver, 100).until(EC.title_contains("done"))
+    WebDriverWait(driver, 300).until(EC.title_contains("done"))
 
     # You should see "cheese! - Google Search"
     data = driver.find_element_by_id('data').get_attribute('innerHTML')
@@ -42,3 +42,4 @@ try:
 finally:
     driver.quit()
     display.sendstop()
+    file.close()
