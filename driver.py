@@ -8,10 +8,12 @@ import os
 
 # Arg 1 to script is the html file that needs to be run.
 # Arg 2 is the log to which the data is written.
+# Arg 3 is the name of the browser
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 4:
     raise Exception('Not enough arguments')
 
+browser = sys.argv[3]
 filename = sys.argv[1]
 loc = os.getcwd()
 html_file = "file://" + os.path.join(loc, filename)
@@ -20,7 +22,11 @@ display = Display(visible=0, size=(800, 600))
 display.start()
 
 # Create a new instance of the Firefox driver
-driver = webdriver.Firefox()
+if browser == "firefox":
+    driver = webdriver.Firefox()
+else:
+    browser = "chrome"
+    driver = webdriver.Chrome()
 
 try:
 
@@ -36,7 +42,7 @@ try:
     # write data to log file
     file = open(sys.argv[2], 'a')
     print data
-    file.write(data + "\n")
+    file.write(browser + data + "\n")
 
 
 finally:
