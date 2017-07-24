@@ -1,12 +1,13 @@
 # Get all transforms.
 include transform.mk
-include languages.mk
+
+# Specify the languages to be run
+LANGUAGES = javascript dart
 
 # Get all source language directories.
 DIRS := $(LANGUAGES)
 
-STOPIFYMK = stopify-Makefile
-RUNNERMK = runner-Makefile
+STOPIFYMK = stopify.mk
 
 # Compile all JS source files with stopify
 # Name of all the stopify directories
@@ -26,14 +27,10 @@ BUILD := $(DIRS:%=%/js-build)
 # Name of all directories to be built wiht %
 TRDIR := $(foreach tr, $(TRANSFORMS), %/js-build/$(tr))
 
-$(TRDIR): %/js-build/stopify-Makefile %/js-build/transform.mk
+$(TRDIR): %/js-build/stopify.mk %/js-build/transform.mk
 	$(MAKE) -C $*/js-build -f $(STOPIFYMK)
 
-# Rules for running the benchmarking harness.
-RUNFILES := runner-Makefile engines.mk transform.mk
-RUNDEP := $(foreach b, $(BUILD), $(foreach r, $(RUNFILES), $b/$r))
-
-%/js-build/stopify-Makefile : ./stopify-Makefile %/js-build/transform.mk | %/js-build
+%/js-build/stopify.mk : ./stopify.mk %/js-build/transform.mk | %/js-build
 	cp $(STOPIFYMK) $@;
 
 %/js-build/transform.mk: ./transform.mk | %/js-build
