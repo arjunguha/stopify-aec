@@ -20,8 +20,9 @@ endef
 define stopify_TEMPLATE
 $(1)/%.html: %.js | $(1)
 	@echo 'stopify $$* with $(1)'
-	@( stopify -i $$< -t $(1) --benchmark -o html > $$@ ) 2> /dev/null || \
-		( printf "\033[0;31mFailed to stopify $$@ \033[0m\n" )
+	@( stopify -i $$< -t $(subst @, ,$(1)) --benchmark -o html > $$@ ) \
+		2> /dev/null || \
+		(printf "\033[0;31mFailed to stopify $$@ \033[0m\n")
 endef
 
 .PHONY: all
