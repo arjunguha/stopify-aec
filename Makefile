@@ -53,7 +53,7 @@ run_jobs: all
 			for i in $(INTERVALS); do \
 				d=`mktemp XXXXX.html` && cat $$f | \
 					sed "s/\/\/ |INTERVAL|/$$i ||/g" > $$d && \
-					python driver.py $$d data.log $e && rm $$d;
+					( python driver.py $$d data.log $e || true ) && rm $$d; \
 			done \
 		done;)
 
