@@ -22,30 +22,33 @@ display = Display(visible=0, size=(800, 600))
 display.start()
 
 # Create a new instance of the Firefox driver
-if browser == "firefox":
-    driver = webdriver.Firefox()
-else:
-    browser = "chrome"
-    driver = webdriver.Chrome()
-
 try:
+    if browser == "firefox":
+        driver = webdriver.Firefox()
+    else:
+        browser = "chrome"
+        driver = webdriver.Chrome()
 
-    # go to the google home page
-    driver.get(html_file)
+    try:
 
-    # Runner signals completion or failure by changing title to done
-    WebDriverWait(driver, 300).until(EC.title_contains("done"))
+        # go to the google home page
+        driver.get(html_file)
 
-    # You should see "cheese! - Google Search"
-    data = driver.find_element_by_id('data').get_attribute('innerHTML')
+        # Runner signals completion or failure by changing title to done
+        WebDriverWait(driver, 300).until(EC.title_contains("done"))
 
-    # write data to log file
-    file = open(sys.argv[2], 'a')
-    print data
-    file.write(browser + data + "\n")
+        # You should see "cheese! - Google Search"
+        data = driver.find_element_by_id('data').get_attribute('innerHTML')
 
+        # write data to log file
+        file = open(sys.argv[2], 'a')
+        print data
+        file.write(browser + data + "\n")
+
+
+    finally:
+        driver.quit()
+        file.close()
 
 finally:
-    driver.quit()
     display.sendstop()
-    file.close()
