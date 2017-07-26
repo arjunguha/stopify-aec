@@ -4,9 +4,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pyvirtualdisplay import Display
 import sys
-import os
 
-# Arg 1 to script is the html file that needs to be run.
+# Arg 1 to script is the FULL PATH of html file that needs to be run.
 # Arg 2 is the log to which the data is written.
 # Arg 3 is the name of the browser
 
@@ -15,8 +14,7 @@ if len(sys.argv) < 4:
 
 browser = sys.argv[3]
 filename = sys.argv[1]
-loc = os.getcwd()
-html_file = "file://" + os.path.join(loc, filename)
+html_file = "file://" + filename
 
 display = Display(visible=0, size=(800, 600))
 display.start()

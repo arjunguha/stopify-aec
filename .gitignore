@@ -1,5 +1,6 @@
-js-build
+*.html
 node_modules
 target
 bin/
 *.log
+

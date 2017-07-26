@@ -2,7 +2,7 @@
 include transform.mk
 
 # Specify the languages to be run
-LANGUAGES = javascript
+LANGUAGES = javascript dart scala
 
 # Engines (must be defined in driver.py, otherwise default to 'chrome'
 ENGINES = chrome firefox
@@ -10,7 +10,11 @@ ENGINES = chrome firefox
 # Get all source language directories.
 DIRS := $(LANGUAGES)
 
+# Stopify makefile
 STOPIFYMK = stopify.mk
+
+# Full path of python selenium driver
+DRIVER := $(shell pwd)/driver.py
 
 # Compile all JS source files with stopify
 # Name of all the stopify directories
@@ -42,26 +46,26 @@ $(TRDIR): %/js-build/stopify.mk %/js-build/transform.mk
 show_jobs: all
 	$(eval TO_RUN := \
 		$(foreach l,$(LANGUAGES), \
-			$(shell find $l -name "*html")))
+			$(shell find "$$(pwd)/$l" -name "*html")))
 	$(eval JOBS := \
 		$(foreach e, $(ENGINES), \
 			$(foreach f, $(TO_RUN), \
 			  $(foreach i, $(INTERVALS), \
 					echo 'd=`mktemp XXXXX.html` && cat $f | \
 						sed "s/\/\/ |INTERVAL|/$i ||/g" > $$d && \
-						( python driver.py $$d data.log $e || true ) && rm $$d;';))))
+						( python $(DRIVER) $$d data.log $e || true ) && rm $$d;';))))
 	echo $(JOBS)
 
 run_jobs: all
 	$(eval TO_RUN := $(foreach l,$(LANGUAGES), \
-		$(shell find $l -name "*html")))
+		$(shell find "$$(pwd)/$l" -name "*html")))
 	# Run with chrome
 	$(foreach e, $(ENGINES), \
 		for f in $(TO_RUN); do \
 			for i in $(INTERVALS); do \
 				d=`mktemp XXXXX.html` && cat $$f | \
 					sed "s/\/\/ |INTERVAL|/$$i ||/g" > $$d && \
-					( python driver.py $$d data.log $e || true ) && rm $$d; \
+					( python $(DRIVER) $$d data.log $e || true ) && rm $$d; \
 			done \
 		done;)
 
