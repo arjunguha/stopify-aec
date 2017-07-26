@@ -12,6 +12,6 @@ parallel --controlmaster \
 
 R --file=plot.r
 T=`date "+%Y-%m-%dT%H_%M"`
-cp data.csv /mnt/nfs/work1/arjun/data-$T.csv
-cp data.pdf /mnt/nfs/work1/arjun/data-$T.pdf
-ssh swarm2 $/repos/plasma-umass/Stopify/benchmarks/swarm2/send_mail
+cp data.csv /mnt/nfs/work1/arjun/arjun/data-$T.csv
+cp data.pdf /mnt/nfs/work1/arjun/arjun/data-$T.pdf
+ssh swarm2 $HOME/repos/plasma-umass/Stopify/benchmarks/swarm2/send_mail
