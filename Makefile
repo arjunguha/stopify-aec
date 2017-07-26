@@ -2,7 +2,7 @@
 include transform.mk
 
 # Specify the languages to be run
-LANGUAGES = javascript dart scala
+LANGUAGES = javascript
 
 # Engines (must be defined in driver.py, otherwise default to 'chrome'
 ENGINES = chrome firefox
@@ -52,8 +52,8 @@ show_jobs: all
 			$(foreach f, $(TO_RUN), \
 			  $(foreach i, $(INTERVALS), \
 					echo 'd=`mktemp XXXXX.html` && cat $f | \
-						sed "s/\/\/ |INTERVAL|/$i ||/g" > $$d && \
-						( python $(DRIVER) $$d data.log $e || true ) && rm $$d;';))))
+						sed "s/\/\/ |INTERVAL|/$i ||/g" > $$$$d && \
+						( python $(DRIVER) `pwd`/$$$$d data.log $e || true ) && rm $$$$d;';))))
 	echo $(JOBS)
 
 run_jobs: all
@@ -65,14 +65,14 @@ run_jobs: all
 			for i in $(INTERVALS); do \
 				d=`mktemp XXXXX.html` && cat $$f | \
 					sed "s/\/\/ |INTERVAL|/$$i ||/g" > $$d && \
-					( python $(DRIVER) $$d data.log $e || true ) && rm $$d; \
+					( python $(DRIVER) `pwd`/$$d data.log $e || true ) && rm $$d; \
 			done \
 		done;)
 
 # Rules for cleanup
 clean:
 	$(foreach d, $(DIRS), $(MAKE) -C $d clean; )
-	rm data.log
+	rm -f data.log
 
 # Rule to debug variables.
 print-%  : ; @echo $* = $($*)
