@@ -40,9 +40,17 @@ $(TRDIR): %/js-build/stopify.mk %/js-build/transform.mk
 	cp ./transform.mk $@
 
 show_jobs: all
-	$(eval TO_RUN := $(foreach l,$(LANGUAGES), \
-		$(shell find $l -name "*html")))
-	@(echo $(TO_RUN) | sed 's/ /\n/g')
+	$(eval TO_RUN := \
+		$(foreach l,$(LANGUAGES), \
+			$(shell find $l -name "*html")))
+	$(eval JOBS := \
+		$(foreach e, $(ENGINES), \
+			$(foreach f, $(TO_RUN), \
+			  $(foreach i, $(INTERVALS), \
+					echo 'd=`mktemp XXXXX.html` && cat $f | \
+						sed "s/\/\/ |INTERVAL|/$i ||/g" > $$d && \
+						( python driver.py $$d data.log $e || true ) && rm $$d;';))))
+	echo $(JOBS)
 
 run_jobs: all
 	$(eval TO_RUN := $(foreach l,$(LANGUAGES), \
