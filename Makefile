@@ -47,14 +47,12 @@ show_jobs: all
 	$(eval TO_RUN := \
 		$(foreach l,$(LANGUAGES), \
 			$(shell find "$$(pwd)/$l" -name "*html")))
-	$(eval JOBS := \
-		$(foreach e, $(ENGINES), \
+		@($(foreach e, $(ENGINES), \
 			$(foreach f, $(TO_RUN), \
 			  $(foreach i, $(INTERVALS), \
-					echo 'd=`mktemp XXXXX.html` && cat $f | \
-						sed "s/\/\/ |INTERVAL|/$i ||/g" > $$$$d && \
-						( python $(DRIVER) `pwd`/$$$$d data.log $e || true ) && rm $$$$d;';))))
-	echo $(JOBS)
+					echo 'd=`pwd`/`mktemp XXXXX.html` && cat $f | \
+						sed "s/\/\/ |INTERVAL|/$i ||/g" > $$d && \
+						( python $(DRIVER) $$d data.log $e || true ) && rm $$d;';))))
 
 run_jobs: all
 	$(eval TO_RUN := $(foreach l,$(LANGUAGES), \
@@ -63,9 +61,9 @@ run_jobs: all
 	$(foreach e, $(ENGINES), \
 		for f in $(TO_RUN); do \
 			for i in $(INTERVALS); do \
-				d=`mktemp XXXXX.html` && cat $$f | \
+				d=`pwd`/`mktemp XXXXX.html` && cat $$f | \
 					sed "s/\/\/ |INTERVAL|/$$i ||/g" > $$d && \
-					( python $(DRIVER) `pwd`/$$d data.log $e || true ) && rm $$d; \
+					( python $(DRIVER) $$d data.log $e || true ) && rm $$d; \
 			done \
 		done;)
 
