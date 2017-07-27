@@ -1,0 +1,16 @@
+A somewhat incomplete list of changes:
+
+- Removed all the __main__ checks.
+- Several benchmarks let me specify the number of iterations. I picked
+  n-iters such that the benchmarks ran for a few seconds.
+- Inlined super constructors in deltablue.py
+- Wrote my own shim for time (Transcrypt's time only works in browser)
+- Disabled saving output to file in raytrace-simple
+- Inlined the file in schulze.py
+- Changed pystone to use time.time() instead of time.clock()
+
+Screwed up ATM:
+
+CHAOS
+gcbench
+Schulze
