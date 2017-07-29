@@ -47,3 +47,21 @@ plot <- ggplot(df, aes(x=Benchmark,y=Time)) +
   mytheme()
 
 mysave("data.pdf", plot)
+
+baseline <- data %>% 
+  filter(Transformation == "baseline") %>%
+  mutate(BaseTime = Time) %>%
+  select(-Time, -Transformation)
+
+df <- inner_join(baseline,data) %>%
+  filter(Transformation != "baseline") %>%
+  mutate(Slowdown = Time / BaseTime,
+         Type = paste(Interval,Transformation))
+
+plot <- ggplot(df, aes(x=Benchmark,y=Slowdown)) +
+  geom_bar(position="dodge", aes(fill=Type),stat="identity") +
+  ylab("Slowdown") +
+  mytheme()
+
+mysave("slowdown.pdf", plot)
+

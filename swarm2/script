@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --time=1:00:00
-#SBATCH --nodes=10
+#SBATCH --nodes=10-30
 #SBATCH --mem=4096
 #SBATCH --mail-type=ALL
 
@@ -8,10 +8,12 @@ echo "Benchmark,Language,Transformation,Interval,Time" > data.csv
 parallel --controlmaster \
   -j 1 \
   --sshlogin `./parse_nodelist` \
-   $PWD/job.sh ::: ../scala/js-build/* ::: {0,500,1000} ::: {callcc,yield,baseline} >> data.csv
+   $PWD/job.sh ::: ../{scala,python}/js-build/* ::: {0,30000} ::: {callcc,baseline} >> data.csv
 
 R --file=plot.r
-T=`date "+%Y-%m-%dT%H_%M"`
+T=`(cd ../..;git log --pretty=format:'%h' -n 1)`
+
 cp data.csv /mnt/nfs/work1/arjun/arjun/data-$T.csv
 cp data.pdf /mnt/nfs/work1/arjun/arjun/data-$T.pdf
+cp slowdown.pdf /mnt/nfs/work1/arjun/slowdown-$T.pdf
 ssh swarm2 $HOME/repos/plasma-umass/Stopify/benchmarks/swarm2/send_mail
