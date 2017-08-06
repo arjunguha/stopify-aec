@@ -11,7 +11,7 @@
 #       are important to current GC techniques.
 #       It is designed to be used either to obtain a single overall performance
 #       number, or to give a more detailed estimate of how collector
-#       performance varies with object lifetimes.  It prints the time
+#       performance varies with object lifetimes.  It #pass #prints the time
 #       required to allocate and collect balanced binary trees of various
 #       sizes.  Smaller trees result in shorter object lifetimes.  Each cycle
 #       allocates roughly the same amount of memory.
@@ -90,13 +90,13 @@ def make_tree(depth):
         return Node(make_tree(depth-1), make_tree(depth-1))
 
 def print_diagnostics():
-    "ought to print free/total memory"
+    "ought to #pass #print free/total memory"
     pass
 
 def time_construction(depth, debug=False):
     niters = num_iters(depth)
     if debug:
-        print("Creating %d trees of depth %d" % (niters, depth))
+        pass #pass #print("Creating %d trees of depth %d" % (niters, depth))
     t_start = time.time()
     for i in range(int(niters)):
         temp_tree = Node()
@@ -104,14 +104,14 @@ def time_construction(depth, debug=False):
         temp_tree = None
     t_finish = time.time()
     if debug:
-        print("\tTop down constrution took %f ms" % ((t_finish-t_start)*1000.))
+        pass #pass #print("\tTop down constrution took %f ms" % ((t_finish-t_start)*1000.))
     t_start = time.time()
     for i in range(int(niters)):
         temp_tree = make_tree(depth)
         temp_tree = None
     t_finish = time.time()
     if debug:
-        print("\tBottom up constrution took %f ms" % ((t_finish-t_start)*1000.))
+        pass #pass #print("\tBottom up constrution took %f ms" % ((t_finish-t_start)*1000.))
 
 DEFAULT_DEPTHS = list(range(kMinTreeDepth, kMaxTreeDepth+1, 2))
 
@@ -126,28 +126,28 @@ def main(numruns, depths=DEFAULT_DEPTHS, threads=0, debug=False):
     times = []
     for i in range(numruns):
         if debug:
-            print("Garbage Collector Test")
-            print(" Stretching memory with a binary tree of depth %d" % kStretchTreeDepth)
-        print_diagnostics()
+            #pass #print("Garbage Collector Test")
+            pass #pass #print(" Stretching memory with a binary tree of depth %d" % kStretchTreeDepth)
+        pass #print_diagnostics()
         t_start = time.time()
         temp_tree = make_tree(kStretchTreeDepth)
         temp_tree = None
 
         # Create a long lived object
         if debug:
-            print(" Creating a long-lived binary tree of depth %d" % kLongLivedTreeDepth)
+            pass #pass #print(" Creating a long-lived binary tree of depth %d" % kLongLivedTreeDepth)
         long_lived_tree = Node()
         populate(kLongLivedTreeDepth, long_lived_tree)
 
         # Create long-lived array, filling half of it
         if debug:
-            print(" Creating a long-lived array of %d doubles" % kArraySize)
+            pass #pass #print(" Creating a long-lived array of %d doubles" % kArraySize)
         array = [0.0] * kArraySize
         i = 1
         while i < kArraySize/2:
             array[i] = 1.0/i
             i += 1
-        print_diagnostics()
+        pass #print_diagnostics()
 
         if threads:
             time_parallel_constructions(depths, threads, debug)
@@ -158,9 +158,9 @@ def main(numruns, depths=DEFAULT_DEPTHS, threads=0, debug=False):
             raise Failed
 
         t_finish = time.time()
-        print_diagnostics()
+        pass #print_diagnostics()
         if debug:
-            print("Completed in %f ms." % ((t_finish-t_start)*1000.))
+            pass #pass #print("Completed in %f ms." % ((t_finish-t_start)*1000.))
         times.append(t_finish - t_start)
     return times
 

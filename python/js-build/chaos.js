@@ -1,5 +1,5 @@
 "use strict";
-// Transcrypt'ed from Python, 2017-07-27 19:23:04
+// Transcrypt'ed from Python, 2017-08-05 21:24:02
 function chaos () {
    var __symbols__ = ['__py3.6__', '__esv5__'];
     var __all__ = {};
@@ -2531,7 +2531,7 @@ function chaos () {
 				__inited__: false,
 				__init__: function (__all__) {
 					var time = function () {
-						return __div__ (__call__ (Date.now, Date), 1000);
+						return Date.now () / 1000;
 					};
 					__pragma__ ('<all>')
 						__all__.time = time;
@@ -2846,7 +2846,7 @@ function chaos () {
 					basepoint.y = __call__ (__iadd__, null, basepoint.y, __mul__ (__mul__ (__div__ (__neg__ (derivative.x), __call__ (derivative.Mag, derivative)), __sub__ (y, 0.5)), self.thickness));
 				}
 				else {
-					__call__ (print, null, 'r', __kwargtrans__ ({end: ' '}));
+					// pass;
 				}
 				__call__ (self.truncate, self, basepoint);
 				return basepoint;

@@ -1,5 +1,5 @@
 "use strict";
-// Transcrypt'ed from Python, 2017-07-27 19:26:15
+// Transcrypt'ed from Python, 2017-08-05 21:24:06
 function spectral_norm () {
    var __symbols__ = ['__py3.6__', '__esv5__'];
     var __all__ = {};
@@ -2478,7 +2478,7 @@ function spectral_norm () {
 				__inited__: false,
 				__init__: function (__all__) {
 					var time = function () {
-						return __div__ (__call__ (Date.now, Date), 1000);
+						return Date.now () / 1000;
 					};
 					__pragma__ ('<all>')
 						__all__.time = time;
@@ -2494,42 +2494,42 @@ function spectral_norm () {
 		__nest__ (time, '', __init__ (__world__.time));
 		__nest__ (itertools, '', __init__ (__world__.itertools));
 		var eval_A = function (i, j) {
-			return __div__ (1.0, __add__ (__add__ (__div__ (__mul__ (__add__ (i, j), __add__ (__add__ (i, j), 1)), 2), i), 1));
+			return 1.0 / ((((i + j) * ((i + j) + 1)) / 2 + i) + 1);
 		};
 		var eval_A_times_u = function (u) {
 			var args = function () {
 				var __accu0__ = [];
-				for (var i = 0; i < __call__ (len, null, u); i++) {
-					__call__ (__accu0__.append, __accu0__, tuple ([i, u]));
+				for (var i = 0; i < len (u); i++) {
+					__accu0__.append (tuple ([i, u]));
 				}
 				return py_iter (__accu0__);
 			} ();
-			return __call__ (list, null, __call__ (map, null, part_A_times_u, args));
+			return list (map (part_A_times_u, args));
 		};
 		var eval_At_times_u = function (u) {
 			var args = function () {
 				var __accu0__ = [];
-				for (var i = 0; i < __call__ (len, null, u); i++) {
-					__call__ (__accu0__.append, __accu0__, tuple ([i, u]));
+				for (var i = 0; i < len (u); i++) {
+					__accu0__.append (tuple ([i, u]));
 				}
 				return py_iter (__accu0__);
 			} ();
-			return __call__ (list, null, __call__ (map, null, part_At_times_u, args));
+			return list (map (part_At_times_u, args));
 		};
 		var eval_AtA_times_u = function (u) {
-			return __call__ (eval_At_times_u, null, __call__ (eval_A_times_u, null, u));
+			return eval_At_times_u (eval_A_times_u (u));
 		};
 		var part_A_times_u = function (xxx_todo_changeme) {
 			var __left0__ = xxx_todo_changeme;
 			var i = __left0__ [0];
 			var u = __left0__ [1];
 			var partial_sum = 0;
-			var __iterable0__ = __call__ (enumerate, null, u);
+			var __iterable0__ = enumerate (u);
 			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var __left0__ = __getitem__ (__iterable0__, __index0__);
+				var __left0__ = __iterable0__ [__index0__];
 				var j = __left0__ [0];
 				var u_j = __left0__ [1];
-				var partial_sum = __call__ (__iadd__, null, partial_sum, __mul__ (__call__ (eval_A, null, i, j), u_j));
+				partial_sum += eval_A (i, j) * u_j;
 			}
 			return partial_sum;
 		};
@@ -2538,12 +2538,12 @@ function spectral_norm () {
 			var i = __left0__ [0];
 			var u = __left0__ [1];
 			var partial_sum = 0;
-			var __iterable0__ = __call__ (enumerate, null, u);
+			var __iterable0__ = enumerate (u);
 			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var __left0__ = __getitem__ (__iterable0__, __index0__);
+				var __left0__ = __iterable0__ [__index0__];
 				var j = __left0__ [0];
 				var u_j = __left0__ [1];
-				var partial_sum = __call__ (__iadd__, null, partial_sum, __mul__ (__call__ (eval_A, null, j, i), u_j));
+				partial_sum += eval_A (j, i) * u_j;
 			}
 			return partial_sum;
 		};
@@ -2551,30 +2551,30 @@ function spectral_norm () {
 		var main = function (n) {
 			var times = list ([]);
 			for (var i = 0; i < n; i++) {
-				var t0 = __call__ (time.time, time);
-				var u = __mul__ (list ([1]), DEFAULT_N);
+				var t0 = time.time ();
+				var u = list ([1]) * DEFAULT_N;
 				for (var dummy = 0; dummy < 10; dummy++) {
-					var v = __call__ (eval_AtA_times_u, null, u);
-					var u = __call__ (eval_AtA_times_u, null, v);
+					var v = eval_AtA_times_u (u);
+					var u = eval_AtA_times_u (v);
 				}
 				var __left0__ = 0;
 				var vBv = __left0__;
 				var vv = __left0__;
-				var __iterable0__ = __call__ (zip, null, u, v);
+				var __iterable0__ = zip (u, v);
 				for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-					var __left0__ = __getitem__ (__iterable0__, __index0__);
+					var __left0__ = __iterable0__ [__index0__];
 					var ue = __left0__ [0];
 					var ve = __left0__ [1];
-					var vBv = __call__ (__iadd__, null, vBv, __mul__ (ue, ve));
-					var vv = __call__ (__iadd__, null, vv, __mul__ (ve, ve));
+					vBv += ue * ve;
+					vv += ve * ve;
 				}
-				var tk = __call__ (time.time, time);
-				__call__ (times.append, times, __sub__ (tk, t0));
+				var tk = time.time ();
+				times.append (tk - t0);
 			}
 			return times;
 		};
-		__call__ (main, null, 10);
-		__call__ (print, null, 'Done');
+		main (10);
+		// pass;
 		__pragma__ ('<use>' +
 			'itertools' +
 			'math' +

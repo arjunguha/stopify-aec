@@ -1,5 +1,5 @@
 "use strict";
-// Transcrypt'ed from Python, 2017-07-27 19:23:08
+// Transcrypt'ed from Python, 2017-08-05 21:24:40
 function gcbench () {
    var __symbols__ = ['__py3.6__', '__esv5__'];
     var __all__ = {};
@@ -2367,7 +2367,7 @@ function gcbench () {
 				__inited__: false,
 				__init__: function (__all__) {
 					var time = function () {
-						return __div__ (__call__ (Date.now, Date), 1000);
+						return Date.now () / 1000;
 					};
 					__pragma__ ('<all>')
 						__all__.time = time;
@@ -2433,7 +2433,7 @@ function gcbench () {
 			};
 			var niters = __call__ (num_iters, null, depth);
 			if (debug) {
-				__call__ (print, null, __mod__ ('Creating %d trees of depth %d', tuple ([niters, depth])));
+				// pass;
 			}
 			var t_start = __call__ (time.time, time);
 			for (var i = 0; i < __call__ (int, null, niters); i++) {
@@ -2443,7 +2443,7 @@ function gcbench () {
 			}
 			var t_finish = __call__ (time.time, time);
 			if (debug) {
-				__call__ (print, null, __mod__ ('\tTop down constrution took %f ms', __mul__ (__sub__ (t_finish, t_start), 1000.0)));
+				// pass;
 			}
 			var t_start = __call__ (time.time, time);
 			for (var i = 0; i < __call__ (int, null, niters); i++) {
@@ -2452,7 +2452,7 @@ function gcbench () {
 			}
 			var t_finish = __call__ (time.time, time);
 			if (debug) {
-				__call__ (print, null, __mod__ ('\tBottom up constrution took %f ms', __mul__ (__sub__ (t_finish, t_start), 1000.0)));
+				// pass;
 			}
 		};
 		var DEFAULT_DEPTHS = __call__ (list, null, __call__ (range, null, kMinTreeDepth, __add__ (kMaxTreeDepth, 1), 2));
@@ -2487,20 +2487,19 @@ function gcbench () {
 			var times = list ([]);
 			for (var i = 0; i < numruns; i++) {
 				if (debug) {
-					__call__ (print, null, 'Garbage Collector Test');
-					__call__ (print, null, __mod__ (' Stretching memory with a binary tree of depth %d', kStretchTreeDepth));
+					// pass;
 				}
-				__call__ (print_diagnostics, null);
+				// pass;
 				var t_start = __call__ (time.time, time);
 				var temp_tree = __call__ (make_tree, null, kStretchTreeDepth);
 				var temp_tree = null;
 				if (debug) {
-					__call__ (print, null, __mod__ (' Creating a long-lived binary tree of depth %d', kLongLivedTreeDepth));
+					// pass;
 				}
 				var long_lived_tree = __call__ (Node, null);
 				__call__ (populate, null, kLongLivedTreeDepth, long_lived_tree);
 				if (debug) {
-					__call__ (print, null, __mod__ (' Creating a long-lived array of %d doubles', kArraySize));
+					// pass;
 				}
 				var array = __mul__ (list ([0.0]), kArraySize);
 				var i = 1;
@@ -2508,7 +2507,7 @@ function gcbench () {
 					__setitem__ (array, i, __div__ (1.0, i));
 					var i = __call__ (__iadd__, null, i, 1);
 				}
-				__call__ (print_diagnostics, null);
+				// pass;
 				if (threads) {
 					__call__ (time_parallel_constructions, null, depths, threads, debug);
 				}
@@ -2521,9 +2520,9 @@ function gcbench () {
 					throw __except0__;
 				}
 				var t_finish = __call__ (time.time, time);
-				__call__ (print_diagnostics, null);
+				// pass;
 				if (debug) {
-					__call__ (print, null, __mod__ ('Completed in %f ms.', __mul__ (__sub__ (t_finish, t_start), 1000.0)));
+					// pass;
 				}
 				__call__ (times.append, times, __sub__ (t_finish, t_start));
 			}

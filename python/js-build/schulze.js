@@ -1,5 +1,5 @@
 "use strict";
-// Transcrypt'ed from Python, 2017-07-27 19:26:00
+// Transcrypt'ed from Python, 2017-08-05 21:24:05
 function schulze () {
    var __symbols__ = ['__py3.6__', '__esv5__'];
     var __all__ = {};
@@ -2366,8 +2366,8 @@ function schulze () {
 			var __accu0__ = [];
 			var __iterable0__ = lines;
 			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var line = __getitem__ (__iterable0__, __index0__);
-				__call__ (__accu0__.append, __accu0__, __call__ (__getslice__ (line, 14, null, 1).rstrip, __getslice__ (line, 14, null, 1)));
+				var line = __iterable0__ [__index0__];
+				__accu0__.append (line.__getslice__ (14, null, 1).rstrip ());
 			}
 			return __accu0__;
 		} ();
@@ -2375,97 +2375,97 @@ function schulze () {
 			var __accu0__ = [];
 			var __iterable0__ = lines;
 			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var line = __getitem__ (__iterable0__, __index0__);
-				__call__ (__accu0__.append, __accu0__, __call__ (line.py_split, line, ' '));
+				var line = __iterable0__ [__index0__];
+				__accu0__.append (line.py_split (' '));
 			}
 			return __accu0__;
 		} ();
 		var candidates = dict ({});
 		var __iterable0__ = votes;
 		for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-			var line = __getitem__ (__iterable0__, __index0__);
+			var line = __iterable0__ [__index0__];
 			var __iterable1__ = line;
 			for (var __index1__ = 0; __index1__ < __iterable1__.length; __index1__++) {
-				var memberId = __getitem__ (__iterable1__, __index1__);
-				__setitem__ (candidates, memberId, 1);
+				var memberId = __iterable1__ [__index1__];
+				candidates [memberId] = 1;
 			}
 		}
-		var __iterable0__ = __call__ (enumerate, null, __call__ (candidates.py_keys, candidates));
+		var __iterable0__ = enumerate (candidates.py_keys ());
 		for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-			var __left0__ = __getitem__ (__iterable0__, __index0__);
+			var __left0__ = __iterable0__ [__index0__];
 			var i = __left0__ [0];
 			var k = __left0__ [1];
-			__setitem__ (candidates, k, i);
+			candidates [k] = i;
 		}
 		var reverseCandidates = dict ({});
-		var __iterable0__ = __call__ (list, null, __call__ (candidates.py_items, candidates));
+		var __iterable0__ = list (candidates.py_items ());
 		for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-			var __left0__ = __getitem__ (__iterable0__, __index0__);
+			var __left0__ = __iterable0__ [__index0__];
 			var k = __left0__ [0];
 			var v = __left0__ [1];
-			__setitem__ (reverseCandidates, v, k);
+			reverseCandidates [v] = k;
 		}
 		var numbers = function () {
 			var __accu0__ = [];
 			var __iterable0__ = votes;
 			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var line = __getitem__ (__iterable0__, __index0__);
-				__call__ (__accu0__.append, __accu0__, function () {
+				var line = __iterable0__ [__index0__];
+				__accu0__.append (function () {
 					var __accu1__ = [];
 					var __iterable1__ = line;
 					for (var __index1__ = 0; __index1__ < __iterable1__.length; __index1__++) {
-						var memberId = __getitem__ (__iterable1__, __index1__);
-						__call__ (__accu1__.append, __accu1__, __getitem__ (candidates, memberId));
+						var memberId = __iterable1__ [__index1__];
+						__accu1__.append (candidates [memberId]);
 					}
 					return __accu1__;
 				} ());
 			}
 			return __accu0__;
 		} ();
-		var size = __call__ (len, null, candidates);
+		var size = len (candidates);
 		var row = list ([]);
 		for (var i = 0; i < size; i++) {
-			__call__ (row.append, row, 0);
+			row.append (0);
 		}
 		var d = list ([]);
 		var p = list ([]);
 		for (var i = 0; i < size; i++) {
-			__call__ (d.append, d, __getslice__ (row, 0, null, 1));
-			__call__ (p.append, p, __getslice__ (row, 0, null, 1));
+			d.append (row.__getslice__ (0, null, 1));
+			p.append (row.__getslice__ (0, null, 1));
 		}
 		for (var i = 0; i < size; i++) {
 			var __iterable0__ = numbers;
 			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var line = __getitem__ (__iterable0__, __index0__);
+				var line = __iterable0__ [__index0__];
 				var __iterable1__ = line;
 				for (var __index1__ = 0; __index1__ < __iterable1__.length; __index1__++) {
-					var entry = __getitem__ (__iterable1__, __index1__);
-					if (__eq__ (entry, i)) {
+					var entry = __iterable1__ [__index1__];
+					if (entry == i) {
 						break;
 					}
-					__setitem__ (__getitem__ (d, entry), i, __call__ (__iadd__, null, __getitem__ (__getitem__ (d, entry), i), 1));
+					d [entry] [i]++;
 				}
 			}
 		}
 		for (var i = 0; i < size; i++) {
 			for (var j = 0; j < size; j++) {
-				if (__ne__ (i, j)) {
-					if (__gt__ (__getitem__ (__getitem__ (d, i), j), __getitem__ (__getitem__ (d, j), i))) {
-						__setitem__ (__getitem__ (p, i), j, __getitem__ (__getitem__ (d, i), j));
+				if (i != j) {
+					if (d [i] [j] > d [j] [i]) {
+						p [i] [j] = d [i] [j];
 					}
 					else {
-						__setitem__ (__getitem__ (p, i), j, 0);
+						p [i] [j] = 0;
 					}
 				}
 			}
 		}
 		for (var i = 0; i < size; i++) {
 			for (var j = 0; j < size; j++) {
-				if (__ne__ (i, j)) {
+				if (i != j) {
 					for (var k = 0; k < size; k++) {
-						if (__ne__ (i, k)) {
-							if (__ne__ (j, k)) {
-								__setitem__ (__getitem__ (p, j), k, __call__ (max, null, __getitem__ (__getitem__ (p, j), k), __call__ (min, null, __getitem__ (__getitem__ (p, j), i), __getitem__ (__getitem__ (p, i), k))));
+						if (i != k) {
+							if (j != k) {
+								p [j] [k] = max (p [j] [k], min (p [j] [i], p [i] [k]));
 							}
 						}
 					}
@@ -2473,34 +2473,34 @@ function schulze () {
 			}
 		}
 		var order = list ([]);
-		var cl = __call__ (list, null, __call__ (range, null, size));
+		var cl = list (range (size));
 		while (cl) {
 			var __iterable0__ = cl;
 			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var c = __getitem__ (__iterable0__, __index0__);
+				var c = __iterable0__ [__index0__];
 				var __break2__ = false;
 				var __iterable1__ = cl;
 				for (var __index1__ = 0; __index1__ < __iterable1__.length; __index1__++) {
-					var n = __getitem__ (__iterable1__, __index1__);
-					if (__ne__ (c, n)) {
-						if (__lt__ (__getitem__ (__getitem__ (p, c), n), __getitem__ (__getitem__ (p, n), c))) {
+					var n = __iterable1__ [__index1__];
+					if (c != n) {
+						if (p [c] [n] < p [n] [c]) {
 							__break2__ = true;
 							break;
 						}
 					}
 				}
 				if (!__break2__) {
-					__call__ (order.append, order, c);
-					__call__ (cl.remove, cl, c);
+					order.append (c);
+					cl.remove (c);
 				}
 			}
 		}
 		var j = 0;
 		var __iterable0__ = order;
 		for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-			var i = __getitem__ (__iterable0__, __index0__);
-			var j = __call__ (__iadd__, null, j, 1);
-			__call__ (print, null, __mod__ ('%3d %s', tuple ([j, __getitem__ (reverseCandidates, i)])));
+			var i = __iterable0__ [__index0__];
+			j++;
+			// pass;
 		}
 		__pragma__ ('<all>')
 			__all__.c = c;

@@ -1,5 +1,5 @@
 "use strict";
-// Transcrypt'ed from Python, 2017-07-27 19:25:29
+// Transcrypt'ed from Python, 2017-08-05 21:24:05
 function richards () {
    var __symbols__ = ['__py3.6__', '__esv5__'];
     var __all__ = {};
@@ -2367,7 +2367,7 @@ function richards () {
 				__inited__: false,
 				__init__: function (__all__) {
 					var time = function () {
-						return __div__ (__call__ (Date.now, Date), 1000);
+						return Date.now () / 1000;
 					};
 					__pragma__ ('<all>')
 						__all__.time = time;
@@ -2387,14 +2387,14 @@ function richards () {
 		var K_DEV = 1000;
 		var K_WORK = 1001;
 		var BUFSIZE = 4;
-		var BUFSIZE_RANGE = __call__ (list, null, __call__ (range, null, BUFSIZE));
+		var BUFSIZE_RANGE = list (range (BUFSIZE));
 		var Packet = __class__ ('Packet', [object], {
 			get __init__ () {return __get__ (this, function (self, l, i, k) {
 				self.link = l;
 				self.ident = i;
 				self.kind = k;
 				self.datum = 0;
-				self.data = __mul__ (list ([0]), BUFSIZE);
+				self.data = list ([0]) * BUFSIZE;
 			});},
 			get append_to () {return __get__ (this, function (self, lst) {
 				self.link = null;
@@ -2432,11 +2432,11 @@ function richards () {
 				self.device_in = null;
 			});},
 			get workInAdd () {return __get__ (this, function (self, p) {
-				self.work_in = __call__ (p.append_to, p, self.work_in);
+				self.work_in = p.append_to (self.work_in);
 				return self.work_in;
 			});},
 			get deviceInAdd () {return __get__ (this, function (self, p) {
-				self.device_in = __call__ (p.append_to, p, self.device_in);
+				self.device_in = p.append_to (self.device_in);
 				return self.device_in;
 			});}
 		});
@@ -2495,35 +2495,35 @@ function richards () {
 		var tracing = false;
 		var layout = 0;
 		var trace = function (a) {
-			layout = __call__ (__isub__, null, layout, 1);
-			if (__le__ (layout, 0)) {
-				__call__ (print, null);
+			layout--;
+			if (layout <= 0) {
+				// pass;
 				layout = 50;
 			}
-			__call__ (print, null, a, __kwargtrans__ ({end: ' '}));
+			// pass;
 		};
 		var TASKTABSIZE = 10;
 		var TaskWorkArea = __class__ ('TaskWorkArea', [object], {
 			get __init__ () {return __get__ (this, function (self) {
-				self.taskTab = __mul__ (list ([null]), TASKTABSIZE);
+				self.taskTab = list ([null]) * TASKTABSIZE;
 				self.taskList = null;
 				self.holdCount = 0;
 				self.qpktCount = 0;
 			});}
 		});
-		var taskWorkArea = __call__ (TaskWorkArea, null);
+		var taskWorkArea = TaskWorkArea ();
 		var Task = __class__ ('Task', [TaskState], {
 			get __init__ () {return __get__ (this, function (self, i, p, w, initialState, r) {
 				self.link = taskWorkArea.taskList;
 				self.ident = i;
 				self.priority = p;
 				self.input = w;
-				self.packet_pending = __call__ (initialState.isPacketPending, initialState);
-				self.task_waiting = __call__ (initialState.isTaskWaiting, initialState);
-				self.task_holding = __call__ (initialState.isTaskHolding, initialState);
+				self.packet_pending = initialState.isPacketPending ();
+				self.task_waiting = initialState.isTaskWaiting ();
+				self.task_holding = initialState.isTaskHolding ();
 				self.handle = r;
 				taskWorkArea.taskList = self;
-				__setitem__ (taskWorkArea.taskTab, i, self);
+				taskWorkArea.taskTab [i] = self;
 			});},
 			get fn () {return __get__ (this, function (self, pkt, r) {
 				var __except0__ = NotImplementedError;
@@ -2534,44 +2534,44 @@ function richards () {
 				if (self.input === null) {
 					self.input = p;
 					self.packet_pending = true;
-					if (__gt__ (self.priority, old.priority)) {
+					if (self.priority > old.priority) {
 						return self;
 					}
 				}
 				else {
-					__call__ (p.append_to, p, self.input);
+					p.append_to (self.input);
 				}
 				return old;
 			});},
 			get runTask () {return __get__ (this, function (self) {
-				if (__call__ (self.isWaitingWithPacket, self)) {
+				if (self.isWaitingWithPacket ()) {
 					var msg = self.input;
 					self.input = msg.link;
 					if (self.input === null) {
-						__call__ (self.running, self);
+						self.running ();
 					}
 					else {
-						__call__ (self.packetPending, self);
+						self.packetPending ();
 					}
 				}
 				else {
 					var msg = null;
 				}
-				return __call__ (self.fn, self, msg, self.handle);
+				return self.fn (msg, self.handle);
 			});},
 			get waitTask () {return __get__ (this, function (self) {
 				self.task_waiting = true;
 				return self;
 			});},
 			get hold () {return __get__ (this, function (self) {
-				taskWorkArea.holdCount = __call__ (__iadd__, null, taskWorkArea.holdCount, 1);
+				taskWorkArea.holdCount++;
 				self.task_holding = true;
 				return self.link;
 			});},
 			get release () {return __get__ (this, function (self, i) {
-				var t = __call__ (self.findtcb, self, i);
+				var t = self.findtcb (i);
 				t.task_holding = false;
-				if (__gt__ (t.priority, self.priority)) {
+				if (t.priority > self.priority) {
 					return t;
 				}
 				else {
@@ -2579,16 +2579,16 @@ function richards () {
 				}
 			});},
 			get qpkt () {return __get__ (this, function (self, pkt) {
-				var t = __call__ (self.findtcb, self, pkt.ident);
-				taskWorkArea.qpktCount = __call__ (__iadd__, null, taskWorkArea.qpktCount, 1);
+				var t = self.findtcb (pkt.ident);
+				taskWorkArea.qpktCount++;
 				pkt.link = null;
 				pkt.ident = self.ident;
-				return __call__ (t.addPacket, t, pkt, self);
+				return t.addPacket (pkt, self);
 			});},
 			get findtcb () {return __get__ (this, function (self, id) {
-				var t = __getitem__ (taskWorkArea.taskTab, id);
+				var t = taskWorkArea.taskTab [id];
 				if (t === null) {
-					var __except0__ = __call__ (Exception, null, __mod__ ('Bad task id %d', id));
+					var __except0__ = Exception (__mod__ ('Bad task id %d', id));
 					__except0__.__cause__ = null;
 					throw __except0__;
 				}
@@ -2597,93 +2597,93 @@ function richards () {
 		});
 		var DeviceTask = __class__ ('DeviceTask', [Task], {
 			get __init__ () {return __get__ (this, function (self, i, p, w, s, r) {
-				__call__ (Task.__init__, Task, self, i, p, w, s, r);
+				Task.__init__ (self, i, p, w, s, r);
 			});},
 			get fn () {return __get__ (this, function (self, pkt, r) {
 				var d = r;
 				if (pkt === null) {
 					var pkt = d.pending;
 					if (pkt === null) {
-						return __call__ (self.waitTask, self);
+						return self.waitTask ();
 					}
 					else {
 						d.pending = null;
-						return __call__ (self.qpkt, self, pkt);
+						return self.qpkt (pkt);
 					}
 				}
 				else {
 					d.pending = pkt;
 					if (tracing) {
-						__call__ (trace, null, pkt.datum);
+						trace (pkt.datum);
 					}
-					return __call__ (self.hold, self);
+					return self.hold ();
 				}
 			});}
 		});
 		var HandlerTask = __class__ ('HandlerTask', [Task], {
 			get __init__ () {return __get__ (this, function (self, i, p, w, s, r) {
-				__call__ (Task.__init__, Task, self, i, p, w, s, r);
+				Task.__init__ (self, i, p, w, s, r);
 			});},
 			get fn () {return __get__ (this, function (self, pkt, r) {
 				var h = r;
 				if (pkt !== null) {
-					if (__eq__ (pkt.kind, K_WORK)) {
-						__call__ (h.workInAdd, h, pkt);
+					if (pkt.kind == K_WORK) {
+						h.workInAdd (pkt);
 					}
 					else {
-						__call__ (h.deviceInAdd, h, pkt);
+						h.deviceInAdd (pkt);
 					}
 				}
 				var work = h.work_in;
 				if (work === null) {
-					return __call__ (self.waitTask, self);
+					return self.waitTask ();
 				}
 				var count = work.datum;
-				if (__ge__ (count, BUFSIZE)) {
+				if (count >= BUFSIZE) {
 					h.work_in = work.link;
-					return __call__ (self.qpkt, self, work);
+					return self.qpkt (work);
 				}
 				var dev = h.device_in;
 				if (dev === null) {
-					return __call__ (self.waitTask, self);
+					return self.waitTask ();
 				}
 				h.device_in = dev.link;
-				dev.datum = __getitem__ (work.data, count);
-				work.datum = __add__ (count, 1);
-				return __call__ (self.qpkt, self, dev);
+				dev.datum = work.data [count];
+				work.datum = count + 1;
+				return self.qpkt (dev);
 			});}
 		});
 		var IdleTask = __class__ ('IdleTask', [Task], {
 			get __init__ () {return __get__ (this, function (self, i, p, w, s, r) {
-				__call__ (Task.__init__, Task, self, i, 0, null, s, r);
+				Task.__init__ (self, i, 0, null, s, r);
 			});},
 			get fn () {return __get__ (this, function (self, pkt, r) {
 				var i = r;
-				i.count = __call__ (__isub__, null, i.count, 1);
-				if (__eq__ (i.count, 0)) {
-					return __call__ (self.hold, self);
+				i.count--;
+				if (i.count == 0) {
+					return self.hold ();
 				}
-				else if (__eq__ ((__and__ (__call__ (int, null, i.control), 1)), 0)) {
-					i.control = __call__ (__idiv__, null, i.control, 2);
-					return __call__ (self.release, self, I_DEVA);
+				else if ((int (i.control) & 1) == 0) {
+					i.control /= 2;
+					return self.release (I_DEVA);
 				}
 				else {
-					i.control = __xor__ (__call__ (int, null, __div__ (i.control, 2)), 53256);
-					return __call__ (self.release, self, I_DEVB);
+					i.control = int (i.control / 2) ^ 53256;
+					return self.release (I_DEVB);
 				}
 			});}
 		});
-		var A = __call__ (ord, null, 'A');
+		var A = ord ('A');
 		var WorkTask = __class__ ('WorkTask', [Task], {
 			get __init__ () {return __get__ (this, function (self, i, p, w, s, r) {
-				__call__ (Task.__init__, Task, self, i, p, w, s, r);
+				Task.__init__ (self, i, p, w, s, r);
 			});},
 			get fn () {return __get__ (this, function (self, pkt, r) {
 				var w = r;
 				if (pkt === null) {
-					return __call__ (self.waitTask, self);
+					return self.waitTask ();
 				}
-				if (__eq__ (w.destination, I_HANDLERA)) {
+				if (w.destination == I_HANDLERA) {
 					var dest = I_HANDLERB;
 				}
 				else {
@@ -2694,14 +2694,14 @@ function richards () {
 				pkt.datum = 0;
 				var __iterable0__ = BUFSIZE_RANGE;
 				for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-					var i = __getitem__ (__iterable0__, __index0__);
-					w.count = __call__ (__iadd__, null, w.count, 1);
-					if (__gt__ (w.count, 26)) {
+					var i = __iterable0__ [__index0__];
+					w.count++;
+					if (w.count > 26) {
 						w.count = 1;
 					}
-					__setitem__ (pkt.data, i, __sub__ (__add__ (A, w.count), 1));
+					pkt.data [i] = (A + w.count) - 1;
 				}
-				return __call__ (self.qpkt, self, pkt);
+				return self.qpkt (pkt);
 			});}
 		});
 		__nest__ (time, '', __init__ (__world__.time));
@@ -2710,16 +2710,16 @@ function richards () {
 			while (t !== null) {
 				var pkt = null;
 				if (tracing) {
-					__call__ (print, null, 'tcb =', t.ident);
+					// pass;
 				}
-				if (__call__ (t.isTaskHoldingOrWaiting, t)) {
+				if (t.isTaskHoldingOrWaiting ()) {
 					var t = t.link;
 				}
 				else {
 					if (tracing) {
-						__call__ (trace, null, __call__ (chr, null, __add__ (__call__ (ord, null, '0'), t.ident)));
+						trace (chr (ord ('0') + t.ident));
 					}
-					var t = __call__ (t.runTask, t);
+					var t = t.runTask ();
 				}
 			}
 		};
@@ -2728,23 +2728,23 @@ function richards () {
 				for (var i = 0; i < iterations; i++) {
 					taskWorkArea.holdCount = 0;
 					taskWorkArea.qpktCount = 0;
-					__call__ (IdleTask, null, I_IDLE, 1, 10000, __call__ (__call__ (TaskState, null).running, __call__ (TaskState, null)), __call__ (IdleTaskRec, null));
-					var wkq = __call__ (Packet, null, null, 0, K_WORK);
-					var wkq = __call__ (Packet, null, wkq, 0, K_WORK);
-					__call__ (WorkTask, null, I_WORK, 1000, wkq, __call__ (__call__ (TaskState, null).waitingWithPacket, __call__ (TaskState, null)), __call__ (WorkerTaskRec, null));
-					var wkq = __call__ (Packet, null, null, I_DEVA, K_DEV);
-					var wkq = __call__ (Packet, null, wkq, I_DEVA, K_DEV);
-					var wkq = __call__ (Packet, null, wkq, I_DEVA, K_DEV);
-					__call__ (HandlerTask, null, I_HANDLERA, 2000, wkq, __call__ (__call__ (TaskState, null).waitingWithPacket, __call__ (TaskState, null)), __call__ (HandlerTaskRec, null));
-					var wkq = __call__ (Packet, null, null, I_DEVB, K_DEV);
-					var wkq = __call__ (Packet, null, wkq, I_DEVB, K_DEV);
-					var wkq = __call__ (Packet, null, wkq, I_DEVB, K_DEV);
-					__call__ (HandlerTask, null, I_HANDLERB, 3000, wkq, __call__ (__call__ (TaskState, null).waitingWithPacket, __call__ (TaskState, null)), __call__ (HandlerTaskRec, null));
+					IdleTask (I_IDLE, 1, 10000, TaskState ().running (), IdleTaskRec ());
+					var wkq = Packet (null, 0, K_WORK);
+					var wkq = Packet (wkq, 0, K_WORK);
+					WorkTask (I_WORK, 1000, wkq, TaskState ().waitingWithPacket (), WorkerTaskRec ());
+					var wkq = Packet (null, I_DEVA, K_DEV);
+					var wkq = Packet (wkq, I_DEVA, K_DEV);
+					var wkq = Packet (wkq, I_DEVA, K_DEV);
+					HandlerTask (I_HANDLERA, 2000, wkq, TaskState ().waitingWithPacket (), HandlerTaskRec ());
+					var wkq = Packet (null, I_DEVB, K_DEV);
+					var wkq = Packet (wkq, I_DEVB, K_DEV);
+					var wkq = Packet (wkq, I_DEVB, K_DEV);
+					HandlerTask (I_HANDLERB, 3000, wkq, TaskState ().waitingWithPacket (), HandlerTaskRec ());
 					var wkq = null;
-					__call__ (DeviceTask, null, I_DEVA, 4000, wkq, __call__ (__call__ (TaskState, null).waiting, __call__ (TaskState, null)), __call__ (DeviceTaskRec, null));
-					__call__ (DeviceTask, null, I_DEVB, 5000, wkq, __call__ (__call__ (TaskState, null).waiting, __call__ (TaskState, null)), __call__ (DeviceTaskRec, null));
-					__call__ (schedule, null);
-					if (__eq__ (taskWorkArea.holdCount, 9297) && __eq__ (taskWorkArea.qpktCount, 23246)) {
+					DeviceTask (I_DEVA, 4000, wkq, TaskState ().waiting (), DeviceTaskRec ());
+					DeviceTask (I_DEVB, 5000, wkq, TaskState ().waiting (), DeviceTaskRec ());
+					schedule ();
+					if (taskWorkArea.holdCount == 9297 && taskWorkArea.qpktCount == 23246) {
 						// pass;
 					}
 					else {
@@ -2755,10 +2755,10 @@ function richards () {
 			});}
 		});
 		var entry_point = function (iterations) {
-			var r = __call__ (Richards, null);
-			var startTime = __call__ (time.time, time);
-			var result = __call__ (r.run, r, iterations);
-			var endTime = __call__ (time.time, time);
+			var r = Richards ();
+			var startTime = time.time ();
+			var result = r.run (iterations);
+			var endTime = time.time ();
 			return tuple ([result, startTime, endTime]);
 		};
 		var main = function (entry_point, iterations) {
@@ -2768,22 +2768,22 @@ function richards () {
 			if (typeof iterations == 'undefined' || (iterations != null && iterations .hasOwnProperty ("__kwargtrans__"))) {;
 				var iterations = 10;
 			};
-			__call__ (print, null, 'Richards benchmark (Python) starting... [%r]', entry_point);
-			var __left0__ = __call__ (entry_point, null, iterations);
+			// pass;
+			var __left0__ = entry_point (iterations);
 			var result = __left0__ [0];
 			var startTime = __left0__ [1];
 			var endTime = __left0__ [2];
 			if (!(result)) {
-				__call__ (print, null, 'Incorrect results!');
-				return __neg__ (1);
+				// pass;
+				return -(1);
 			}
-			__call__ (print, null, 'finished.');
-			var total_s = __sub__ (endTime, startTime);
-			__call__ (print, null, 'Total time for %d iterations: %.2f secs', iterations, total_s);
-			__call__ (print, null, 'Average time per iteration: %.2f ms', __div__ (__mul__ (total_s, 1000), iterations));
+			// pass;
+			var total_s = endTime - startTime;
+			// pass;
+			// pass;
 			return 42;
 		};
-		__call__ (main, null, entry_point, 10);
+		main (entry_point, 10);
 		__pragma__ ('<use>' +
 			'time' +
 		'</use>')

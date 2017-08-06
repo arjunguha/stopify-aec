@@ -8,6 +8,7 @@ A somewhat incomplete list of changes:
 - Disabled saving output to file in raytrace-simple
 - Inlined the file in schulze.py
 - Changed pystone to use time.time() instead of time.clock()
+- Removed all print statements
 
 Screwed up ATM:
 

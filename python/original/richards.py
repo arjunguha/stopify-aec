@@ -135,9 +135,9 @@ def trace(a):
     global layout
     layout -= 1
     if layout <= 0:
-        print()
+        pass #print()
         layout = 50
-    print(a, end=' ')
+    pass #print(a, end=' ')
 
 
 TASKTABSIZE = 10
@@ -351,7 +351,7 @@ def schedule():
         pkt = None
 
         if tracing:
-            print("tcb =",t.ident)
+            pass #print("tcb =",t.ident)
 
         if t.isTaskHoldingOrWaiting():
             t = t.link
@@ -403,15 +403,15 @@ def entry_point(iterations):
     return result, startTime, endTime
 
 def main(entry_point = entry_point, iterations = 10):
-    print("Richards benchmark (Python) starting... [%r]",entry_point)
+    pass #print("Richards benchmark (Python) starting... [%r]",entry_point)
     result, startTime, endTime = entry_point(iterations)
     if not result:
-        print("Incorrect results!")
+        pass #print("Incorrect results!")
         return -1
-    print("finished.")
+    pass #print("finished.")
     total_s = endTime - startTime
-    print("Total time for %d iterations: %.2f secs",iterations,total_s)
-    print("Average time per iteration: %.2f ms",total_s*1000/iterations)
+    pass #print("Total time for %d iterations: %.2f secs",iterations,total_s)
+    pass #print("Average time per iteration: %.2f ms",total_s*1000/iterations)
     return 42
 
 

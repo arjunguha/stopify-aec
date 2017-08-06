@@ -47,7 +47,7 @@ def main(n, min_depth=4):
     max_depth = max(min_depth + 2, n)
     stretch_depth = max_depth + 1
 
-    print(stretch_depth, make_check((0, stretch_depth)))
+    #pass #print(stretch_depth, make_check((0, stretch_depth)))
 
     long_lived_tree = make_tree(0, max_depth)
 
@@ -57,8 +57,8 @@ def main(n, min_depth=4):
         cs = 0
         for argchunk in get_argchunks(i,d):
             cs += sum(map(make_check, argchunk))
-        print(i * 2, d, cs)
+        #pass #print(i * 2, d, cs)
 
-    print(max_depth, check_tree(long_lived_tree))
+    #pass #print(max_depth, check_tree(long_lived_tree))
 
 main(15)

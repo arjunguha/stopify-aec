@@ -1,6 +1,6 @@
 "use strict";
-// Transcrypt'ed from Python, 2017-08-05 21:24:03
-function nbody_modified () {
+// Transcrypt'ed from Python, 2017-08-05 21:24:01
+function binary_trees () {
    var __symbols__ = ['__py3.6__', '__esv5__'];
     var __all__ = {};
     var __world__ = __all__;
@@ -2360,199 +2360,82 @@ function nbody_modified () {
     };
     __all__.__setslice__ = __setslice__;
 
-	__nest__ (
-		__all__,
-		'time', {
-			__all__: {
-				__inited__: false,
-				__init__: function (__all__) {
-					var time = function () {
-						return Date.now () / 1000;
-					};
-					__pragma__ ('<all>')
-						__all__.time = time;
-					__pragma__ ('</all>')
-				}
-			}
-		}
-	);
 	(function () {
-		var time = {};
-		__nest__ (time, '', __init__ (__world__.time));
-		var combinations = function (l) {
-			var result = list ([]);
-			for (var x = 0; x < len (l) - 1; x++) {
-				var ls = l.__getslice__ (x + 1, null, 1);
-				var __iterable0__ = ls;
-				for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-					var y = __iterable0__ [__index0__];
-					result.append (tuple ([l [x], y]));
+		var make_tree = function (i, d) {
+			if (d > 0) {
+				var i2 = i + i;
+				d--;
+				return tuple ([i, make_tree (i2 - 1, d), make_tree (i2, d)]);
+			}
+			return tuple ([i, null, null]);
+		};
+		var check_tree = function (node) {
+			var __left0__ = node;
+			var i = __left0__ [0];
+			var l = __left0__ [1];
+			var r = __left0__ [2];
+			if (l === null) {
+				return i;
+			}
+			else {
+				return (i + check_tree (l)) - check_tree (r);
+			}
+		};
+		var make_check = function (itde, make, check) {
+			if (typeof make == 'undefined' || (make != null && make .hasOwnProperty ("__kwargtrans__"))) {;
+				var make = make_tree;
+			};
+			if (typeof check == 'undefined' || (check != null && check .hasOwnProperty ("__kwargtrans__"))) {;
+				var check = check_tree;
+			};
+			var __left0__ = itde;
+			var i = __left0__ [0];
+			var d = __left0__ [1];
+			return check (make (i, d));
+		};
+		var get_argchunks = function* (i, d, chunksize) {
+			if (typeof chunksize == 'undefined' || (chunksize != null && chunksize .hasOwnProperty ("__kwargtrans__"))) {;
+				var chunksize = 5000;
+			};
+			var chunk = list ([]);
+			for (var k = 1; k < i + 1; k++) {
+				chunk.extend (list ([tuple ([k, d]), tuple ([-(k), d])]));
+				if (len (chunk) == chunksize) {
+					yield chunk;
+					var chunk = list ([]);
 				}
 			}
-			return result;
+			if (len (chunk) > 0) {
+				yield chunk;
+			}
 		};
-		var PI = 3.141592653589793;
-		var SOLAR_MASS = (4 * PI) * PI;
-		var DAYS_PER_YEAR = 365.24;
-		var BODIES = dict ({'sun': tuple ([list ([0.0, 0.0, 0.0]), list ([0.0, 0.0, 0.0]), SOLAR_MASS]), 'jupiter': tuple ([list ([4.841431442464721, -(1.1603200440274284), -(0.10362204447112311)]), list ([0.001660076642744037 * DAYS_PER_YEAR, 0.007699011184197404 * DAYS_PER_YEAR, -(6.90460016972063e-05) * DAYS_PER_YEAR]), 0.0009547919384243266 * SOLAR_MASS]), 'saturn': tuple ([list ([8.34336671824458, 4.124798564124305, -(0.4035234171143214)]), list ([-(0.002767425107268624) * DAYS_PER_YEAR, 0.004998528012349172 * DAYS_PER_YEAR, 2.3041729757376393e-05 * DAYS_PER_YEAR]), 0.0002858859806661308 * SOLAR_MASS]), 'uranus': tuple ([list ([12.894369562139131, -(15.111151401698631), -(0.22330757889265573)]), list ([0.002964601375647616 * DAYS_PER_YEAR, 0.0023784717395948095 * DAYS_PER_YEAR, -(2.9658956854023756e-05) * DAYS_PER_YEAR]), 4.366244043351563e-05 * SOLAR_MASS]), 'neptune': tuple ([list ([15.379697114850917, -(25.919314609987964), 0.17925877295037118]), list ([0.0026806777249038932 * DAYS_PER_YEAR, 0.001628241700382423 * DAYS_PER_YEAR, -(9.515922545197159e-05) * DAYS_PER_YEAR]), 5.1513890204661145e-05 * SOLAR_MASS])});
-		var SYSTEM = list (BODIES.py_values ());
-		var PAIRS = combinations (SYSTEM);
-		var advance = function (dt, n, bodies, pairs) {
-			if (typeof bodies == 'undefined' || (bodies != null && bodies .hasOwnProperty ("__kwargtrans__"))) {;
-				var bodies = SYSTEM;
+		var main = function (n, min_depth) {
+			if (typeof min_depth == 'undefined' || (min_depth != null && min_depth .hasOwnProperty ("__kwargtrans__"))) {;
+				var min_depth = 4;
 			};
-			if (typeof pairs == 'undefined' || (pairs != null && pairs .hasOwnProperty ("__kwargtrans__"))) {;
-				var pairs = PAIRS;
-			};
-			for (var i = 0; i < n; i++) {
-				var __iterable0__ = pairs;
+			var max_depth = max (min_depth + 2, n);
+			var stretch_depth = max_depth + 1;
+			var long_lived_tree = make_tree (0, max_depth);
+			var mmd = max_depth + min_depth;
+			for (var d = min_depth; d < stretch_depth; d += 2) {
+				var i = Math.pow (2, mmd - d);
+				var cs = 0;
+				var __iterable0__ = get_argchunks (i, d);
 				for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-					var __left0__ = __iterable0__ [__index0__];
-					var x1 = __left0__ [0][0][0];
-					var y1 = __left0__ [0][0][1];
-					var z1 = __left0__ [0][0][2];
-					var v1 = __left0__ [0][1];
-					var m1 = __left0__ [0][2];
-					var x2 = __left0__ [1][0][0];
-					var y2 = __left0__ [1][0][1];
-					var z2 = __left0__ [1][0][2];
-					var v2 = __left0__ [1][1];
-					var m2 = __left0__ [1][2];
-					var dx = x1 - x2;
-					var dy = y1 - y2;
-					var dz = z1 - z2;
-					var mag = dt * Math.pow ((dx * dx + dy * dy) + dz * dz, -(1.5));
-					var b1m = m1 * mag;
-					var b2m = m2 * mag;
-					v1 [0] -= dx * b2m;
-					v1 [1] -= dy * b2m;
-					v1 [2] -= dz * b2m;
-					v2 [0] += dx * b1m;
-					v2 [1] += dy * b1m;
-					v2 [2] += dz * b1m;
-				}
-				var __iterable0__ = bodies;
-				for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-					var __left0__ = __iterable0__ [__index0__];
-					var r = __left0__ [0];
-					var vx = __left0__ [1][0];
-					var vy = __left0__ [1][1];
-					var vz = __left0__ [1][2];
-					var m = __left0__ [2];
-					r [0] += dt * vx;
-					r [1] += dt * vy;
-					r [2] += dt * vz;
+					var argchunk = __iterable0__ [__index0__];
+					cs += sum (map (make_check, argchunk));
 				}
 			}
 		};
-		var report_energy = function (bodies, pairs, e) {
-			if (typeof bodies == 'undefined' || (bodies != null && bodies .hasOwnProperty ("__kwargtrans__"))) {;
-				var bodies = SYSTEM;
-			};
-			if (typeof pairs == 'undefined' || (pairs != null && pairs .hasOwnProperty ("__kwargtrans__"))) {;
-				var pairs = PAIRS;
-			};
-			if (typeof e == 'undefined' || (e != null && e .hasOwnProperty ("__kwargtrans__"))) {;
-				var e = 0.0;
-			};
-			var __iterable0__ = pairs;
-			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var __left0__ = __iterable0__ [__index0__];
-				var x1 = __left0__ [0][0][0];
-				var y1 = __left0__ [0][0][1];
-				var z1 = __left0__ [0][0][2];
-				var v1 = __left0__ [0][1];
-				var m1 = __left0__ [0][2];
-				var x2 = __left0__ [1][0][0];
-				var y2 = __left0__ [1][0][1];
-				var z2 = __left0__ [1][0][2];
-				var v2 = __left0__ [1][1];
-				var m2 = __left0__ [1][2];
-				var dx = x1 - x2;
-				var dy = y1 - y2;
-				var dz = z1 - z2;
-				e -= (m1 * m2) / Math.pow ((dx * dx + dy * dy) + dz * dz, 0.5);
-			}
-			var __iterable0__ = bodies;
-			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var __left0__ = __iterable0__ [__index0__];
-				var r = __left0__ [0];
-				var vx = __left0__ [1][0];
-				var vy = __left0__ [1][1];
-				var vz = __left0__ [1][2];
-				var m = __left0__ [2];
-				e += (m * ((vx * vx + vy * vy) + vz * vz)) / 2.0;
-			}
-		};
-		var offset_momentum = function (ref, bodies, px, py, pz) {
-			if (typeof bodies == 'undefined' || (bodies != null && bodies .hasOwnProperty ("__kwargtrans__"))) {;
-				var bodies = SYSTEM;
-			};
-			if (typeof px == 'undefined' || (px != null && px .hasOwnProperty ("__kwargtrans__"))) {;
-				var px = 0.0;
-			};
-			if (typeof py == 'undefined' || (py != null && py .hasOwnProperty ("__kwargtrans__"))) {;
-				var py = 0.0;
-			};
-			if (typeof pz == 'undefined' || (pz != null && pz .hasOwnProperty ("__kwargtrans__"))) {;
-				var pz = 0.0;
-			};
-			var __iterable0__ = bodies;
-			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var __left0__ = __iterable0__ [__index0__];
-				var r = __left0__ [0];
-				var vx = __left0__ [1][0];
-				var vy = __left0__ [1][1];
-				var vz = __left0__ [1][2];
-				var m = __left0__ [2];
-				px -= vx * m;
-				py -= vy * m;
-				pz -= vz * m;
-			}
-			var __left0__ = ref;
-			var r = __left0__ [0];
-			var v = __left0__ [1];
-			var m = __left0__ [2];
-			v [0] = px / m;
-			v [1] = py / m;
-			v [2] = pz / m;
-		};
-		var NUMBER_OF_ITERATIONS = 20000;
-		var main = function (n, ref) {
-			if (typeof ref == 'undefined' || (ref != null && ref .hasOwnProperty ("__kwargtrans__"))) {;
-				var ref = 'sun';
-			};
-			var times = list ([]);
-			for (var i = 0; i < n; i++) {
-				var t0 = time.time ();
-				offset_momentum (BODIES [ref]);
-				report_energy ();
-				advance (0.01, NUMBER_OF_ITERATIONS);
-				report_energy ();
-				var tk = time.time ();
-				times.append (tk - t0);
-			}
-			return times;
-		};
-		main (10);
-		__pragma__ ('<use>' +
-			'time' +
-		'</use>')
+		main (15);
 		__pragma__ ('<all>')
-			__all__.BODIES = BODIES;
-			__all__.DAYS_PER_YEAR = DAYS_PER_YEAR;
-			__all__.NUMBER_OF_ITERATIONS = NUMBER_OF_ITERATIONS;
-			__all__.PAIRS = PAIRS;
-			__all__.PI = PI;
-			__all__.SOLAR_MASS = SOLAR_MASS;
-			__all__.SYSTEM = SYSTEM;
-			__all__.advance = advance;
-			__all__.combinations = combinations;
+			__all__.check_tree = check_tree;
+			__all__.get_argchunks = get_argchunks;
 			__all__.main = main;
-			__all__.offset_momentum = offset_momentum;
-			__all__.report_energy = report_energy;
+			__all__.make_check = make_check;
+			__all__.make_tree = make_tree;
 		__pragma__ ('</all>')
 	}) ();
    return __all__;
 }
-nbody_modified ();
+binary_trees ();

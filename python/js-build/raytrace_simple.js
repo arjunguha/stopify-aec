@@ -1,5 +1,5 @@
 "use strict";
-// Transcrypt'ed from Python, 2017-07-27 19:25:08
+// Transcrypt'ed from Python, 2017-08-05 21:24:04
 function raytrace_simple () {
    var __symbols__ = ['__py3.6__', '__esv5__'];
     var __all__ = {};
@@ -2473,7 +2473,7 @@ function raytrace_simple () {
 				__inited__: false,
 				__init__: function (__all__) {
 					var time = function () {
-						return __div__ (__call__ (Date.now, Date), 1000);
+						return Date.now () / 1000;
 					};
 					__pragma__ ('<all>')
 						__all__.time = time;
@@ -2556,7 +2556,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __call__ (math.sqrt, math, __call__ (self.dot, self, self));
+				return math.sqrt (self.dot (self));
 			});},
 			get __add__ () {return __get__ (this, function (self, other) {
 				if (arguments.length) {
@@ -2573,11 +2573,11 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				if (__call__ (other.isPoint, other)) {
-					return __call__ (Point, null, __add__ (self.x, other.x), __add__ (self.y, other.y), __add__ (self.z, other.z));
+				if (other.isPoint ()) {
+					return Point (self.x + other.x, self.y + other.y, self.z + other.z);
 				}
 				else {
-					return __call__ (Vector, null, __add__ (self.x, other.x), __add__ (self.y, other.y), __add__ (self.z, other.z));
+					return Vector (self.x + other.x, self.y + other.y, self.z + other.z);
 				}
 			});},
 			get __sub__ () {return __get__ (this, function (self, other) {
@@ -2595,8 +2595,8 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				__call__ (other.mustBeVector, other);
-				return __call__ (Vector, null, __sub__ (self.x, other.x), __sub__ (self.y, other.y), __sub__ (self.z, other.z));
+				other.mustBeVector ();
+				return Vector (self.x - other.x, self.y - other.y, self.z - other.z);
 			});},
 			get scale () {return __get__ (this, function (self, factor) {
 				if (arguments.length) {
@@ -2613,7 +2613,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __call__ (Vector, null, __mul__ (factor, self.x), __mul__ (factor, self.y), __mul__ (factor, self.z));
+				return Vector (factor * self.x, factor * self.y, factor * self.z);
 			});},
 			get dot () {return __get__ (this, function (self, other) {
 				if (arguments.length) {
@@ -2630,8 +2630,8 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				__call__ (other.mustBeVector, other);
-				return __add__ (__add__ (__mul__ (self.x, other.x), __mul__ (self.y, other.y)), __mul__ (self.z, other.z));
+				other.mustBeVector ();
+				return (self.x * other.x + self.y * other.y) + self.z * other.z;
 			});},
 			get cross () {return __get__ (this, function (self, other) {
 				if (arguments.length) {
@@ -2648,8 +2648,8 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				__call__ (other.mustBeVector, other);
-				return __call__ (Vector, null, __sub__ (__mul__ (self.y, other.z), __mul__ (self.z, other.y)), __sub__ (__mul__ (self.z, other.x), __mul__ (self.x, other.z)), __sub__ (__mul__ (self.x, other.y), __mul__ (self.y, other.x)));
+				other.mustBeVector ();
+				return Vector (self.y * other.z - self.z * other.y, self.z * other.x - self.x * other.z, self.x * other.y - self.y * other.x);
 			});},
 			get normalized () {return __get__ (this, function (self) {
 				if (arguments.length) {
@@ -2665,7 +2665,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __call__ (self.scale, self, __div__ (1.0, __call__ (self.magnitude, self)));
+				return self.scale (1.0 / self.magnitude ());
 			});},
 			get negated () {return __get__ (this, function (self) {
 				if (arguments.length) {
@@ -2681,7 +2681,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __call__ (self.scale, self, __neg__ (1));
+				return self.scale (-(1));
 			});},
 			get __eq__ () {return __get__ (this, function (self, other) {
 				if (arguments.length) {
@@ -2698,7 +2698,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __eq__ (self.x, other.x) && __eq__ (self.y, other.y) && __eq__ (self.z, other.z);
+				return self.x == other.x && self.y == other.y && self.z == other.z;
 			});},
 			get isVector () {return __get__ (this, function (self) {
 				if (arguments.length) {
@@ -2781,14 +2781,14 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				var d = __call__ (normal.scale, normal, __call__ (self.dot, self, normal));
-				return __sub__ (self, __call__ (d.scale, d, 2));
+				var d = normal.scale (self.dot (normal));
+				return self - d.scale (2);
 			});}
 		});
-		Vector.ZERO = __call__ (Vector, null, 0, 0, 0);
-		Vector.RIGHT = __call__ (Vector, null, 1, 0, 0);
-		Vector.UP = __call__ (Vector, null, 0, 1, 0);
-		Vector.OUT = __call__ (Vector, null, 0, 0, 1);
+		Vector.ZERO = Vector (0, 0, 0);
+		Vector.RIGHT = Vector (1, 0, 0);
+		Vector.UP = Vector (0, 1, 0);
+		Vector.OUT = Vector (0, 0, 1);
 		var Point = __class__ ('Point', [object], {
 			get __init__ () {return __get__ (this, function (self, initx, inity, initz) {
 				if (arguments.length) {
@@ -2858,8 +2858,8 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				__call__ (other.mustBeVector, other);
-				return __call__ (Point, null, __add__ (self.x, other.x), __add__ (self.y, other.y), __add__ (self.z, other.z));
+				other.mustBeVector ();
+				return Point (self.x + other.x, self.y + other.y, self.z + other.z);
 			});},
 			get __sub__ () {return __get__ (this, function (self, other) {
 				if (arguments.length) {
@@ -2876,11 +2876,11 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				if (__call__ (other.isPoint, other)) {
-					return __call__ (Vector, null, __sub__ (self.x, other.x), __sub__ (self.y, other.y), __sub__ (self.z, other.z));
+				if (other.isPoint ()) {
+					return Vector (self.x - other.x, self.y - other.y, self.z - other.z);
 				}
 				else {
-					return __call__ (Point, null, __sub__ (self.x, other.x), __sub__ (self.y, other.y), __sub__ (self.z, other.z));
+					return Point (self.x - other.x, self.y - other.y, self.z - other.z);
 				}
 			});},
 			get isVector () {return __get__ (this, function (self) {
@@ -2967,7 +2967,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				__call__ (centre.mustBePoint, centre);
+				centre.mustBePoint ();
 				self.centre = centre;
 				self.radius = radius;
 			});},
@@ -2985,7 +2985,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __mod__ ('Sphere(%s,%s)', tuple ([__call__ (repr, null, self.centre), self.radius]));
+				return __mod__ ('Sphere(%s,%s)', tuple ([repr (self.centre), self.radius]));
 			});},
 			get intersectionTime () {return __get__ (this, function (self, ray) {
 				if (arguments.length) {
@@ -3002,14 +3002,14 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				var cp = __sub__ (self.centre, ray.point);
-				var v = __call__ (cp.dot, cp, ray.vector);
-				var discriminant = __sub__ (__mul__ (self.radius, self.radius), __sub__ (__call__ (cp.dot, cp, cp), __mul__ (v, v)));
-				if (__lt__ (discriminant, 0)) {
+				var cp = self.centre - ray.point;
+				var v = cp.dot (ray.vector);
+				var discriminant = self.radius * self.radius - (cp.dot (cp) - v * v);
+				if (discriminant < 0) {
 					return null;
 				}
 				else {
-					return __sub__ (v, __call__ (math.sqrt, math, discriminant));
+					return v - math.sqrt (discriminant);
 				}
 			});},
 			get normalAt () {return __get__ (this, function (self, p) {
@@ -3027,7 +3027,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __call__ ((__sub__ (p, self.centre)).normalized, __sub__ (p, self.centre));
+				return (p - self.centre).normalized ();
 			});}
 		});
 		var Halfspace = __class__ ('Halfspace', [object], {
@@ -3048,7 +3048,7 @@ function raytrace_simple () {
 				else {
 				}
 				self.point = point;
-				self.normal = __call__ (normal.normalized, normal);
+				self.normal = normal.normalized ();
 			});},
 			get __repr__ () {return __get__ (this, function (self) {
 				if (arguments.length) {
@@ -3064,7 +3064,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __mod__ ('Halfspace(%s,%s)', tuple ([__call__ (repr, null, self.point), __call__ (repr, null, self.normal)]));
+				return __mod__ ('Halfspace(%s,%s)', tuple ([repr (self.point), repr (self.normal)]));
 			});},
 			get intersectionTime () {return __get__ (this, function (self, ray) {
 				if (arguments.length) {
@@ -3081,9 +3081,9 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				var v = __call__ (ray.vector.dot, ray.vector, self.normal);
+				var v = ray.vector.dot (self.normal);
 				if (v) {
-					return __div__ (1, __neg__ (v));
+					return 1 / -(v);
 				}
 				else {
 					return null;
@@ -3125,7 +3125,7 @@ function raytrace_simple () {
 				else {
 				}
 				self.point = point;
-				self.vector = __call__ (vector.normalized, vector);
+				self.vector = vector.normalized ();
 			});},
 			get __repr__ () {return __get__ (this, function (self) {
 				if (arguments.length) {
@@ -3141,7 +3141,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __mod__ ('Ray(%s,%s)', tuple ([__call__ (repr, null, self.point), __call__ (repr, null, self.vector)]));
+				return __mod__ ('Ray(%s,%s)', tuple ([repr (self.point), repr (self.vector)]));
 			});},
 			get pointAtTime () {return __get__ (this, function (self, t) {
 				if (arguments.length) {
@@ -3158,12 +3158,12 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				return __add__ (self.point, __call__ (self.vector.scale, self.vector, t));
+				return self.point + self.vector.scale (t);
 			});}
 		});
-		Point.ZERO = __call__ (Point, null, 0, 0, 0);
-		var a = __call__ (Vector, null, 3, 4, 12);
-		var b = __call__ (Vector, null, 1, 1, 1);
+		Point.ZERO = Point (0, 0, 0);
+		var a = Vector (3, 4, 12);
+		var b = Vector (1, 1, 1);
 		var PpmCanvas = __class__ ('PpmCanvas', [object], {
 			get __init__ () {return __get__ (this, function (self, width, height, filenameBase) {
 				if (arguments.length) {
@@ -3183,9 +3183,9 @@ function raytrace_simple () {
 				else {
 				}
 				__nest__ (array, '', __init__ (__world__.array));
-				self.bytes = __call__ (array.array, array, 'B', __mul__ (list ([0]), __mul__ (__mul__ (width, height), 3)));
-				for (var i = 0; i < __mul__ (width, height); i++) {
-					__setitem__ (self.bytes, __add__ (__mul__ (i, 3), 2), 255);
+				self.bytes = array.array ('B', list ([0]) * ((width * height) * 3));
+				for (var i = 0; i < width * height; i++) {
+					self.bytes [i * 3 + 2] = 255;
 				}
 				self.width = width;
 				self.height = height;
@@ -3210,10 +3210,10 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				var i = __mul__ (__add__ (__mul__ (__sub__ (__sub__ (self.height, y), 1), self.width), x), 3);
-				__setitem__ (self.bytes, i, __call__ (max, null, 0, __call__ (min, null, 255, __call__ (int, null, __mul__ (r, 255)))));
-				__setitem__ (self.bytes, __add__ (i, 1), __call__ (max, null, 0, __call__ (min, null, 255, __call__ (int, null, __mul__ (g, 255)))));
-				__setitem__ (self.bytes, __add__ (i, 2), __call__ (max, null, 0, __call__ (min, null, 255, __call__ (int, null, __mul__ (b, 255)))));
+				var i = (((self.height - y) - 1) * self.width + x) * 3;
+				self.bytes [i] = max (0, min (255, int (r * 255)));
+				self.bytes [i + 1] = max (0, min (255, int (g * 255)));
+				self.bytes [i + 2] = max (0, min (255, int (b * 255)));
 			});},
 			get save () {return __get__ (this, function (self) {
 				if (arguments.length) {
@@ -3229,9 +3229,9 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				f = __call__ (open, null, __add__ (self.filenameBase, '.ppm'), 'wb');
-				__call__ (f.write, f, __mod__ ('P6 %d %d 255\n', tuple ([self.width, self.height])));
-				__call__ (f.write, f, __call__ (self.bytes.tostring, self.bytes));
+				f = open (self.filenameBase + '.ppm', 'wb');
+				f.write (__mod__ ('P6 %d %d 255\n', tuple ([self.width, self.height])));
+				f.write (self.bytes.tostring ());
 				f.close ();
 			});}
 		});
@@ -3252,10 +3252,10 @@ function raytrace_simple () {
 			var result = null;
 			var __iterable0__ = intersections;
 			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var i = __getitem__ (__iterable0__, __index0__);
-				var candidateT = __getitem__ (i, 1);
-				if (candidateT !== null && __gt__ (candidateT, __neg__ (EPSILON))) {
-					if (result === null || __lt__ (candidateT, __getitem__ (result, 1))) {
+				var i = __iterable0__ [__index0__];
+				var candidateT = i [1];
+				if (candidateT !== null && candidateT > -(EPSILON)) {
+					if (result === null || candidateT < result [1]) {
 						var result = i;
 					}
 				}
@@ -3279,7 +3279,7 @@ function raytrace_simple () {
 				}
 				self.objects = list ([]);
 				self.lightPoints = list ([]);
-				self.position = __call__ (Point, null, 0, 1.8, 10);
+				self.position = Point (0, 1.8, 10);
 				self.lookingAt = Point.ZERO;
 				self.fieldOfView = 45;
 				self.recursionDepth = 0;
@@ -3334,7 +3334,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				__call__ (self.objects.append, self.objects, tuple ([object, surface]));
+				self.objects.append (tuple ([object, surface]));
 			});},
 			get addLight () {return __get__ (this, function (self, p) {
 				if (arguments.length) {
@@ -3351,7 +3351,7 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				__call__ (self.lightPoints.append, self.lightPoints, p);
+				self.lightPoints.append (p);
 			});},
 			get render () {return __get__ (this, function (self, canvas) {
 				if (arguments.length) {
@@ -3368,28 +3368,28 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				var fovRadians = __div__ (__mul__ (math.pi, __div__ (self.fieldOfView, 2.0)), 180.0);
-				var halfWidth = __call__ (math.tan, math, fovRadians);
-				var halfHeight = __mul__ (0.75, halfWidth);
-				var width = __mul__ (halfWidth, 2);
-				var height = __mul__ (halfHeight, 2);
-				var pixelWidth = __div__ (width, __sub__ (canvas.width, 1));
-				var pixelHeight = __div__ (height, __sub__ (canvas.height, 1));
-				var eye = __call__ (Ray, null, self.position, __sub__ (self.lookingAt, self.position));
-				var vpRight = __call__ (__call__ (eye.vector.cross, eye.vector, Vector.UP).normalized, __call__ (eye.vector.cross, eye.vector, Vector.UP));
-				var vpUp = __call__ (__call__ (vpRight.cross, vpRight, eye.vector).normalized, __call__ (vpRight.cross, vpRight, eye.vector));
+				var fovRadians = (math.pi * (self.fieldOfView / 2.0)) / 180.0;
+				var halfWidth = math.tan (fovRadians);
+				var halfHeight = 0.75 * halfWidth;
+				var width = halfWidth * 2;
+				var height = halfHeight * 2;
+				var pixelWidth = width / (canvas.width - 1);
+				var pixelHeight = height / (canvas.height - 1);
+				var eye = Ray (self.position, self.lookingAt - self.position);
+				var vpRight = eye.vector.cross (Vector.UP).normalized ();
+				var vpUp = vpRight.cross (eye.vector).normalized ();
 				var previousfraction = 0;
 				for (var y = 0; y < canvas.height; y++) {
-					var currentfraction = __div__ (__call__ (float, null, y), canvas.height);
-					if (__gt__ (__sub__ (currentfraction, previousfraction), 0.05)) {
+					var currentfraction = float (y) / canvas.height;
+					if (currentfraction - previousfraction > 0.05) {
 						var previousfraction = currentfraction;
 					}
 					for (var x = 0; x < canvas.width; x++) {
-						var xcomp = __call__ (vpRight.scale, vpRight, __sub__ (__mul__ (x, pixelWidth), halfWidth));
-						var ycomp = __call__ (vpUp.scale, vpUp, __sub__ (__mul__ (y, pixelHeight), halfHeight));
-						var ray = __call__ (Ray, null, eye.point, __add__ (__add__ (eye.vector, xcomp), ycomp));
-						var colour = __call__ (self.rayColour, self, ray);
-						__call__.apply (null, [canvas.plot].concat ([canvas]).concat ([x]).concat ([y]).concat (colour));
+						var xcomp = vpRight.scale (x * pixelWidth - halfWidth);
+						var ycomp = vpUp.scale (y * pixelHeight - halfHeight);
+						var ray = Ray (eye.point, (eye.vector + xcomp) + ycomp);
+						var colour = self.rayColour (ray);
+						canvas.plot.apply (null, [x].concat ([y]).concat (colour));
 					}
 				}
 			});},
@@ -3408,23 +3408,23 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				if (__gt__ (self.recursionDepth, 3)) {
+				if (self.recursionDepth > 3) {
 					return tuple ([0, 0, 0]);
 				}
 				try {
-					self.recursionDepth = __add__ (self.recursionDepth, 1);
+					self.recursionDepth = self.recursionDepth + 1;
 					var intersections = function () {
 						var __accu0__ = [];
 						var __iterable0__ = self.objects;
 						for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-							var __left0__ = __getitem__ (__iterable0__, __index0__);
+							var __left0__ = __iterable0__ [__index0__];
 							var o = __left0__ [0];
 							var s = __left0__ [1];
-							__call__ (__accu0__.append, __accu0__, tuple ([o, __call__ (o.intersectionTime, o, ray), s]));
+							__accu0__.append (tuple ([o, o.intersectionTime (ray), s]));
 						}
 						return __accu0__;
 					} ();
-					var i = __call__ (firstIntersection, null, intersections);
+					var i = firstIntersection (intersections);
 					if (i === null) {
 						return tuple ([0, 0, 0]);
 					}
@@ -3433,12 +3433,12 @@ function raytrace_simple () {
 						var o = __left0__ [0];
 						var t = __left0__ [1];
 						var s = __left0__ [2];
-						var p = __call__ (ray.pointAtTime, ray, t);
-						return __call__ (s.colourAt, s, self, ray, p, __call__ (o.normalAt, o, p));
+						var p = ray.pointAtTime (t);
+						return s.colourAt (self, ray, p, o.normalAt (p));
 					}
 				}
 				finally {
-					self.recursionDepth = __sub__ (self.recursionDepth, 1);
+					self.recursionDepth = self.recursionDepth - 1;
 				}
 			});},
 			get _lightIsVisible () {return __get__ (this, function (self, l, p) {
@@ -3459,11 +3459,11 @@ function raytrace_simple () {
 				}
 				var __iterable0__ = self.objects;
 				for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-					var __left0__ = __getitem__ (__iterable0__, __index0__);
+					var __left0__ = __iterable0__ [__index0__];
 					var o = __left0__ [0];
 					var s = __left0__ [1];
-					var t = __call__ (o.intersectionTime, o, __call__ (Ray, null, p, __sub__ (l, p)));
-					if (t !== null && __gt__ (t, EPSILON)) {
+					var t = o.intersectionTime (Ray (p, l - p));
+					if (t !== null && t > EPSILON) {
 						return false;
 					}
 				}
@@ -3487,9 +3487,9 @@ function raytrace_simple () {
 				var result = list ([]);
 				var __iterable0__ = self.lightPoints;
 				for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-					var l = __getitem__ (__iterable0__, __index0__);
-					if (__call__ (self._lightIsVisible, self, l, p)) {
-						__call__ (result.append, result, l);
+					var l = __iterable0__ [__index0__];
+					if (self._lightIsVisible (l, p)) {
+						result.append (l);
 					}
 				}
 				return result;
@@ -3511,7 +3511,7 @@ function raytrace_simple () {
 			}
 			else {
 			}
-			return tuple ([__add__ (__getitem__ (a, 0), __mul__ (scale, __getitem__ (b, 0))), __add__ (__getitem__ (a, 1), __mul__ (scale, __getitem__ (b, 1))), __add__ (__getitem__ (a, 2), __mul__ (scale, __getitem__ (b, 2)))]);
+			return tuple ([a [0] + scale * b [0], a [1] + scale * b [1], a [2] + scale * b [2]]);
 		};
 		var SimpleSurface = __class__ ('SimpleSurface', [object], {
 			get __init__ () {return __get__ (this, function (self) {
@@ -3531,10 +3531,10 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				self.baseColour = __call__ (kwargs.py_get, kwargs, 'baseColour', tuple ([1, 1, 1]));
-				self.specularCoefficient = __call__ (kwargs.py_get, kwargs, 'specularCoefficient', 0.2);
-				self.lambertCoefficient = __call__ (kwargs.py_get, kwargs, 'lambertCoefficient', 0.6);
-				self.ambientCoefficient = __sub__ (__sub__ (1.0, self.specularCoefficient), self.lambertCoefficient);
+				self.baseColour = kwargs.py_get ('baseColour', tuple ([1, 1, 1]));
+				self.specularCoefficient = kwargs.py_get ('specularCoefficient', 0.2);
+				self.lambertCoefficient = kwargs.py_get ('lambertCoefficient', 0.6);
+				self.ambientCoefficient = (1.0 - self.specularCoefficient) - self.lambertCoefficient;
 			});},
 			get baseColourAt () {return __get__ (this, function (self, p) {
 				if (arguments.length) {
@@ -3571,28 +3571,28 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				var b = __call__ (self.baseColourAt, self, p);
+				var b = self.baseColourAt (p);
 				var c = tuple ([0, 0, 0]);
-				if (__gt__ (self.specularCoefficient, 0)) {
-					var reflectedRay = __call__ (Ray, null, p, __call__ (ray.vector.reflectThrough, ray.vector, normal));
-					var reflectedColour = __call__ (scene.rayColour, scene, reflectedRay);
-					var c = __call__ (addColours, null, c, self.specularCoefficient, reflectedColour);
+				if (self.specularCoefficient > 0) {
+					var reflectedRay = Ray (p, ray.vector.reflectThrough (normal));
+					var reflectedColour = scene.rayColour (reflectedRay);
+					var c = addColours (c, self.specularCoefficient, reflectedColour);
 				}
-				if (__gt__ (self.lambertCoefficient, 0)) {
+				if (self.lambertCoefficient > 0) {
 					var lambertAmount = 0;
-					var __iterable0__ = __call__ (scene.visibleLights, scene, p);
+					var __iterable0__ = scene.visibleLights (p);
 					for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-						var lightPoint = __getitem__ (__iterable0__, __index0__);
-						var contribution = __call__ (__call__ ((__sub__ (lightPoint, p)).normalized, __sub__ (lightPoint, p)).dot, __call__ ((__sub__ (lightPoint, p)).normalized, __sub__ (lightPoint, p)), normal);
-						if (__gt__ (contribution, 0)) {
-							var lambertAmount = __add__ (lambertAmount, contribution);
+						var lightPoint = __iterable0__ [__index0__];
+						var contribution = (lightPoint - p).normalized ().dot (normal);
+						if (contribution > 0) {
+							var lambertAmount = lambertAmount + contribution;
 						}
 					}
-					var lambertAmount = __call__ (min, null, 1, lambertAmount);
-					var c = __call__ (addColours, null, c, __mul__ (self.lambertCoefficient, lambertAmount), b);
+					var lambertAmount = min (1, lambertAmount);
+					var c = addColours (c, self.lambertCoefficient * lambertAmount, b);
 				}
-				if (__gt__ (self.ambientCoefficient, 0)) {
-					var c = __call__ (addColours, null, c, self.ambientCoefficient, b);
+				if (self.ambientCoefficient > 0) {
+					var c = addColours (c, self.ambientCoefficient, b);
 				}
 				return c;
 			});}
@@ -3615,9 +3615,9 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				__call__ (SimpleSurface.__init__, SimpleSurface, self, __kwargtrans__ (kwargs));
-				self.otherColour = __call__ (kwargs.py_get, kwargs, 'otherColour', tuple ([0, 0, 0]));
-				self.checkSize = __call__ (kwargs.py_get, kwargs, 'checkSize', 1);
+				SimpleSurface.__init__ (self, __kwargtrans__ (kwargs));
+				self.otherColour = kwargs.py_get ('otherColour', tuple ([0, 0, 0]));
+				self.checkSize = kwargs.py_get ('checkSize', 1);
 			});},
 			get baseColourAt () {return __get__ (this, function (self, p) {
 				if (arguments.length) {
@@ -3634,9 +3634,9 @@ function raytrace_simple () {
 				}
 				else {
 				}
-				var v = __sub__ (p, Point.ZERO);
-				__call__ (v.scale, v, __div__ (1.0, self.checkSize));
-				if (__mod__ (__add__ (__add__ (__call__ (int, null, __add__ (__call__ (abs, null, v.x), 0.5)), __call__ (int, null, __add__ (__call__ (abs, null, v.y), 0.5))), __call__ (int, null, __add__ (__call__ (abs, null, v.z), 0.5))), 2)) {
+				var v = p - Point.ZERO;
+				v.scale (1.0 / self.checkSize);
+				if (__mod__ ((int (abs (v.x) + 0.5) + int (abs (v.y) + 0.5)) + int (abs (v.z) + 0.5), 2)) {
 					return self.otherColour;
 				}
 				else {
@@ -3656,17 +3656,17 @@ function raytrace_simple () {
 			else {
 			}
 			var Canvas = PpmCanvas;
-			var c = __call__ (Canvas, null, 100, 100, 'test_raytrace');
-			var s = __call__ (Scene, null);
-			__call__ (s.addLight, s, __call__ (Point, null, 30, 30, 10));
-			__call__ (s.addLight, s, __call__ (Point, null, __neg__ (10), 100, 30));
-			__call__ (s.lookAt, s, __call__ (Point, null, 0, 3, 0));
-			__call__ (s.addObject, s, __call__ (Sphere, null, __call__ (Point, null, 1, 3, __neg__ (10)), 2), __call__ (SimpleSurface, null, __kwargtrans__ ({baseColour: tuple ([1, 1, 0])})));
+			var c = Canvas (100, 100, 'test_raytrace');
+			var s = Scene ();
+			s.addLight (Point (30, 30, 10));
+			s.addLight (Point (-(10), 100, 30));
+			s.lookAt (Point (0, 3, 0));
+			s.addObject (Sphere (Point (1, 3, -(10)), 2), SimpleSurface (__kwargtrans__ ({baseColour: tuple ([1, 1, 0])})));
 			for (var y = 0; y < 6; y++) {
-				__call__ (s.addObject, s, __call__ (Sphere, null, __call__ (Point, null, __sub__ (__neg__ (3), __mul__ (y, 0.4)), 2.3, __neg__ (5)), 0.4), __call__ (SimpleSurface, null, __kwargtrans__ ({baseColour: tuple ([__div__ (y, 6.0), __sub__ (1, __div__ (y, 6.0)), 0.5])})));
+				s.addObject (Sphere (Point (-(3) - y * 0.4, 2.3, -(5)), 0.4), SimpleSurface (__kwargtrans__ ({baseColour: tuple ([y / 6.0, 1 - y / 6.0, 0.5])})));
 			}
-			__call__ (s.addObject, s, __call__ (Halfspace, null, __call__ (Point, null, 0, 0, 0), Vector.UP), __call__ (CheckerboardSurface, null));
-			__call__ (s.render, s, c);
+			s.addObject (Halfspace (Point (0, 0, 0), Vector.UP), CheckerboardSurface ());
+			s.render (c);
 		};
 		var main = function (n) {
 			if (arguments.length) {
@@ -3685,17 +3685,17 @@ function raytrace_simple () {
 			__nest__ (time, '', __init__ (__world__.time));
 			var times = list ([]);
 			for (var i = 0; i < 5; i++) {
-				__call__ (_main, null);
+				_main ();
 			}
 			for (var i = 0; i < n; i++) {
-				var t1 = __call__ (time.time, time);
-				__call__ (_main, null);
-				var t2 = __call__ (time.time, time);
-				__call__ (times.append, times, __sub__ (t2, t1));
+				var t1 = time.time ();
+				_main ();
+				var t2 = time.time ();
+				times.append (t2 - t1);
 			}
 			return times;
 		};
-		__call__ (main, null, 2);
+		main (2);
 		__pragma__ ('<use>' +
 			'array' +
 			'math' +

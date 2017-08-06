@@ -1382,4 +1382,4 @@ while cl:
 j = 0
 for i in order:
     j += 1
-    print('%3d %s' % (j, reverseCandidates[i]))
+    pass #print('%3d %s' % (j, reverseCandidates[i]))

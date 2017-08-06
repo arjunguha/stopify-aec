@@ -196,7 +196,7 @@ class Chaosgame(object):
             basepoint.y += -derivative.x / derivative.Mag() * (y - 0.5) * \
                            self.thickness
         else:
-            print("r", end=' ')
+            pass #pass #print("r", end=' ')
         self.truncate(basepoint)
         return basepoint
 

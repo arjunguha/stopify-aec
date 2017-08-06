@@ -224,7 +224,7 @@ class Scene(object):
         self.lightPoints.append(p)
 
     def render(self, canvas):
-        #print 'Computing field of view'
+        ##pass #print 'Computing field of view'
         fovRadians = math.pi * (self.fieldOfView / 2.0) / 180.0
         halfWidth = math.tan(fovRadians)
         halfHeight = 0.75 * halfWidth
@@ -237,13 +237,13 @@ class Scene(object):
         vpRight = eye.vector.cross(Vector.UP).normalized()
         vpUp = vpRight.cross(eye.vector).normalized()
 
-        #print 'Looping over pixels'
+        ##pass #print 'Looping over pixels'
         previousfraction = 0
         for y in range(canvas.height):
             currentfraction = float(y) / canvas.height
             if currentfraction - previousfraction > 0.05:
                 # canvas.save()
-                #print '%d%% complete' % (currentfraction * 100)
+                ##pass #print '%d%% complete' % (currentfraction * 100)
                 previousfraction = currentfraction
             for x in range(canvas.width):
                 xcomp = vpRight.scale(x * pixelWidth - halfWidth)
@@ -252,7 +252,7 @@ class Scene(object):
                 colour = self.rayColour(ray)
                 canvas.plot(x,y,*colour)
 
-        #print 'Complete.'
+        ##pass #print 'Complete.'
 
     def rayColour(self, ray):
         if self.recursionDepth > 3:
@@ -305,7 +305,7 @@ class SimpleSurface(object):
         c = (0,0,0)
         if self.specularCoefficient > 0:
             reflectedRay = Ray(p, ray.vector.reflectThrough(normal))
-            #print p, normal, ray.vector, reflectedRay.vector
+            ##pass #print p, normal, ray.vector, reflectedRay.vector
             reflectedColour = scene.rayColour(reflectedRay)
             c = addColours(c, self.specularCoefficient, reflectedColour)
 
