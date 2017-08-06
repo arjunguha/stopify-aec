@@ -25,7 +25,7 @@ mytheme <- function() {
              legend.margin = unit(0.001, "in"),
              legend.key.size = unit(0.2, "in"),
              legend.title = element_blank(),
-             legend.position = c(0.9, .9),
+             legend.position = c(0.9, .7),
              legend.text = element_text(family = "CM Roman", size=8),
              legend.background = element_blank()))
 }
@@ -35,30 +35,34 @@ mysave <- function(filename, plot) {
   embed_fonts(filename)
 }
 
-data <- read.csv("data.csv",header = TRUE)
+data <- read.csv("data.csv",header = TRUE) %>%
+  select(-Path,-Hostname,-NumYields)
 
 df <- data %>%
-  mutate(Type = paste(Interval,Transformation)) %>%
-  select(-Transformation,-Interval)
+  mutate(Type = paste(Platform,Transform,YieldInterval)) %>%
+  mutate(Label = paste(Language,Benchmark)) %>%
+  select(-Platform,-Transform,-YieldInterval,-Language,-Benchmark)
 
-plot <- ggplot(df, aes(x=Benchmark,y=Time)) +
+plot <- ggplot(df, aes(x=Label,y=RunningTime)) +
   geom_bar(position="dodge", aes(fill=Type),stat="identity") +
-  ylab("Time (ms)") +
-  mytheme()
+  ylab("Time (ms)") + mytheme()
 
 mysave("data.pdf", plot)
 
 baseline <- data %>% 
-  filter(Transformation == "baseline") %>%
-  mutate(BaseTime = Time) %>%
-  select(-Time, -Transformation)
+  filter(Transform == "original") %>%
+  mutate(BaseTime = RunningTime) %>%
+  select(-RunningTime, -Transform, -YieldInterval) %>%
+  distinct(Platform, Benchmark, Language, .keep_all = TRUE)
 
 df <- inner_join(baseline,data) %>%
-  filter(Transformation != "baseline") %>%
-  mutate(Slowdown = Time / BaseTime,
-         Type = paste(Interval,Transformation))
+  filter(Transform != "original") %>%
+  mutate(Slowdown = RunningTime / BaseTime,
+         Label = paste(Language,Benchmark),
+         Type = paste(Platform,Transform,YieldInterval)) %>%
+  select(-Platform,-Transform,-YieldInterval,-RunningTime,-BaseTime,-Language,-Benchmark)
 
-plot <- ggplot(df, aes(x=Benchmark,y=Slowdown)) +
+plot <- ggplot(df, aes(x=Label,y=Slowdown)) +
   geom_bar(position="dodge", aes(fill=Type),stat="identity") +
   ylab("Slowdown") +
   mytheme()
