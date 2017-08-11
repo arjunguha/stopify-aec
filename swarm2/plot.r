@@ -50,7 +50,7 @@ plot <- ggplot(df, aes(x=Label,y=RunningTime)) +
 mysave("data.pdf", plot)
 
 baseline <- data %>% 
-  filter(Transform == "original") %>%
+  filter(Transform == "original" & YieldInterval == 0) %>%
   mutate(BaseTime = RunningTime) %>%
   select(-RunningTime, -Transform, -YieldInterval) %>%
   distinct(Platform, Benchmark, Language, .keep_all = TRUE)

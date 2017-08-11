@@ -1,5 +1,5 @@
 "use strict";
-// Transcrypt'ed from Python, 2017-08-05 21:24:03
+// Transcrypt'ed from Python, 2017-08-11 06:34:59
 function pystone () {
    var __symbols__ = ['__py3.6__', '__esv5__'];
     var __all__ = {};
@@ -2380,7 +2380,7 @@ function pystone () {
 		var LOOPS = 50000;
 		var time = __init__ (__world__.time).time;
 		var __version__ = '1.1';
-		var __left0__ = list (range (1, 6));
+		var __left0__ = __call__ (list, null, __call__ (range, null, 1, 6));
 		var Ident1 = __left0__ [0];
 		var Ident2 = __left0__ [1];
 		var Ident3 = __left0__ [2];
@@ -2410,7 +2410,7 @@ function pystone () {
 				self.StringComp = StringComp;
 			});},
 			get copy () {return __get__ (this, function (self) {
-				return Record (self.PtrComp, self.Discr, self.EnumComp, self.IntComp, self.StringComp);
+				return __call__ (Record, null, self.PtrComp, self.Discr, self.EnumComp, self.IntComp, self.StringComp);
 			});}
 		});
 		var TRUE = 1;
@@ -2419,7 +2419,7 @@ function pystone () {
 			if (typeof loops == 'undefined' || (loops != null && loops .hasOwnProperty ("__kwargtrans__"))) {;
 				var loops = LOOPS;
 			};
-			var __left0__ = pystones (loops);
+			var __left0__ = __call__ (pystones, null, loops);
 			var benchtime = __left0__ [0];
 			var stones = __left0__ [1];
 		};
@@ -2427,19 +2427,19 @@ function pystone () {
 			if (typeof loops == 'undefined' || (loops != null && loops .hasOwnProperty ("__kwargtrans__"))) {;
 				var loops = LOOPS;
 			};
-			return Proc0 (loops);
+			return __call__ (Proc0, null, loops);
 		};
 		var IntGlob = 0;
 		var BoolGlob = FALSE;
 		var Char1Glob = '\x00';
 		var Char2Glob = '\x00';
-		var Array1Glob = list ([0]) * 51;
+		var Array1Glob = __mul__ (list ([0]), 51);
 		var Array2Glob = function () {
 			var __accu0__ = [];
-			var __iterable0__ = list ([Array1Glob]) * 51;
+			var __iterable0__ = __mul__ (list ([Array1Glob]), 51);
 			for (var __index0__ = 0; __index0__ < __iterable0__.length; __index0__++) {
-				var x = __iterable0__ [__index0__];
-				__accu0__.append (x.__getslice__ (0, null, 1));
+				var x = __getitem__ (__iterable0__, __index0__);
+				__call__ (__accu0__.append, __accu0__, __getslice__ (x, 0, null, 1));
 			}
 			return __accu0__;
 		} ();
@@ -2449,86 +2449,86 @@ function pystone () {
 			if (typeof loops == 'undefined' || (loops != null && loops .hasOwnProperty ("__kwargtrans__"))) {;
 				var loops = LOOPS;
 			};
-			var starttime = time ();
+			var starttime = __call__ (time, null);
 			for (var i = 0; i < loops; i++) {
 				// pass;
 			}
-			var nulltime = time () - starttime;
-			PtrGlbNext = Record ();
-			PtrGlb = Record ();
+			var nulltime = __sub__ (__call__ (time, null), starttime);
+			PtrGlbNext = __call__ (Record, null);
+			PtrGlb = __call__ (Record, null);
 			PtrGlb.PtrComp = PtrGlbNext;
 			PtrGlb.Discr = Ident1;
 			PtrGlb.EnumComp = Ident3;
 			PtrGlb.IntComp = 40;
 			PtrGlb.StringComp = 'DHRYSTONE PROGRAM, SOME STRING';
 			var String1Loc = "DHRYSTONE PROGRAM, 1'ST STRING";
-			Array2Glob [8] [7] = 10;
-			var starttime = time ();
+			__setitem__ (__getitem__ (Array2Glob, 8), 7, 10);
+			var starttime = __call__ (time, null);
 			for (var i = 0; i < loops; i++) {
-				Proc5 ();
-				Proc4 ();
+				__call__ (Proc5, null);
+				__call__ (Proc4, null);
 				var IntLoc1 = 2;
 				var IntLoc2 = 3;
 				var String2Loc = "DHRYSTONE PROGRAM, 2'ND STRING";
 				var EnumLoc = Ident2;
-				BoolGlob = !(Func2 (String1Loc, String2Loc));
-				while (IntLoc1 < IntLoc2) {
-					var IntLoc3 = 5 * IntLoc1 - IntLoc2;
-					var IntLoc3 = Proc7 (IntLoc1, IntLoc2);
-					var IntLoc1 = IntLoc1 + 1;
+				BoolGlob = !(__call__ (Func2, null, String1Loc, String2Loc));
+				while (__lt__ (IntLoc1, IntLoc2)) {
+					var IntLoc3 = __sub__ (__mul__ (5, IntLoc1), IntLoc2);
+					var IntLoc3 = __call__ (Proc7, null, IntLoc1, IntLoc2);
+					var IntLoc1 = __add__ (IntLoc1, 1);
 				}
-				Proc8 (Array1Glob, Array2Glob, IntLoc1, IntLoc3);
-				PtrGlb = Proc1 (PtrGlb);
+				__call__ (Proc8, null, Array1Glob, Array2Glob, IntLoc1, IntLoc3);
+				PtrGlb = __call__ (Proc1, null, PtrGlb);
 				var CharIndex = 'A';
-				while (CharIndex <= Char2Glob) {
-					if (EnumLoc == Func1 (CharIndex, 'C')) {
-						var EnumLoc = Proc6 (Ident1);
+				while (__le__ (CharIndex, Char2Glob)) {
+					if (__eq__ (EnumLoc, __call__ (Func1, null, CharIndex, 'C'))) {
+						var EnumLoc = __call__ (Proc6, null, Ident1);
 					}
-					var CharIndex = chr (ord (CharIndex) + 1);
+					var CharIndex = __call__ (chr, null, __add__ (__call__ (ord, null, CharIndex), 1));
 				}
-				var IntLoc3 = IntLoc2 * IntLoc1;
-				var IntLoc2 = IntLoc3 / IntLoc1;
-				var IntLoc2 = 7 * (IntLoc3 - IntLoc2) - IntLoc1;
-				var IntLoc1 = Proc2 (IntLoc1);
+				var IntLoc3 = __mul__ (IntLoc2, IntLoc1);
+				var IntLoc2 = __div__ (IntLoc3, IntLoc1);
+				var IntLoc2 = __sub__ (__mul__ (7, __sub__ (IntLoc3, IntLoc2)), IntLoc1);
+				var IntLoc1 = __call__ (Proc2, null, IntLoc1);
 			}
-			var benchtime = (time () - starttime) - nulltime;
-			if (benchtime == 0.0) {
+			var benchtime = __sub__ (__sub__ (__call__ (time, null), starttime), nulltime);
+			if (__eq__ (benchtime, 0.0)) {
 				var loopsPerBenchtime = 0.0;
 			}
 			else {
-				var loopsPerBenchtime = loops / benchtime;
+				var loopsPerBenchtime = __div__ (loops, benchtime);
 			}
 			return tuple ([benchtime, loopsPerBenchtime]);
 		};
 		var Proc1 = function (PtrParIn) {
-			var __left0__ = PtrGlb.copy ();
+			var __left0__ = __call__ (PtrGlb.copy, PtrGlb);
 			PtrParIn.PtrComp = __left0__;
 			var NextRecord = __left0__;
 			PtrParIn.IntComp = 5;
 			NextRecord.IntComp = PtrParIn.IntComp;
 			NextRecord.PtrComp = PtrParIn.PtrComp;
-			NextRecord.PtrComp = Proc3 (NextRecord.PtrComp);
-			if (NextRecord.Discr == Ident1) {
+			NextRecord.PtrComp = __call__ (Proc3, null, NextRecord.PtrComp);
+			if (__eq__ (NextRecord.Discr, Ident1)) {
 				NextRecord.IntComp = 6;
-				NextRecord.EnumComp = Proc6 (PtrParIn.EnumComp);
+				NextRecord.EnumComp = __call__ (Proc6, null, PtrParIn.EnumComp);
 				NextRecord.PtrComp = PtrGlb.PtrComp;
-				NextRecord.IntComp = Proc7 (NextRecord.IntComp, 10);
+				NextRecord.IntComp = __call__ (Proc7, null, NextRecord.IntComp, 10);
 			}
 			else {
-				var PtrParIn = NextRecord.copy ();
+				var PtrParIn = __call__ (NextRecord.copy, NextRecord);
 			}
 			NextRecord.PtrComp = null;
 			return PtrParIn;
 		};
 		var Proc2 = function (IntParIO) {
-			var IntLoc = IntParIO + 10;
+			var IntLoc = __add__ (IntParIO, 10);
 			while (1) {
-				if (Char1Glob == 'A') {
-					var IntLoc = IntLoc - 1;
-					var IntParIO = IntLoc - IntGlob;
+				if (__eq__ (Char1Glob, 'A')) {
+					var IntLoc = __sub__ (IntLoc, 1);
+					var IntParIO = __sub__ (IntLoc, IntGlob);
 					var EnumLoc = Ident1;
 				}
-				if (EnumLoc == Ident1) {
+				if (__eq__ (EnumLoc, Ident1)) {
 					break;
 				}
 			}
@@ -2541,11 +2541,11 @@ function pystone () {
 			else {
 				IntGlob = 100;
 			}
-			PtrGlb.IntComp = Proc7 (10, IntGlob);
+			PtrGlb.IntComp = __call__ (Proc7, null, 10, IntGlob);
 			return PtrParOut;
 		};
 		var Proc4 = function () {
-			var BoolLoc = Char1Glob == 'A';
+			var BoolLoc = __eq__ (Char1Glob, 'A');
 			var BoolLoc = BoolLoc || BoolGlob;
 			Char2Glob = 'B';
 		};
@@ -2555,52 +2555,52 @@ function pystone () {
 		};
 		var Proc6 = function (EnumParIn) {
 			var EnumParOut = EnumParIn;
-			if (!(Func3 (EnumParIn))) {
+			if (!(__call__ (Func3, null, EnumParIn))) {
 				var EnumParOut = Ident4;
 			}
-			if (EnumParIn == Ident1) {
+			if (__eq__ (EnumParIn, Ident1)) {
 				var EnumParOut = Ident1;
 			}
-			else if (EnumParIn == Ident2) {
-				if (IntGlob > 100) {
+			else if (__eq__ (EnumParIn, Ident2)) {
+				if (__gt__ (IntGlob, 100)) {
 					var EnumParOut = Ident1;
 				}
 				else {
 					var EnumParOut = Ident4;
 				}
 			}
-			else if (EnumParIn == Ident3) {
+			else if (__eq__ (EnumParIn, Ident3)) {
 				var EnumParOut = Ident2;
 			}
-			else if (EnumParIn == Ident4) {
+			else if (__eq__ (EnumParIn, Ident4)) {
 				// pass;
 			}
-			else if (EnumParIn == Ident5) {
+			else if (__eq__ (EnumParIn, Ident5)) {
 				var EnumParOut = Ident3;
 			}
 			return EnumParOut;
 		};
 		var Proc7 = function (IntParI1, IntParI2) {
-			var IntLoc = IntParI1 + 2;
-			var IntParOut = IntParI2 + IntLoc;
+			var IntLoc = __add__ (IntParI1, 2);
+			var IntParOut = __add__ (IntParI2, IntLoc);
 			return IntParOut;
 		};
 		var Proc8 = function (Array1Par, Array2Par, IntParI1, IntParI2) {
-			var IntLoc = IntParI1 + 5;
-			Array1Par [IntLoc] = IntParI2;
-			Array1Par [IntLoc + 1] = Array1Par [IntLoc];
-			Array1Par [IntLoc + 30] = IntLoc;
-			for (var IntIndex = IntLoc; IntIndex < IntLoc + 2; IntIndex++) {
-				Array2Par [IntLoc] [IntIndex] = IntLoc;
+			var IntLoc = __add__ (IntParI1, 5);
+			__setitem__ (Array1Par, IntLoc, IntParI2);
+			__setitem__ (Array1Par, __add__ (IntLoc, 1), __getitem__ (Array1Par, IntLoc));
+			__setitem__ (Array1Par, __add__ (IntLoc, 30), IntLoc);
+			for (var IntIndex = IntLoc; IntIndex < __add__ (IntLoc, 2); IntIndex++) {
+				__setitem__ (__getitem__ (Array2Par, IntLoc), IntIndex, IntLoc);
 			}
-			Array2Par [IntLoc] [IntLoc - 1] = Array2Par [IntLoc] [IntLoc - 1] + 1;
-			Array2Par [IntLoc + 20] [IntLoc] = Array1Par [IntLoc];
+			__setitem__ (__getitem__ (Array2Par, IntLoc), __sub__ (IntLoc, 1), __add__ (__getitem__ (__getitem__ (Array2Par, IntLoc), __sub__ (IntLoc, 1)), 1));
+			__setitem__ (__getitem__ (Array2Par, __add__ (IntLoc, 20)), IntLoc, __getitem__ (Array1Par, IntLoc));
 			IntGlob = 5;
 		};
 		var Func1 = function (CharPar1, CharPar2) {
 			var CharLoc1 = CharPar1;
 			var CharLoc2 = CharLoc1;
-			if (CharLoc2 != CharPar2) {
+			if (__ne__ (CharLoc2, CharPar2)) {
 				return Ident1;
 			}
 			else {
@@ -2609,20 +2609,20 @@ function pystone () {
 		};
 		var Func2 = function (StrParI1, StrParI2) {
 			var IntLoc = 1;
-			while (IntLoc <= 1) {
-				if (Func1 (StrParI1 [IntLoc], StrParI2 [IntLoc + 1]) == Ident1) {
+			while (__le__ (IntLoc, 1)) {
+				if (__eq__ (__call__ (Func1, null, __getitem__ (StrParI1, IntLoc), __getitem__ (StrParI2, __add__ (IntLoc, 1))), Ident1)) {
 					var CharLoc = 'A';
-					var IntLoc = IntLoc + 1;
+					var IntLoc = __add__ (IntLoc, 1);
 				}
 			}
-			if (CharLoc >= 'W' && CharLoc <= 'Z') {
+			if (__ge__ (CharLoc, 'W') && __le__ (CharLoc, 'Z')) {
 				var IntLoc = 7;
 			}
-			if (CharLoc == 'X') {
+			if (__eq__ (CharLoc, 'X')) {
 				return TRUE;
 			}
-			else if (StrParI1 > StrParI2) {
-				var IntLoc = IntLoc + 7;
+			else if (__gt__ (StrParI1, StrParI2)) {
+				var IntLoc = __add__ (IntLoc, 7);
 				return TRUE;
 			}
 			else {
@@ -2631,12 +2631,12 @@ function pystone () {
 		};
 		var Func3 = function (EnumParIn) {
 			var EnumLoc = EnumParIn;
-			if (EnumLoc == Ident3) {
+			if (__eq__ (EnumLoc, Ident3)) {
 				return TRUE;
 			}
 			return FALSE;
 		};
-		main (LOOPS);
+		__call__ (main, null, LOOPS);
 		__pragma__ ('<use>' +
 			'time' +
 		'</use>')

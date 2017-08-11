@@ -21,6 +21,8 @@ K_WORK = 1001
 
 # Packet
 
+__pragma__('opov')
+
 BUFSIZE = 4
 
 BUFSIZE_RANGE = list(range(BUFSIZE))
