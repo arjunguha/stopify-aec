@@ -31,7 +31,6 @@ Version History:
                 of different versions can't be compared directly.
 
 """
-__pragma__('opov')
 
 LOOPS = 50000
 

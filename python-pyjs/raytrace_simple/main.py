@@ -7,9 +7,6 @@
 
 import math
 
-__pragma__ ('kwargs')
-__pragma__('opov')
-
 EPSILON = 0.00001
 
 class Vector(object):
@@ -174,8 +171,7 @@ b = Vector(1,1,1)
 
 class PpmCanvas(object):
     def __init__(self, width, height, filenameBase):
-        import array
-        self.bytes = array.array('B', [0] * (width * height * 3))
+        self.bytes = [0] * (width * height * 3)
         for i in range(width * height):
             self.bytes[i * 3 + 2] = 255
         self.width = width
@@ -367,4 +363,4 @@ def main(n):
         times.append(t2 - t1)
     return times
 
-main(2)
+main(1)

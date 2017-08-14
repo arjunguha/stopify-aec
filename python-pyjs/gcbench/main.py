@@ -45,8 +45,6 @@
 #                 check for proper locking
 import time
 
-__pragma__ ('opov')
-
 USAGE = """gcbench [num_repetitions] [--depths=N,N,N..] [--threads=N]"""
 ENABLE_THREADS = True
 

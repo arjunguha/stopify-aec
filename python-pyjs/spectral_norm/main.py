@@ -9,7 +9,6 @@
 
 from math            import sqrt
 import time
-import itertools
 
 def eval_A (i, j):
     return 1.0 / ((i + j) * (i + j + 1) / 2 + i + 1)
@@ -60,5 +59,4 @@ def main(n):
         times.append(tk - t0)
     return times
 
-main(10)
-pass #print("Done")
+main(1)

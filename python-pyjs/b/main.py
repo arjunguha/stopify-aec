@@ -16,7 +16,7 @@ class a(object):
       _buffer_write('\n')
       for column in row:
         _buffer_write('<td>')
-        _buffer_write('%s' % column)
+        _buffer_write(str(column)) # AG: Removed string interpolation for Transcrypt
         _buffer_write('</td>')
         _buffer_write('\n')
       _buffer_write('</tr>')
@@ -25,5 +25,7 @@ class a(object):
     _buffer_write('\n')
     return ''.join(_buffer)
 
-
-a().main(table)
+# AG: Added as a sanity check
+r = a().main(table)
+if 12901045 != len(r):
+  raise Exception('Bad result')
