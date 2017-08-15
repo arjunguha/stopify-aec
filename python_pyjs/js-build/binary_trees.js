@@ -14613,7 +14613,7 @@ var $generator_state = [0], $generator_exc = [null], $yield_value = null, $exc =
 	$m['get_argchunks']['__args__'] = [null,null,['i'],['d'],['chunksize', 5000]];
 	$m['main'] = function(n, min_depth) {
 		if (typeof min_depth == 'undefined') min_depth=arguments['callee']['__args__'][3][1];
-		var ch,$add13,$iter4_type,cs,$iter4_iter,$iter3_idx,$pow2,$pow1,stretch_depth,$iter3_nextval,$sub8,$iter3_iter,$sub7,max_depth,$iter3_array,$add14,$add15,$add16,argchunk,$add10,$add11,$add12,$iter3_type,mmd,$mul2,$mul1,d,i,$iter4_nextval,$iter4_idx,long_lived_tree,$iter4_array,$add9;
+		var ch,$add13,$iter4_type,cs,$iter4_iter,$iter3_idx,$pow2,$pow1,stretch_depth,$iter3_nextval,$sub8,$iter3_iter,$sub7,max_depth,$iter3_array,$add14,$add15,$add16,argchunk,$add10,$add11,$add12,$iter3_type,mmd,d,i,$iter4_nextval,$iter4_idx,long_lived_tree,$iter4_array,$add9;
 		max_depth = $p['max']($p['__op_add']($add9=min_depth,$add10=2), n);
 		stretch_depth = $p['__op_add']($add11=max_depth,$add12=1);
 		long_lived_tree = $m['make_tree'](0, max_depth);
@@ -14633,18 +14633,14 @@ var $generator_state = [0], $generator_exc = [null], $yield_value = null, $exc =
 				argchunk = $iter4_nextval['$nextval'];
 				cs = $p['__op_add']($add15=cs,$add16=$p['sum']($p['map']($m['make_check'], argchunk)));
 			}
-			$p['printFunc']([$p['tuple']([(typeof ($mul1=i)==typeof ($mul2=2) && typeof $mul1=='number'?
-				$mul1*$mul2:
-				$p['op_mul']($mul1,$mul2)), d, cs])], 1);
 		}
-		$p['printFunc']([$p['tuple']([max_depth, $m['check_tree'](long_lived_tree)])], 1);
 		return null;
 	};
 	$m['main']['__name__'] = 'main';
 
 	$m['main']['__bind_type__'] = 0;
 	$m['main']['__args__'] = [null,null,['n'],['min_depth', 4]];
-	$m['main'](15);
+	$m['main'](12);
 	return this;
 }; /* end main */
 

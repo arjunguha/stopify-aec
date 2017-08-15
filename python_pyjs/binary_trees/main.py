@@ -58,8 +58,8 @@ def main(n, min_depth=4):
         ch = get_argchunks(i, d)
         for argchunk in ch:
             cs += sum(map(make_check, argchunk))
-        print(i * 2, d, cs)
+        # print(i * 2, d, cs)
 
-    print(max_depth, check_tree(long_lived_tree))
+    # print(max_depth, check_tree(long_lived_tree))
 
-main(15)
+main(12)
