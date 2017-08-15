@@ -1303,7 +1303,7 @@ lines = ["227AB8KF2FVE  22270 72 3655 273 1 13425 3365 922 15866 18060 7073 1904
 # Strip superfluous information
 lines = [line[14:].rstrip() for line in lines]
 
-votes = [line.split(' ') for line in lines]
+votes = [line.split( ) for line in lines]
 
 # Make a canonical set of all the candidates
 candidates = {}
@@ -1379,7 +1379,12 @@ while cl:
 
 
 # Display the results
-j = 0
-for i in order:
-    j += 1
-    pass #print('%3d %s' % (j, reverseCandidates[i]))
+# j = 0
+# for i in order:
+#     j += 1
+#     print(%3d %s % (j, reverseCandidates[i]))
+
+# NOTE(arjun): Verify the result
+results = [int(reverseCandidates[i]) for i in order]
+assert(sum(results) == 6402391)
+
