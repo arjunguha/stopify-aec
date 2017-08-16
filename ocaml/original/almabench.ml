@@ -323,8 +323,9 @@ let result_1 =
     21.27, -16.57;
     20.41, -19.04|]
 
+open Micro_bench_types
+
 exception Err of (int * float * float)
-exception Benchmark_error of string
 
 let check_1 _ result =
   let result = result.(0) in
@@ -335,6 +336,7 @@ let check_1 _ result =
               && abs_float (b' -. b) <= 0.01)
       then raise (Err (i, a, b)))
       result;
+    Ok
   with Err (i, a, b) ->
     let (a', b') = result_1.(i) in
     let s =
@@ -344,19 +346,11 @@ let check_1 _ result =
       ^ string_of_float a' ^ " "
       ^ string_of_float b'
     in
-    raise (Benchmark_error s)
+    Error s
 
-(* Commented out operf-micro boilerplate that adds benchmark to bench runner *)
-(*let functions =
+let functions =
   [ "bench", Int (run, (fun i -> i), check_1,
                   [ Range (20, 100), Short ])
   ]
-*)
 
-(* Inserted custom test runner fixture *)
-
-let run_and_check () =
-  let res = run 20 in
-  check_1 () res
-
-let _ = run_and_check ()
+let () = add functions

@@ -881,23 +881,15 @@ let term = cterm_to_term(
               CProp ("implies",[CVar 23; CVar 22])]))
 
 
-exception Benchmark_error of string
+open Micro_bench_types
 
 let run () = tautp (apply_subst subst term)
 let check b =
-  if not b then
-  raise (Benchmark_error "Cannot prove")
+  if b
+  then Ok
+  else Error "Cannot prove"
 
-(* Commented out operf-micro boilerplate that adds benchmark to bench runner *)
-(*let functions =
+let functions =
   [ "boyer", Unit (run, check, Long) ]
 
 let () = add functions
-*)
-
-(* Inserted custom test runner fixture *)
-let run_and_check () =
-  let res = run () in
-  check res
-
-let _ = run_and_check ()

@@ -1,5 +1,3 @@
-type result = Ok | Error of string
-
 let rec fib n =
   if n < 2 then 1 else fib(n-1) + fib(n-2)
 
@@ -10,7 +8,7 @@ let results =
     14930352; 24157817; 39088169; 63245986; 102334155; 165580141; 267914296;
     433494437; 701408733|]
 
-(*open Micro_bench_types*)
+open Micro_bench_types
 
 let prepare i = i
 let run i = fib i
@@ -20,8 +18,7 @@ let check i n =
   else Error ("fib " ^ (string_of_int i) ^ " returned " ^ (string_of_int n)
               ^ " instead of " ^ (string_of_int results.(i)))
 
-(* Commented out operf-micro boilerplate that adds benchmark to bench runner *)
-(*let functions =
+let functions =
   [ "fib", Int (run, prepare, check,
                 [ Range (0, 28), Short;
                   Range (29, 40), Long;
@@ -29,12 +26,3 @@ let check i n =
   ]
 
 let () = add functions
-*)
-
-let run_and_check () =
-  let res = run (prepare 10) in
-  match check 10 res with
-  | Error s -> raise (Failure s)
-  | Ok -> ()
-
-let _ = run_and_check ()

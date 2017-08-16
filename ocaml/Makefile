@@ -14,4 +14,4 @@ js-build/%.js: js-build/%.byte
 	js_of_ocaml $<
 
 clean:
-	rm -rf lib js-build
+	rm -rf lib js-build benchmark-files/*.cm*
