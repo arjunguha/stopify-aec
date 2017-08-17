@@ -1,6 +1,0 @@
-#!/bin/bash
-cd `dirname $0`
-INFO=`(cd ../..;git log --pretty=format:'%s - %h' -n 1)`
-mailx -s "Stopify: benchmark results from Swarm 2 ($INFO)" -a data.csv -a data.pdf -a slowdown.pdf arjun@cs.umass.edu rnigam@umass.edu sbaxter@cs.umass.edu joe.politz@gmail.com << EOT
-Attached is the latest benchmark results from Swarm 2.
-EOT
