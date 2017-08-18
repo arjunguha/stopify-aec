@@ -1,0 +1,11 @@
+{
+  "name": "stopify-ocaml",
+  "sources":
+  {
+    "dir": ".",
+    "subdirs": [
+      "./benchmark-files"
+    ]
+  }
+}
+

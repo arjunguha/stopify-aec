@@ -5,5 +5,3 @@ setup.data
 setup.log
 lib
 .merlin
-*.cmi
-*.cmo
