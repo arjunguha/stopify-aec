@@ -93,8 +93,7 @@ def print_diagnostics():
 
 def time_construction(depth, debug=False):
     niters = num_iters(depth)
-    if debug:
-        pass #pass #print("Creating %d trees of depth %d" % (niters, depth))
+    print("Creating %d trees of depth %d" % (niters, depth))
     t_start = time.time()
     for i in range(int(niters)):
         temp_tree = Node()
@@ -132,14 +131,12 @@ def main(numruns, depths=DEFAULT_DEPTHS, threads=0, debug=False):
         temp_tree = None
 
         # Create a long lived object
-        if debug:
-            pass #pass #print(" Creating a long-lived binary tree of depth %d" % kLongLivedTreeDepth)
+        print(" Creating a long-lived binary tree of depth %d" % kLongLivedTreeDepth)
         long_lived_tree = Node()
         populate(kLongLivedTreeDepth, long_lived_tree)
 
         # Create long-lived array, filling half of it
-        if debug:
-            pass #pass #print(" Creating a long-lived array of %d doubles" % kArraySize)
+        print(" Creating a long-lived array of %d doubles" % kArraySize)
         array = [0.0] * kArraySize
         i = 1
         while i < kArraySize/2:
@@ -156,7 +153,7 @@ def main(numruns, depths=DEFAULT_DEPTHS, threads=0, debug=False):
             raise Failed
 
         t_finish = time.time()
-        pass #print_diagnostics()
+        print_diagnostics()
         if debug:
             pass #pass #print("Completed in %f ms." % ((t_finish-t_start)*1000.))
         times.append(t_finish - t_start)
