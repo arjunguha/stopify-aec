@@ -1,3 +1,26 @@
+#lang r5rs
+(define (time x) x)
+
+(define (run-bench name count ok? run)
+  (let loop ((i 0) (result (list 'undefined)))
+    (if (< i count)
+      (loop (+ i 1) (run))
+      result)))
+
+(define (run-benchmark name count ok? run-maker . args)
+  (newline)
+  (let* ((run (apply run-maker args))
+         (result (time (run-bench name count ok? run))))
+    (if (not (ok? result))
+      (begin
+        (display "*** wrong result ***")
+        (newline)
+        (display "*** got: ")
+        (write result)
+        (newline))
+      (begin
+        (display "OK") 
+        (newline)))))
 ; Hacked to change error to fatal-error.
 ; (One of the benchmarked systems has a problem with calls to error.)
 
@@ -948,3 +971,4 @@
 
 (define (main . args)
   (parsing-benchmark parsing-iters "../data/test.sch"))
+(main)

@@ -1,3 +1,26 @@
+#lang r5rs
+(define (time x) x)
+
+(define (run-bench name count ok? run)
+  (let loop ((i 0) (result (list 'undefined)))
+    (if (< i count)
+      (loop (+ i 1) (run))
+      result)))
+
+(define (run-benchmark name count ok? run-maker . args)
+  (newline)
+  (let* ((run (apply run-maker args))
+         (result (time (run-bench name count ok? run))))
+    (if (not (ok? result))
+      (begin
+        (display "*** wrong result ***")
+        (newline)
+        (display "*** got: ")
+        (write result)
+        (newline))
+      (begin
+        (display "OK") 
+        (newline)))))
 ;;; NTAKL -- The TAKeuchi function using lists as counters,
 ;;; with an alternative boolean expression.
  
@@ -43,3 +66,4 @@
     takl-iters
     (lambda () (mas l18 l12 l6))
     (lambda (result) (equal? result '(7 6 5 4 3 2 1)))))
+(main)

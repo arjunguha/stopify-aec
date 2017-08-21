@@ -1,3 +1,31 @@
+#lang r5rs
+
+(define boyer-iters 1)
+
+(define (error) (car '()))
+
+(define (time x) x)
+
+(define (run-bench name count ok? run)
+  (let loop ((i 0) (result (list 'undefined)))
+    (if (< i count)
+      (loop (+ i 1) (run))
+      result)))
+
+(define (run-benchmark name count ok? run-maker . args)
+  (newline)
+  (let* ((run (apply run-maker args))
+         (result (time (run-bench name count ok? run))))
+    (if (not (ok? result))
+      (begin
+        (display "*** wrong result ***")
+        (newline)
+        (display "*** got: ")
+        (write result)
+        (newline))
+      (begin
+        (display "OK") 
+        (newline)))))
 ;;; BOYER -- Logic programming benchmark, originally written by Bob Boyer.
 ;;; Fairly CONS intensive.
 
@@ -41,7 +69,7 @@
          (put (car (cadr term))
               (quote lemmas)
               (cons term (get (car (cadr term)) (quote lemmas)))))
-        (else (fatal-error "ADD-LEMMA did not like term:  " term))))
+        (else (error "ADD-LEMMA did not like term:  " term))))
 
 (define (add-lemma-lst lst)
   (cond ((null? lst)
@@ -566,3 +594,4 @@
                               (and (implies z u)
                                    (implies u w))))
                     (implies x w)))))
+(main)

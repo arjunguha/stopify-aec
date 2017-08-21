@@ -1,3 +1,28 @@
+#lang r5rs
+(define (error) (car '()))
+(define matrix-iters 10)
+(define (time x) x)
+
+(define (run-bench name count ok? run)
+  (let loop ((i 0) (result (list 'undefined)))
+    (if (< i count)
+      (loop (+ i 1) (run))
+      result)))
+
+(define (run-benchmark name count ok? run-maker . args)
+  (newline)
+  (let* ((run (apply run-maker args))
+         (result (time (run-bench name count ok? run))))
+    (if (not (ok? result))
+      (begin
+        (display "*** wrong result ***")
+        (newline)
+        (display "*** got: ")
+        (write result)
+        (newline))
+      (begin
+        (display "OK") 
+        (newline)))))
 ;;; MATRIX -- Obtained from Andrew Wright.
 
 ; Chez-Scheme compatibility stuff:
@@ -246,7 +271,7 @@
    (lambda (modulus)
       (let* ((reduce
                 (lambda (x)
-                   (modulo x modulus)))
+                   (remainder x modulus)))
              (coef-zero?
                 (lambda (x)
                    (zero? (reduce x))))
@@ -503,7 +528,7 @@
                           (let ((p
                                    (car primes)))
                              (or (< trial (* p p))
-                                 (and (not (zero? (modulo trial p)))
+                                 (and (not (zero? (remainder trial p)))
                                       (_-*- (cdr primes))))))))))
          (if (> 2 bound)
              2
@@ -764,3 +789,4 @@
    (lambda (number-of-cols inv-size) (lambda () (really-go number-of-cols inv-size)))
    5
    5))
+(main)

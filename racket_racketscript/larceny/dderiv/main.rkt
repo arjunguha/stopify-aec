@@ -1,3 +1,28 @@
+#lang r5rs
+(define (fatal-error) (car '()))
+(define dderiv-iters 1)
+(define (time x) x)
+
+(define (run-bench name count ok? run)
+  (let loop ((i 0) (result (list 'undefined)))
+    (if (< i count)
+      (loop (+ i 1) (run))
+      result)))
+
+(define (run-benchmark name count ok? run-maker . args)
+  (newline)
+  (let* ((run (apply run-maker args))
+         (result (time (run-bench name count ok? run))))
+    (if (not (ok? result))
+      (begin
+        (display "*** wrong result ***")
+        (newline)
+        (display "*** got: ")
+        (write result)
+        (newline))
+      (begin
+        (display "OK") 
+        (newline)))))
 ;;; DDERIV -- Table-driven symbolic derivation.
 
 ;;; Returns the wrong answer for quotients.
@@ -84,3 +109,4 @@
                   0)))
     (lambda (a) (lambda () (dderiv a)))
     '(+ (* 3 x x) (* a x x) (* b x) 5)))
+(main)
