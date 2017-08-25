@@ -14265,6 +14265,23 @@ $pyjs['loaded_modules']['math'] = function (__mod_name__) {
 
 /* end module: math */
 
+
+// NOTE(arjun): I hacked up this implementation of math.random.
+$pyjs.loaded_modules.random = function(__mod_name__) {
+    if ($pyjs.loaded_modules.random.__was_initialized__) {
+        return $pyjs.loaded_modules.random;
+    }
+    var $m = $pyjs.loaded_modules.random;
+    $m.__was_initialized__ = true;
+    $m.uniform = function(loValue, hiValue) {
+        const lo = loValue.valueOf();
+        const hi = hiValue.valueOf();
+        // Math.random : () => { x:number | x >= 0 && x < 1 }
+        return $p.float((hi - lo) * Math.random() + lo);
+    }
+    return this;
+  }
+  
 var wait_count = 0;
 
 var onExecutionError = function (exception, name) {
