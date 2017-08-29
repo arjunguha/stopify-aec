@@ -355,8 +355,10 @@ let check_1 _ result =
 
 (* Inserted custom test runner fixture *)
 
+open Fixture
+
 let run_and_check () =
   let res = run 20 in
   check_1 () res
 
-let _ = run_and_check ()
+let _ = Fixture.run_n_times 10000 run_and_check

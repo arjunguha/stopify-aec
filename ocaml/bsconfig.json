@@ -5,6 +5,9 @@
     "dir": ".",
     "subdirs": [
       "./benchmark-files"
+    ],
+    "files": [
+      "./fixture.ml"
     ]
   }
 }

@@ -31,10 +31,12 @@ let check i n =
 let () = add functions
 *)
 
+open Fixture
+
 let run_and_check () =
   let res = run (prepare 10) in
   match check 10 res with
   | Error s -> raise (Failure s)
   | Ok -> ()
 
-let _ = run_and_check ()
+let _ = Fixture.run_n_times 5000000 run_and_check

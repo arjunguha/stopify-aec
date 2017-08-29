@@ -3237,10 +3237,12 @@ let check v =
 let () = add functions
 *)
 
+open Fixture
+
 let run_and_check () =
   let res = run () in
   match check res with
   | Error s -> raise (Failure s)
   | Ok -> ()
 
-let _ = run_and_check ()
+let _ = Fixture.run_n_times 200 run_and_check

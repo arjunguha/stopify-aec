@@ -265,6 +265,8 @@ let () = add functions
 
 (* Inserted custom test runner fixture *)
 
+open Fixture
+
 let run_eval () =
   let res = run_eval (prepare_eval 10) in
   match check_eval 10 res with
@@ -277,5 +279,5 @@ let run_build () =
   | Error s -> raise (Failure s)
   | Ok -> ()
 
-let _ = run_eval ()
-let _ = run_build ()
+let _ = Fixture.run_n_times 3000 run_eval
+let _ = Fixture.run_n_times 3000 run_build
