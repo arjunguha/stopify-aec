@@ -11,14 +11,25 @@
    :compile-path]
   :profiles {:uberjar {:aot :all}}
   :cljsbuild {
-              :builds [{:id "dev"
-                        :jar true
-                        :source-paths ["nbody"]
-                        :incremental true
-                        :compiler {
-                                   :cache-analysis true
-                                   :parallel-build true
-                                   :optimizations :advanced
-                                   :output-to "out/main.js"
-                                   :output-dir "out"
-                                   :static-fns true}}]})
+              :builds {:nbody {:id "dev"
+                               :jar true
+                               :source-paths ["nbody"]
+                               :incremental true
+                               :compiler {
+                                          :cache-analysis true
+                                          :parallel-build true
+                                          :optimizations :advanced
+                                          :output-to "js-build/nbody.js"
+                                          :output-dir "out/nbody"
+                                          :static-fns true}}
+                       :binarytrees {:id "dev"
+                                     :jar true
+                                     :source-paths ["binarytrees"]
+                                     :incremental true
+                                     :compiler {
+                                                :cache-analysis true
+                                                :parallel-build true
+                                                :optimizations :advanced
+                                                :output-to "js-build/binarytrees.js"
+                                                :output-dir "out/binarytrees"
+                                                :static-fns true}}}})
