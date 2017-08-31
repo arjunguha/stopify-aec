@@ -41,18 +41,3 @@
     (let [long-lived-tree (bottom-up-tree 0 max-depth)]
       (doseq [d (range min-depth stretch-depth 2)]
         (iterate-trees max-depth min-depth d)))))
-
-;;(defn main [max-depth]
-;;  (let [stretch-depth (inc max-depth)]
-;;    (let [tree (bottom-up-tree 0 stretch-depth)
-;;          check (item-check tree)]
-;;      (println (format "stretch tree of depth %d\t check: %d" stretch-depth check)))
-;;    (let [long-lived-tree (bottom-up-tree 0 max-depth)]
-;;      (doseq [d (range min-depth stretch-depth 2)]
-;;        (iterate-trees max-depth min-depth d))
-;;      (println (format "long lived tree of depth %d\t check: %d" max-depth (item-check long-lived-tree))))))
-;;
-;;(defn -main [& args]
-;;  (let [n (if (first args) (Integer/parseInt (first args)) 0)
-;;        max-depth (if (> (+ min-depth 2) n) (+ min-depth 2) n)]
-;;    (main max-depth)))
