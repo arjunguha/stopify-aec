@@ -1,4 +1,4 @@
-(defproject lejure "0.1.0-SNAPSHOT"
+(defproject benchmarks "0.1.0-SNAPSHOT"
   :description "Pure ClojureScript benchmarks"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.908"]
