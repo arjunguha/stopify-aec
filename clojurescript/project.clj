@@ -5,7 +5,7 @@
                  [cljx-sampling "0.1.0"]]
   :plugins [[lein-cljsbuild "1.1.7"]]
   :hooks [leiningen.cljsbuild]
-  :source-paths ["nbody" "binarytrees" "fannkuch" "pidigits" "spectralnorm" "meteor" "memuse" "collatz"]
+  :source-paths ["nbody" "binarytrees" "fannkuch" "pidigits" "spectralnorm" "meteor" "memuse" "collatz" "mandelbrot"]
   :clean-targets
   [[:cljsbuild :builds 0 :compiler :output-to]
    :target-path
@@ -99,4 +99,15 @@
                                             :optimizations :advanced
                                             :output-to "js-build/collatz.js"
                                             :output-dir "out/collatz"
+                                            :static-fns true}}
+                       :mandelbrot {:id "dev"
+                                 :jar true
+                                 :source-paths ["mandelbrot"]
+                                 :incremental true
+                                 :compiler {
+                                            :cache-analysis true
+                                            :parallel-build true
+                                            :optimizations :advanced
+                                            :output-to "js-build/mandelbrot.js"
+                                            :output-dir "out/mandelbrot"
                                             :static-fns true}}}})
