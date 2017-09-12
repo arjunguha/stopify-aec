@@ -1,4 +1,4 @@
-#!/usr/local/bin/Rscript
+#!/usr/bin/env Rscript
 source("./lib.r")
 
 args <- commandArgs(TRUE)
