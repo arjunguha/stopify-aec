@@ -53,7 +53,7 @@ for (source in sources) {
 
 df <- calc_slowdown(data)
 plot <- ggplot(df, aes(x=Slowdown, color=Type,y=Count)) + geom_step() +
-  ylab("% of benchmarks") +
+  ylab("number of benchmarks") +
   scale_x_continuous(breaks = seq(0, 100, by = 10),
                      minor_breaks = seq(0, 100, by = 1)) +
   mytheme()
