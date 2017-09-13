@@ -1,5 +1,4 @@
 #!/usr/bin/env Rscript
-library(sitools)
 library(scales)
 library(grid)
 library(extrafont)
