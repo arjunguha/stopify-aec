@@ -21,15 +21,4 @@
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-let bitwiseAndValue = 4294967296;
-for (var i = 0; i < 600000; i++)
-    bitwiseAndValue = bitwiseAndValue & i;
-
-var result = bitwiseAndValue;
-
-var expected = 0;
-if (result != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + result;
-
+ */let bitwiseAndValue=4294967296;for(var i=0;i<600000;i++)bitwiseAndValue=bitwiseAndValue&i;var result=bitwiseAndValue;var expected=0;if(result!=expected)throw"ERROR: bad result: expected "+expected+" but got "+result;
