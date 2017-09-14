@@ -32,7 +32,6 @@ mytheme <- function() {
 
 mysave <- function(filename, plot) {
   ggsave(filename, plot, width=8, height=8, units=c("in"))
-  embed_fonts(filename)
 }
 
 sources <- commandArgs(TRUE)
@@ -58,7 +57,7 @@ plot <- ggplot(df, aes(x=Slowdown, color=Type,y=Count)) + geom_step() +
                      minor_breaks = seq(0, 100, by = 1)) +
   mytheme()
 
-mysave("slowdown.pdf", plot)
+mysave("slowdown.jpg", plot)
 
 # df <- data %>%
 #   mutate(Type = paste(Platform,Transform,TargetLatency)) %>%
