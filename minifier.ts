@@ -16,7 +16,8 @@ function main() {
     plugins: [
     ],
     babelrc: false,
-    minified: true
+    minified: true,
+    comments: false
   };
   babel.transformFile(filename, opts, (err, result) => {
     if (err !== null) {
