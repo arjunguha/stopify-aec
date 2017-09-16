@@ -1,5 +1,38 @@
 library(tidyverse)
 library(stringr)
+library(scales)
+library(grid)
+library(extrafont)
+library(fontcm)
+
+# Theme for output
+mytheme <- function() {
+  return(theme_bw() +
+           theme(
+             panel.background = element_rect(size = 0.9),
+             text = element_text(family = "CM Roman", size=10),
+             #panel.grid.major = element_blank(),
+             #panel.grid.minor = element_blank(),
+             panel.grid.major = element_line(colour="gray", size=0.1),
+             panel.grid.minor =
+                 element_line(colour="gray", size=0.1, linetype='dotted'),
+             axis.ticks = element_line(size=0.05),
+             axis.ticks.length=unit("-0.05", "in"),
+             axis.ticks.margin=unit("0.2", "in"),
+             axis.text.y = element_text(margin = margin(r = 5)),
+             axis.text.x = element_text(margin = margin(t = 5), angle=90),
+             legend.key = element_rect(colour=NA),
+             legend.margin = unit(0.001, "in"),
+             legend.key.size = unit(0.2, "in"),
+             legend.title = element_blank(),
+             legend.position = c(0.9, .7),
+             legend.text = element_text(family = "CM Roman", size=8),
+             legend.background = element_blank()))
+}
+
+mysave <- function(filename, plot) {
+  ggsave(filename, plot, width=8, height=8, units=c("in"))
+}
 
 # Edit this if needed
 run_configurations <- tribble(
@@ -82,10 +115,16 @@ with_run_command <- function(benchmarks) {
                       sep=" ")))
 }
 
-
 read_timing <- function(source) {
   df <- read_csv(source) %>%
     select(Platform,Transform, Benchmark, Language, RunningTime,YieldInterval) %>%
+    mutate(Source = source)
+  return(df)
+}
+
+read_code_size <- function(source) {
+  df <- read_csv(source) %>%
+    select(Transform, Benchmark, Language, NewMethod, TimesBlowup) %>%
     mutate(Source = source)
   return(df)
 }
@@ -111,16 +150,29 @@ calc_slowdown <- function(timing) {
   return(df)
 }
 
+code_blow <- function(timing) {
+  df <- filter(timing, Transform != "original") %>%
+    mutate(Type = paste(Transform,Source,NewMethod)) %>%
+    select(Type,TimesBlowup) %>%
+    mutate(TMP = 1) %>%
+    group_by(Type) %>%
+    arrange(TimesBlowup) %>%
+    mutate(Count = cumsum(TMP),
+           Slowdown = TimesBlowup)
+
+  return(df)
+}
+
 # benchmark_table <- benchmark_configurations(c("ocaml", "scala"))
 # df <- with_run_command(with_compile_command(benchmark_table))
 
 what_broke <- function(old_csv, new_csv) {
   epsilon <- 5
   old <- read_timing(old_csv) %>%
-    mutate(OldRunningTime = RunningTime) %>% 
+    mutate(OldRunningTime = RunningTime) %>%
     select(OldRunningTime,Platform,Transform,Benchmark, Language,YieldInterval)
   new <- read_timing(new_csv) %>%
-    mutate(NewRunningTime = RunningTime) %>% 
+    mutate(NewRunningTime = RunningTime) %>%
     select(NewRunningTime,Platform,Transform,Benchmark, Language,YieldInterval)
   diff <- full_join(old, new) %>%
     filter(is.na(NewRunningTime)) %>%
