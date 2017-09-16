@@ -5,10 +5,6 @@ NOTE(rachit): Benchmark from https://github.com/attractivechaos/plb/blob/master/
 
 package main
 
-import "fmt"
-import "flag"
-import "strconv"
-
 func matgen(n int) [][]float64 {
 	a := make([][]float64, n)
 	aflat := make([]float64, n*n)
@@ -49,12 +45,15 @@ func matmul(a [][]float64, b [][]float64) [][]float64 {
 	return x
 }
 
+// NOTE(rachit): Added to stop go compiler from complaning.
+func id(x float64) float64 {
+  return x
+}
+
 func main() {
 	n := int(1000)
-	flag.Parse()
-	if flag.NArg() > 0 { n,_ = strconv.Atoi(flag.Arg(0)) }
 	a := matgen(n)
 	b := matgen(n)
 	x := matmul(a, b)
-	fmt.Printf("%f\n", x[n/2][n/2])
+  id(x[n/2][n/2])
 }

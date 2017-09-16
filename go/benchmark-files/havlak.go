@@ -7,7 +7,6 @@ overflow in gopherjs.
 package main
 
 import "container/list"
-import "fmt"
 
 type BasicBlock struct {
 	Name     int
@@ -20,20 +19,6 @@ func NewBasicBlock(name int) *BasicBlock {
 }
 
 func (bb *BasicBlock) Dump() {
-	fmt.Printf("BB#%03d: ", bb.Name)
-	if len(bb.InEdges) > 0 {
-		fmt.Printf("in : ")
-		for _, iter := range bb.InEdges {
-			fmt.Printf("BB#%03d ", iter.Name)
-		}
-	}
-	if len(bb.OutEdges) > 0 {
-		fmt.Print("out: ")
-		for _, iter := range bb.OutEdges {
-			fmt.Printf("BB#%03d ", iter.Name)
-		}
-	}
-	fmt.Printf("\n")
 }
 
 //-----------------------------------------------------------
@@ -120,35 +105,6 @@ func (loop *SimpleLoop) AddChildLoop(child *SimpleLoop) {
 }
 
 func (loop *SimpleLoop) Dump(indent int) {
-	for i := 0; i < indent; i++ {
-		fmt.Printf("  ")
-	}
-
-	// No ? operator ?
-	fmt.Printf("loop-%d nest: %d depth %d ",
-		loop.Counter, loop.NestingLevel, loop.DepthLevel)
-	if !loop.IsReducible {
-		fmt.Printf("(Irreducible) ")
-	}
-
-	// must have > 0
-	if len(loop.children) > 0 {
-		fmt.Printf("Children: ")
-		for ll, _ := range loop.children {
-			fmt.Printf("loop-%d", ll.Counter)
-		}
-	}
-	if len(loop.basicBlocks) > 0 {
-		fmt.Printf("(")
-		for bb, _ := range loop.basicBlocks {
-			fmt.Printf("BB#%03d ", bb.Name)
-			if loop.header == bb {
-				fmt.Printf("*")
-			}
-		}
-		fmt.Printf("\b)")
-	}
-	fmt.Printf("\n")
 }
 
 func (loop *SimpleLoop) SetHeader(bb *BasicBlock) {
@@ -616,24 +572,20 @@ func buildBaseLoop(cfgraph *CFG, from int) int {
 }
 
 func main() {
-	fmt.Printf("Welcome to LoopTesterApp, Go edition\n")
 
 	lsgraph := NewLSG()
 	cfgraph := NewCFG()
 
-	fmt.Printf("Constructing Simple CFG...\n")
 
 	cfgraph.CreateNode(0) // top
 	buildBaseLoop(cfgraph, 0)
 	cfgraph.CreateNode(1) // bottom
 	NewBasicBlockEdge(cfgraph, 0, 2)
 
-	fmt.Printf("15000 dummy loops\n")
 	for dummyloop := 0; dummyloop < 15000; dummyloop++ {
 		FindHavlakLoops(cfgraph, NewLSG())
 	}
 
-	fmt.Printf("Constructing CFG...\n")
 	n := 2
 
   // NOTE(rachit): orginal
@@ -658,15 +610,10 @@ func main() {
 		buildConnect(cfgraph, n, 1)
 	}
 
-	fmt.Printf("Performing Loop Recognition\n1 Iteration\n")
 	FindHavlakLoops(cfgraph, lsgraph)
 
-	fmt.Printf("Another 50 iterations...\n")
 	s := 0
 	for i := 0; i < 50; i++ {
-		fmt.Printf(".")
 		s += FindHavlakLoops(cfgraph, NewLSG())
 	}
-
-	fmt.Printf("\nFound %d loops (including artificial root node) (%d)\n", len(lsgraph.Loops), s)
 }
