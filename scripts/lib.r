@@ -129,6 +129,14 @@ read_code_size <- function(source) {
   return(df)
 }
 
+read_compile_time <- function(source) {
+  df <- read_csv(source) %>%
+    select(Transform, Benchmark, Language, NewMethod, Time) %>%
+    mutate(Source = source)
+  return(df)
+}
+
+
 calc_slowdown <- function(timing) {
   baseline <- timing %>%
     filter(Transform == "original") %>%
@@ -159,6 +167,19 @@ code_blow <- function(timing) {
     arrange(TimesBlowup) %>%
     mutate(Count = cumsum(TMP),
            Slowdown = TimesBlowup)
+
+  return(df)
+}
+
+compile_time <- function(timing) {
+  df <- filter(timing, Transform != "original") %>%
+    mutate(Type = paste(Transform,Source,NewMethod)) %>%
+    select(Type,Time) %>%
+    mutate(TMP = 1) %>%
+    group_by(Type) %>%
+    arrange(Time) %>%
+    mutate(Count = cumsum(TMP),
+           Slowdown = Time)
 
   return(df)
 }
