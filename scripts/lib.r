@@ -136,19 +136,24 @@ read_compile_time <- function(source) {
   return(df)
 }
 
-
-calc_slowdown <- function(timing) {
+individual_slowdowns <- function(timing) {
   baseline <- timing %>%
     filter(Transform == "original") %>%
     mutate(BaseTime = RunningTime) %>%
     select(Platform,Benchmark,Language,Source,BaseTime) %>%
     distinct(Platform, Benchmark, Language, Source, .keep_all = TRUE)
-
+  
   withoutOriginal <- timing %>% filter(Transform != "original")
   df <- inner_join(baseline, withoutOriginal) %>%
     mutate(Slowdown = RunningTime / BaseTime,
            Label = paste(Language,Benchmark),
            Type = paste(Platform,Transform,YieldInterval,Source)) %>%
+    select(Label,Type,Slowdown)
+  return (df)
+}
+
+calc_slowdown <- function(timing) {
+  df <- individual_slowdowns(timing) %>%
     select(Type,Slowdown) %>%
     mutate(TMP = 1) %>%
     group_by(Type) %>%
