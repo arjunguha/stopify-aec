@@ -1,10 +1,4 @@
-NOTE(arjun): These are compiled with PyJS, which took some major hacks.
-Ask me for details if you're curious. However, I've verified that all benchmarks
-run the same in Python and Node. Hopefully, any debugging can be done by
-only examining the JavaScript output.
-
-
-A somewhat incomplete list of changes:
+Summary of changes:
 
 - Removed all the __main__ checks.
 - Several benchmarks let me specify the number of iterations. I picked
@@ -13,7 +7,9 @@ A somewhat incomplete list of changes:
 - Disabled saving output to file in raytrace-simple
 - Inlined the file in schulze.py
 - Changed pystone to use time.time() instead of time.clock()
-- Removed all print statements
+- Removed some print statements. We used to require no output, but this was
+  a bad idea.
 - Disabled use of string iterpolation for Transcrypt. No longer relevant for
-  PyJS, I think.
+  PyJS, but this change remains.
 - Messed with the number of iterations for several benchmarks.
+- Removed use of onload

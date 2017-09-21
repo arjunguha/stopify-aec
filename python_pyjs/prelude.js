@@ -80,16 +80,16 @@ function __pygwt_webModeFrameOnLoad(iframeWindow, name) {
 }
 
 
-function __pygwt_hookOnLoad() {
-  var oldHandler = window.onload;
-  window.onload = function() {
-    __pygwt_isHostPageLoaded = true;
-    if (oldHandler) {
-      oldHandler();
-    }
-  };
-}
-
+// function __pygwt_hookOnLoad() {
+//   var oldHandler = window.onload;
+//   window.onload = function() {
+//     __pygwt_isHostPageLoaded = true;
+//     if (oldHandler) {
+//       oldHandler();
+//     }
+//   };
+// }
+// 
 
 // Returns an array that splits the module name from the meta content into
 // [0] the prefix url, if any, guaranteed to end with a slash
@@ -333,7 +333,7 @@ function __pygwt_earlyUser() {
 //
 __pygwt_earlyUser();
 __pygwt_processMetas();
-__pygwt_hookOnLoad();
+// __pygwt_hookOnLoad();
 __pygwt_forEachModule(__pygwt_injectWebModeFrame);
 
 
