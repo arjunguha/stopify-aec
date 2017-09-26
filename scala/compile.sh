@@ -12,7 +12,7 @@ trap cleanup EXIT
 
 mkdir -p $WORKSPACE/project
 
-echo 'addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.15")' > $WORKSPACE/project/plugins.sbt
+echo 'addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.20")' > $WORKSPACE/project/plugins.sbt
 
 cat > $WORKSPACE/build.sbt <<EOF
 enablePlugins(ScalaJSPlugin)
