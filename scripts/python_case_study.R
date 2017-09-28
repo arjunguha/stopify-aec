@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 suppressMessages(library(tidyverse))
+suppressMessages(source("./theme.R"))
 library(stringr)
-source("./theme.R")
 
 timing_csv <- commandArgs(TRUE)
 
@@ -10,61 +10,115 @@ if (length(timing_csv) != 1) {
   quit(save = "no", status = 1)
 }
 
-all_data <- read_csv(timing_csv)
-# all_data <- str_match(Sys.glob(str_c(sources, "/*.done")), 
-#   ".*/([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-\\d.done")
-# colnames(all_data) <- c("Filename", "Benchmark", "Platform", "Transform", 
-#                           "New", "ES", "Estimator", "YieldInterval")
+all_data <- read_csv(timing_csv) %>%
+  filter(Language == "python_pyjs") %>%
+  select(-Language)
 
-# read_measurements <- function(filename) {
-#   if (is.na(filename)) {
-#     return (NA)
-#   }
-#   lines <- readLines(filename)
-#   return (lines[length(lines)])
-# }
+conservative_benchmarks <- unique(all_data(EsMode == "es5")$Benchmark)
+all_data <- all_data %>% filter(Benchmark %in% conservative_benchmarks)
 
-# all_data <- as.tibble(all_data) %>%
-#   na.omit() %>%
-#   rowwise() %>% 
-#   mutate(Measurement = read_measurements(Filename)) %>%
-#   ungroup() %>%
-#   na.omit() %>%
-#   mutate(
-#     RunningTime = str_split(Measurement, fixed(",")) %>% 
-#       map(function(x)x[1]) %>% unlist %>% as.integer,
-#     NumYields = str_split(Measurement, fixed(",")) %>% 
-#       map(function(x)x[2]) %>% unlist %>% as.integer) %>%
+native <- all_data %>%
+  filter(Platform == "native") %>%
+  select(Benchmark,RunningTime) %>%
+  group_by(Benchmark) %>%
+  summarise(MeanNativeTime = mean(RunningTime)) %>%
+  ungroup()
 
-# original <- read_rds("results.rdata") %>%
-#   filter(Language == "python_pyjs" & Transformation == "original") %>%
-#   select(Benchmark, Platform, Transformation, RunningTime) %>%
-#   rename(Transform = Transformation, OriginalTime = RunningTime) %>%
-#   group_by(Benchmark, Platform) %>%
-#   summarise(MeanOriginalTime = mean(OriginalTime)) %>%
-#   ungroup()
+original <- all_data %>%
+  filter(Transform == "original") %>%
+  select(Benchmark,Platform,RunningTime)
 
-
-# df <- all_data %>%
-#   filter(Platform == "chrome" & Transform == "lazy" & New == "direct" &
-#            Estimator == "countdown") %>%
-#   inner_join(original) %>%
-#   mutate(Slowdown = RunningTime / MeanOriginalTime) %>%
-#   select(Benchmark, ES, Slowdown) %>%
-#   group_by(Benchmark, ES) %>%
-#   summarise(Mean = mean(Slowdown),
-#             Se = sd(Slowdown) / length(Slowdown)) %>%
-#   ungroup() %>%
-#   mutate(Factor = ifelse(ES == "sane", "No implicit conversions", "Implicit conversions"))
-
-# plot <- ggplot(df, aes(x=Benchmark,y=Mean,fill=Factor)) +
-#   mytheme() +
-#   geom_bar(stat="identity",position="dodge") +
-#   ylab("Slowdown relative to PyJS")
-# mysave("file.pdf", plot)
-# #   geom_line(color="blue",size=linew) +
-#   #   labs(x = "Resources", y = "Time (milliseconds)")
+original_avgtimes <- original %>%
+  select(Benchmark, Platform, RunningTime) %>%
+  group_by(Benchmark, Platform) %>%
+  summarise(AvgOriginalTime = mean(RunningTime)) %>%
+  ungroup()
   
-  
-# ggplot(df, aes(x=)
+# Compare vanilla PyJS vs. PyJS + Stopify with naive settings on Chrome
+conservative <- inner_join(
+  all_data %>%
+    filter(Platform == "chrome" & Transform == "lazy" & NewMethod == "direct" &
+           EsMode == "es5" & Estimator == "countdown") %>% 
+    select(Benchmark,RunningTime),
+  original_avgtimes %>% 
+    filter(Platform == 'chrome') %>%
+    select(-Platform))
+conservative <- conservative %>%
+  mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
+  select(Benchmark, Slowdown) %>%
+  group_by(Benchmark) %>%
+  summarise(MeanSlowdown = mean(Slowdown),
+            SeSlowdown = sd(Slowdown) / sqrt(length(Slowdown))) %>%
+  ungroup()
 
+plot <- ggplot(conservative, aes(x=Benchmark,y=MeanSlowdown)) +
+  mytheme() +
+  geom_bar(stat="identity") +
+  ylab("Slowdown relative to PyJS")
+mysave("pyjs_case_study_conservative.pdf", plot)
+
+
+# Slowdown without implicit conversions
+es_sane <- inner_join(
+  all_data %>%
+    filter(Platform == "chrome" & Transform == "lazy" & NewMethod == "direct" &
+             EsMode == "sane" & Estimator == "countdown") %>%
+    select(Benchmark,RunningTime),
+  original_avgtimes %>% 
+    filter(Platform == 'chrome') %>%
+    select(-Platform))
+es_sane <- es_sane %>%  
+  mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
+  select(Benchmark, Slowdown) %>%
+  group_by(Benchmark) %>%
+  summarise(MeanSlowdown = mean(Slowdown),
+            SeSlowdown = sd(Slowdown) / sqrt(length(Slowdown))) %>%
+  ungroup()
+
+es_sane_vs_insane <- rbind(
+  conservative %>% mutate(Factor = "Implicit Conversions"),
+  es_sane %>% mutate(Factor = "No Implicit Conversions")
+)
+
+plot <- ggplot(es_sane_vs_insane, aes(x=Benchmark,y=MeanSlowdown,fill=Factor)) +
+  mytheme() +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Slowdown relative to PyJS")
+mysave("pyjs_case_study_sane_vs_insane.pdf", plot)
+
+new_method <- all_data %>%
+  filter(Transform == "lazy" & EsMode == "sane" & Estimator == "countdown") %>%
+  select(Benchmark,Platform,NewMethod,RunningTime)
+new_method <- inner_join(new_method,original_avgtimes) %>%
+  mutate(Factor = str_c(Platform, 
+                        ifelse(NewMethod == "direct", "new", "Object.c"),
+                        sep = " - ")) %>%
+  select(Benchmark,Factor,RunningTime, AvgOriginalTime)
+
+new_method <- new_method %>%
+  mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
+  select(Benchmark, Factor, Slowdown) %>%
+  group_by(Benchmark,Factor) %>%
+  summarise(MeanSlowdown = mean(Slowdown),
+            SeSlowdown = sd(Slowdown) / sqrt(length(Slowdown))) %>%
+  ungroup()
+
+plot <- ggplot(new_method, 
+               aes(x=Benchmark,y=MeanSlowdown,fill=Factor)) +
+  mytheme() +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Slowdown relative to PyJS")
+mysave("pyjs_case_study_new_method.pdf", plot)
+
+
+avg_interval <- all_data %>% 
+  filter(Transform == "lazy" & EsMode == "sane" & Estimator == "countdown" &
+         ((Platform == "chrome" & NewMethod == "wrapper") |
+          (Platform == "firefox" & NewMethod == "direct"))) %>%
+  mutate(AvgInterval = RunningTime / NumYields) %>%
+  select(Benchmark,Platform,AvgInterval)
+plot <- ggplot(avg_interval, aes(x=Benchmark,y=AvgInterval,fill=Platform)) +
+  mytheme() +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Average interval between yields")
+mysave("pyjs_case_study_interval_variance.pdf", plot)
