@@ -1,0 +1,23 @@
+{
+  "name": "stopify-benchmarking-harness",
+  "version": "1.0.0",
+  "description": "minification script",
+  "scripts": {
+    "install": "./node_modules/.bin/tsc",
+    "csv": "node ./dist/csv",
+    "init": "node ./dist/init",
+    "run": "node ./dist/run"
+  },
+  "repository": "git+https://github.com/plasma-umass/stopify-benchmarks.git",
+  "license": "BSD-3-Clause",
+  "devDependencies": {},
+  "dependencies": {
+    "@types/better-sqlite3": "^3.1.2",
+    "@types/csv-stringify": "^1.4.1",
+    "@types/glob": "^5.0.32",
+    "better-sqlite3": "^4.0.3",
+    "csv-stringify": "^1.0.4",
+    "glob": "^7.1.2",
+    "typescript": "^2.5.3"
+  }
+}
