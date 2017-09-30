@@ -43,7 +43,7 @@ export function runBenchmark(lang: string,
       const filename = path.resolve(__dirname, `../../${lang}/${bench}/main.py`);
       const runningTime = time('python', filename);
       if (runningTime) {
-        return { runningTime  };
+        return { runningTime };
       }
       else {
         return undefined;
@@ -88,13 +88,16 @@ export function runBenchmark(lang: string,
     if (yieldInterval) {
       args.push('-y', String(yieldInterval));
     }
-    args.push(compiledFilename);
+    if (<any>platform === 'MicrosoftEdge') {
+      args.push('--remote', 'http://10.9.0.100:4444/wd/hub',
+        '--local-host', '10.9.0.102');
+    }
+       args.push(compiledFilename);
     try {
       console.error(`Running ./bin/browser ${args.join(' ')}`);
       let proc = spawnSync('./bin/browser', args, {
         stdio: [ 'none', 'inherit', 'pipe' ],
-        cwd: path.resolve(__dirname, '../../..'),
-        timeout: 30 * 60 * 1000
+        cwd: path.resolve(__dirname, '../../..')
       });
       const output = String(proc.stdout).split('\n');
       const lastLine = output[output.length - 2].split(',');
@@ -104,7 +107,8 @@ export function runBenchmark(lang: string,
         return { runningTime, numYields };
       }
       else {
-        console.error(`unexpected result from ./bin/browser ${args.join(' ')}`);
+      console.error(`unexpected result from ./bin/browser ${args.join(' ')}`);
+      console.error(output.join('\n'));
         return undefined;
       }
     }

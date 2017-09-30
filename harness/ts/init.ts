@@ -58,15 +58,30 @@ function initTiming(i: number,
 }
 
 function pythonBenchmark(name: string) {
+  // Sadly, these two just crash with --es=es5
+  if (name === 'gcbench' || name === 'schulze') {
+    return;
+  }
   for (let i = 0; i < 10; i++) {
+    const edge = 'MicrosoftEdge';
     initTiming(i, 'python_pyjs', name, 'native');
     initTiming(i, 'python_pyjs', name, 'chrome', 'original');
     initTiming(i, 'python_pyjs', name, 'firefox', 'original');
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct', 'es5', 'countdown');
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct', 'sane', 'countdown', undefined,   1000000);
+    initTiming(i, 'python_pyjs', name, 'MicrosoftEdge', 'original');
+
+    // Compare ES5 sane vs. insane mode using Chrome only. The other browsers
+    // are just way too slow.
+    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct',  'es5',  'countdown');
+    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper',  'es5',  'countdown');
+    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct',  'sane', 'countdown', undefined,   1000000);
+
+    // Compare all Chrome, Firefox, and Edge for new method.
     initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'countdown', undefined,  1000000);
+    initTiming(i, 'python_pyjs', name, edge,     'lazy', 'direct',  'sane', 'countdown', undefined,   1000000);
+    initTiming(i, 'python_pyjs', name, edge,     'lazy', 'wrapper', 'sane', 'countdown', undefined,  1000000);
     initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'direct', 'sane', 'countdown', undefined,  1000000);
     initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'wrapper', 'sane', 'countdown', undefined, 1000000);
+
     initTiming(i, 'python_pyjs', name, 'firefox', 'retval', 'direct', 'sane', 'countdown', undefined,  1000000);
     initTiming(i, 'python_pyjs', name, 'chrome', 'retval', 'wrapper', 'sane', 'countdown', undefined,  1000000);
     initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'reservoir', undefined,  100);
