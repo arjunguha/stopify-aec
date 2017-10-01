@@ -1,7 +1,7 @@
 CXX = em++
 CC = emcc
 CFLAGS = -s TOTAL_MEMORY=1677721600 -s NO_DYNAMIC_EXECUTION=1 -O3 --memory-init-file 0
-CXXFLAGS = $(CFLAGS) -msse2 -std=c++11
+CXXFLAGS = $(CFLAGS) -std=c++11
 
 BDIR = benchmark-files
 CSRCS = $(wildcard $(BDIR)/*.c)
