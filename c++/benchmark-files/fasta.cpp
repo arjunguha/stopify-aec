@@ -292,11 +292,11 @@ void make(const char* desc, int n, generator_type generator, converter_type conv
 
 int main(int argc, char *argv[])
 {
-   int n = 1000;
-   if (argc < 2 || (n = std::atoi(argv[1])) <= 0) {
-      std::cerr << "usage: " << argv[0] << " length\n";
-      return 1;
-   }
+   int n = 10000000;
+//   if (argc < 2 || (n = std::atoi(argv[1])) <= 0) {
+//      std::cerr << "usage: " << argv[0] << " length\n";
+//      return 1;
+//   }
 
    make_cumulative(iub.begin(), iub.end());
    make_cumulative(homosapiens.begin(), homosapiens.end());
