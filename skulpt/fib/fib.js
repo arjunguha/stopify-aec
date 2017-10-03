@@ -67,615 +67,678 @@
 /*    67 */             $postfinally = undefined,
 /*    68 */             $currLineNo = undefined,
 /*    69 */             $currColNo = undefined;
-/*    70 */         if ($scope120.$wakingSuspension !== undefined) {
-/*    71 */             $wakeFromSuspension();
+/*    70 */         if (typeof Sk.execStart === 'undefined') {
+/*    71 */             Sk.execStart = Date.now()
 /*    72 */         }
-/*    73 */         if (Sk.retainGlobals) {
-/*    74 */             if (Sk.globals) {
-/*    75 */                 $gbl = Sk.globals;
-/*    76 */                 Sk.globals = $gbl;
-/*    77 */                 $loc = $gbl;
-/*    78 */             } else {
-/*    79 */                 Sk.globals = $gbl;
-/*    80 */             }
-/*    81 */         } else {
-/*    82 */             Sk.globals = $gbl;
-/*    83 */         }
-/*    84 */         while (true) {
-/*    85 */             try {
-/*    86 */                 switch ($blk) {
-/*    87 */                 case 0:
-/*    88 */                     /* --- module entry --- */
-/*    89 */                     //
-/*    90 */                     // line 2:
-/*    91 */                     // def fib(n):
-/*    92 */                     // ^
-/*    93 */                     //
-/*    94 */                     $currLineNo = 2;
-/*    95 */                     $currColNo = 0;
-/*    96 */ 
-/*    97 */                     $scope121.co_name = new Sk.builtins['str']('fib');
-/*    98 */                     $scope121.co_varnames = ['n'];
-/*    99 */                     var $funcobj138 = new Sk.builtins['function']($scope121, $gbl);
-/*   100 */                     $loc.fib = $funcobj138;
-/*   101 */                     //
-/*   102 */                     // line 7:
-/*   103 */                     // def f(n):
-/*   104 */                     // ^
-/*   105 */                     //
-/*   106 */                     $currLineNo = 7;
-/*   107 */                     $currColNo = 0;
-/*   108 */ 
-/*   109 */                     $scope139.co_name = new Sk.builtins['str']('f');
-/*   110 */                     $scope139.co_varnames = ['n'];
-/*   111 */                     var $funcobj152 = new Sk.builtins['function']($scope139, $gbl);
-/*   112 */                     $loc.f = $funcobj152;
-/*   113 */                     //
-/*   114 */                     // line 13:
-/*   115 */                     // f(1)
-/*   116 */                     // ^
-/*   117 */                     //
-/*   118 */                     $currLineNo = 13;
-/*   119 */                     $currColNo = 0;
-/*   120 */ 
-/*   121 */                     var $loadname153 = $loc.f !== undefined ? $loc.f : Sk.misceval.loadname('f', $gbl);;
-/*   122 */                     $ret;
-/*   123 */                     $ret = Sk.misceval.callsimOrSuspend($loadname153, new Sk.builtin.int_(1));
-/*   124 */                     $blk = 1; /* allowing case fallthrough */
-/*   125 */                 case 1:
-/*   126 */                     /* --- function return or resume suspension --- */
-/*   127 */                     if ($ret && $ret.$isSuspension) {
-/*   128 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 13, 0);
-/*   129 */                     }
-/*   130 */                     var $call154 = $ret;
-/*   131 */                     //
-/*   132 */                     // line 13:
-/*   133 */                     // f(1)
-/*   134 */                     // ^
-/*   135 */                     //
-/*   136 */                     $currLineNo = 13;
-/*   137 */                     $currColNo = 0;
-/*   138 */ 
-/*   139 */                     return $loc;
-/*   140 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
-/*   141 */                 }
-/*   142 */             } catch (err) {
-/*   143 */                 if (!(err instanceof Sk.builtin.BaseException)) {
-/*   144 */                     err = new Sk.builtin.ExternalError(err);
-/*   145 */                 }
-/*   146 */                 err.traceback.push({
-/*   147 */                     lineno: $currLineNo,
-/*   148 */                     colno: $currColNo,
-/*   149 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
-/*   150 */                 });
-/*   151 */                 if ($exc.length > 0) {
-/*   152 */                     $err = err;
-/*   153 */                     $blk = $exc.pop();
-/*   154 */                     continue;
-/*   155 */                 } else {
-/*   156 */                     throw err;
-/*   157 */                 }
-/*   158 */             }
-/*   159 */         }
-/*   160 */     });
-/*   161 */     var $scope121 = (function $fib122$(n) {
-/*   162 */         var n, n, n, n, n, $compareres123, $compareres123, $jfalse124, $boolopsucc125, $jtrue126, $compareres127, $loadgbl131, $binop132, $loadgbl131, $binop132, $call133, $loadgbl134, $binop135;
-/*   163 */         var $wakeFromSuspension = function() {
-/*   164 */             var susp = $scope121.$wakingSuspension;
-/*   165 */             delete $scope121.$wakingSuspension;
-/*   166 */             $blk = susp.$blk;
-/*   167 */             $loc = susp.$loc;
-/*   168 */             $gbl = susp.$gbl;
-/*   169 */             $exc = susp.$exc;
-/*   170 */             $err = susp.$err;
-/*   171 */             $postfinally = susp.$postfinally;
-/*   172 */             $currLineNo = susp.$lineno;
-/*   173 */             $currColNo = susp.$colno;
-/*   174 */             Sk.lastYield = Date.now();
-/*   175 */             n = susp.$tmps.n;
-/*   176 */             $compareres123 = susp.$tmps.$compareres123;
-/*   177 */             $jfalse124 = susp.$tmps.$jfalse124;
-/*   178 */             $boolopsucc125 = susp.$tmps.$boolopsucc125;
-/*   179 */             $jtrue126 = susp.$tmps.$jtrue126;
-/*   180 */             $compareres127 = susp.$tmps.$compareres127;
-/*   181 */             $loadgbl131 = susp.$tmps.$loadgbl131;
-/*   182 */             $binop132 = susp.$tmps.$binop132;
-/*   183 */             $call133 = susp.$tmps.$call133;
-/*   184 */             $loadgbl134 = susp.$tmps.$loadgbl134;
-/*   185 */             $binop135 = susp.$tmps.$binop135;
-/*   186 */             try {
-/*   187 */                 $ret = susp.child.resume();
-/*   188 */             } catch (err) {
-/*   189 */                 if (!(err instanceof Sk.builtin.BaseException)) {
-/*   190 */                     err = new Sk.builtin.ExternalError(err);
-/*   191 */                 }
-/*   192 */                 err.traceback.push({
-/*   193 */                     lineno: $currLineNo,
-/*   194 */                     colno: $currColNo,
-/*   195 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
-/*   196 */                 });
-/*   197 */                 if ($exc.length > 0) {
-/*   198 */                     $err = err;
-/*   199 */                     $blk = $exc.pop();
-/*   200 */                 } else {
-/*   201 */                     throw err;
-/*   202 */                 }
-/*   203 */             }
-/*   204 */         };
-/*   205 */         var $saveSuspension = function($child, $filename, $lineno, $colno) {
-/*   206 */             var susp = new Sk.misceval.Suspension();
-/*   207 */             susp.child = $child;
-/*   208 */             susp.resume = function() {
-/*   209 */                 $scope121.$wakingSuspension = susp;
-/*   210 */                 return $scope121();
-/*   211 */             };
-/*   212 */             susp.data = susp.child.data;
-/*   213 */             susp.$blk = $blk;
-/*   214 */             susp.$loc = $loc;
-/*   215 */             susp.$gbl = $gbl;
-/*   216 */             susp.$exc = $exc;
-/*   217 */             susp.$err = $err;
-/*   218 */             susp.$postfinally = $postfinally;
-/*   219 */             susp.$filename = $filename;
-/*   220 */             susp.$lineno = $lineno;
-/*   221 */             susp.$colno = $colno;
-/*   222 */             susp.optional = susp.child.optional;
-/*   223 */             susp.$tmps = {
-/*   224 */                 "n": n,
-/*   225 */                 "$compareres123": $compareres123,
-/*   226 */                 "$jfalse124": $jfalse124,
-/*   227 */                 "$boolopsucc125": $boolopsucc125,
-/*   228 */                 "$jtrue126": $jtrue126,
-/*   229 */                 "$compareres127": $compareres127,
-/*   230 */                 "$loadgbl131": $loadgbl131,
-/*   231 */                 "$binop132": $binop132,
-/*   232 */                 "$call133": $call133,
-/*   233 */                 "$loadgbl134": $loadgbl134,
-/*   234 */                 "$binop135": $binop135
-/*   235 */             };
-/*   236 */             return susp;
-/*   237 */         };
-/*   238 */         var $blk = 0,
-/*   239 */             $exc = [],
-/*   240 */             $loc = {},
-/*   241 */             $gbl = this,
-/*   242 */             $err = undefined,
-/*   243 */             $ret = undefined,
-/*   244 */             $postfinally = undefined,
-/*   245 */             $currLineNo = undefined,
-/*   246 */             $currColNo = undefined;
-/*   247 */         if ($scope121.$wakingSuspension !== undefined) {
-/*   248 */             $wakeFromSuspension();
-/*   249 */         } else {
-/*   250 */             Sk.builtin.pyCheckArgs("fib", arguments, 1, 1, false, false);
-/*   251 */         }
-/*   252 */         while (true) {
-/*   253 */             try {
-/*   254 */                 switch ($blk) {
-/*   255 */                 case 0:
-/*   256 */                     /* --- codeobj entry --- */
-/*   257 */                     if (n === undefined) {
-/*   258 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   259 */                     }
-/*   260 */ 
-/*   261 */                     //
-/*   262 */                     // line 3:
-/*   263 */                     //     if n == 0 or n == 1:
-/*   264 */                     //     ^
-/*   265 */                     //
-/*   266 */                     $currLineNo = 3;
-/*   267 */                     $currColNo = 4;
-/*   268 */ 
-/*   269 */                     if (n === undefined) {
-/*   270 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   271 */                     }
-/*   272 */                     var $compareres123 = null;
-/*   273 */                     $ret = Sk.builtin.bool(Sk.misceval.richCompareBool(n, new Sk.builtin.int_(0), 'Eq', true));
-/*   274 */                     $blk = 4; /* allowing case fallthrough */
-/*   275 */                 case 4:
-/*   276 */                     /* --- function return or resume suspension --- */
-/*   277 */                     if ($ret && $ret.$isSuspension) {
-/*   278 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 3, 7);
-/*   279 */                     }
-/*   280 */                     $compareres123 = $ret;
-/*   281 */                     var $jfalse124 = ($ret === false || !Sk.misceval.isTrue($ret));
-/*   282 */                     if ($jfalse124) { /*test failed */
-/*   283 */                         $blk = 3;
-/*   284 */                         continue;
-/*   285 */                     }
-/*   286 */                     $blk = 3; /* allowing case fallthrough */
-/*   287 */                 case 3:
-/*   288 */                     /* --- done --- */
-/*   289 */                     var $boolopsucc125 = $compareres123;
-/*   290 */                     $boolopsucc125 = $compareres123;
-/*   291 */                     var $jtrue126 = ($compareres123 === true || Sk.misceval.isTrue($compareres123));
-/*   292 */                     if ($jtrue126) { /*test passed */
-/*   293 */                         $blk = 2;
-/*   294 */                         continue;
-/*   295 */                     }
-/*   296 */                     if (n === undefined) {
-/*   297 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   298 */                     }
-/*   299 */                     var $compareres127 = null;
-/*   300 */                     $ret = Sk.builtin.bool(Sk.misceval.richCompareBool(n, new Sk.builtin.int_(1), 'Eq', true));
-/*   301 */                     $blk = 6; /* allowing case fallthrough */
-/*   302 */                 case 6:
-/*   303 */                     /* --- function return or resume suspension --- */
-/*   304 */                     if ($ret && $ret.$isSuspension) {
-/*   305 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 3, 17);
-/*   306 */                     }
-/*   307 */                     $compareres127 = $ret;
-/*   308 */                     var $jfalse128 = ($ret === false || !Sk.misceval.isTrue($ret));
-/*   309 */                     if ($jfalse128) { /*test failed */
-/*   310 */                         $blk = 5;
-/*   311 */                         continue;
-/*   312 */                     }
-/*   313 */                     $blk = 5; /* allowing case fallthrough */
-/*   314 */                 case 5:
-/*   315 */                     /* --- done --- */
-/*   316 */                     $boolopsucc125 = $compareres127;
-/*   317 */                     var $jtrue129 = ($compareres127 === true || Sk.misceval.isTrue($compareres127));
-/*   318 */                     if ($jtrue129) { /*test passed */
-/*   319 */                         $blk = 2;
-/*   320 */                         continue;
+/*    73 */         if (typeof Sk.lastYield === 'undefined') {
+/*    74 */             Sk.lastYield = Date.now()
+/*    75 */         }
+/*    76 */         if ($scope120.$wakingSuspension !== undefined) {
+/*    77 */             $wakeFromSuspension();
+/*    78 */         }
+/*    79 */         if (Sk.retainGlobals) {
+/*    80 */             if (Sk.globals) {
+/*    81 */                 $gbl = Sk.globals;
+/*    82 */                 Sk.globals = $gbl;
+/*    83 */                 $loc = $gbl;
+/*    84 */             } else {
+/*    85 */                 Sk.globals = $gbl;
+/*    86 */             }
+/*    87 */         } else {
+/*    88 */             Sk.globals = $gbl;
+/*    89 */         }
+/*    90 */         while (true) {
+/*    91 */             try {
+/*    92 */                 var $dateNow = Date.now();
+/*    93 */                 if ($dateNow - Sk.execStart > Sk.execLimit) {
+/*    94 */                     throw new Sk.builtin.TimeLimitError(Sk.timeoutMsg())
+/*    95 */                 }
+/*    96 */                 if ($dateNow - Sk.lastYield > Sk.yieldLimit) {
+/*    97 */                     var $susp = $saveSuspension({
+/*    98 */                         data: {
+/*    99 */                             type: 'Sk.yield'
+/*   100 */                         },
+/*   101 */                         resume: function() {}
+/*   102 */                     }, '/home/sbaxter/benchmarks/skulpt/fib/main.py', $currLineNo, $currColNo);
+/*   103 */                     $susp.$blk = $blk;
+/*   104 */                     $susp.optional = true;
+/*   105 */                     return $susp;
+/*   106 */                 }
+/*   107 */                 switch ($blk) {
+/*   108 */                 case 0:
+/*   109 */                     /* --- module entry --- */
+/*   110 */                     //
+/*   111 */                     // line 2:
+/*   112 */                     // def fib(n):
+/*   113 */                     // ^
+/*   114 */                     //
+/*   115 */                     $currLineNo = 2;
+/*   116 */                     $currColNo = 0;
+/*   117 */ 
+/*   118 */                     $scope121.co_name = new Sk.builtins['str']('fib');
+/*   119 */                     $scope121.co_varnames = ['n'];
+/*   120 */                     var $funcobj138 = new Sk.builtins['function']($scope121, $gbl);
+/*   121 */                     $loc.fib = $funcobj138;
+/*   122 */                     //
+/*   123 */                     // line 7:
+/*   124 */                     // def f(n):
+/*   125 */                     // ^
+/*   126 */                     //
+/*   127 */                     $currLineNo = 7;
+/*   128 */                     $currColNo = 0;
+/*   129 */ 
+/*   130 */                     $scope139.co_name = new Sk.builtins['str']('f');
+/*   131 */                     $scope139.co_varnames = ['n'];
+/*   132 */                     var $funcobj152 = new Sk.builtins['function']($scope139, $gbl);
+/*   133 */                     $loc.f = $funcobj152;
+/*   134 */                     //
+/*   135 */                     // line 13:
+/*   136 */                     // f(1)
+/*   137 */                     // ^
+/*   138 */                     //
+/*   139 */                     $currLineNo = 13;
+/*   140 */                     $currColNo = 0;
+/*   141 */ 
+/*   142 */                     var $loadname153 = $loc.f !== undefined ? $loc.f : Sk.misceval.loadname('f', $gbl);;
+/*   143 */                     $ret;
+/*   144 */                     $ret = Sk.misceval.callsimOrSuspend($loadname153, new Sk.builtin.int_(1));
+/*   145 */                     $blk = 1; /* allowing case fallthrough */
+/*   146 */                 case 1:
+/*   147 */                     /* --- function return or resume suspension --- */
+/*   148 */                     if ($ret && $ret.$isSuspension) {
+/*   149 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 13, 0);
+/*   150 */                     }
+/*   151 */                     var $call154 = $ret;
+/*   152 */                     //
+/*   153 */                     // line 13:
+/*   154 */                     // f(1)
+/*   155 */                     // ^
+/*   156 */                     //
+/*   157 */                     $currLineNo = 13;
+/*   158 */                     $currColNo = 0;
+/*   159 */ 
+/*   160 */                     return $loc;
+/*   161 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
+/*   162 */                 }
+/*   163 */             } catch (err) {
+/*   164 */                 if (!(err instanceof Sk.builtin.BaseException)) {
+/*   165 */                     err = new Sk.builtin.ExternalError(err);
+/*   166 */                 }
+/*   167 */                 err.traceback.push({
+/*   168 */                     lineno: $currLineNo,
+/*   169 */                     colno: $currColNo,
+/*   170 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
+/*   171 */                 });
+/*   172 */                 if ($exc.length > 0) {
+/*   173 */                     $err = err;
+/*   174 */                     $blk = $exc.pop();
+/*   175 */                     continue;
+/*   176 */                 } else {
+/*   177 */                     throw err;
+/*   178 */                 }
+/*   179 */             }
+/*   180 */         }
+/*   181 */     });
+/*   182 */     var $scope121 = (function $fib122$(n) {
+/*   183 */         var n, n, n, n, n, $compareres123, $compareres123, $jfalse124, $boolopsucc125, $jtrue126, $compareres127, $loadgbl131, $binop132, $loadgbl131, $binop132, $call133, $loadgbl134, $binop135;
+/*   184 */         var $wakeFromSuspension = function() {
+/*   185 */             var susp = $scope121.$wakingSuspension;
+/*   186 */             delete $scope121.$wakingSuspension;
+/*   187 */             $blk = susp.$blk;
+/*   188 */             $loc = susp.$loc;
+/*   189 */             $gbl = susp.$gbl;
+/*   190 */             $exc = susp.$exc;
+/*   191 */             $err = susp.$err;
+/*   192 */             $postfinally = susp.$postfinally;
+/*   193 */             $currLineNo = susp.$lineno;
+/*   194 */             $currColNo = susp.$colno;
+/*   195 */             Sk.lastYield = Date.now();
+/*   196 */             n = susp.$tmps.n;
+/*   197 */             $compareres123 = susp.$tmps.$compareres123;
+/*   198 */             $jfalse124 = susp.$tmps.$jfalse124;
+/*   199 */             $boolopsucc125 = susp.$tmps.$boolopsucc125;
+/*   200 */             $jtrue126 = susp.$tmps.$jtrue126;
+/*   201 */             $compareres127 = susp.$tmps.$compareres127;
+/*   202 */             $loadgbl131 = susp.$tmps.$loadgbl131;
+/*   203 */             $binop132 = susp.$tmps.$binop132;
+/*   204 */             $call133 = susp.$tmps.$call133;
+/*   205 */             $loadgbl134 = susp.$tmps.$loadgbl134;
+/*   206 */             $binop135 = susp.$tmps.$binop135;
+/*   207 */             try {
+/*   208 */                 $ret = susp.child.resume();
+/*   209 */             } catch (err) {
+/*   210 */                 if (!(err instanceof Sk.builtin.BaseException)) {
+/*   211 */                     err = new Sk.builtin.ExternalError(err);
+/*   212 */                 }
+/*   213 */                 err.traceback.push({
+/*   214 */                     lineno: $currLineNo,
+/*   215 */                     colno: $currColNo,
+/*   216 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
+/*   217 */                 });
+/*   218 */                 if ($exc.length > 0) {
+/*   219 */                     $err = err;
+/*   220 */                     $blk = $exc.pop();
+/*   221 */                 } else {
+/*   222 */                     throw err;
+/*   223 */                 }
+/*   224 */             }
+/*   225 */         };
+/*   226 */         var $saveSuspension = function($child, $filename, $lineno, $colno) {
+/*   227 */             var susp = new Sk.misceval.Suspension();
+/*   228 */             susp.child = $child;
+/*   229 */             susp.resume = function() {
+/*   230 */                 $scope121.$wakingSuspension = susp;
+/*   231 */                 return $scope121();
+/*   232 */             };
+/*   233 */             susp.data = susp.child.data;
+/*   234 */             susp.$blk = $blk;
+/*   235 */             susp.$loc = $loc;
+/*   236 */             susp.$gbl = $gbl;
+/*   237 */             susp.$exc = $exc;
+/*   238 */             susp.$err = $err;
+/*   239 */             susp.$postfinally = $postfinally;
+/*   240 */             susp.$filename = $filename;
+/*   241 */             susp.$lineno = $lineno;
+/*   242 */             susp.$colno = $colno;
+/*   243 */             susp.optional = susp.child.optional;
+/*   244 */             susp.$tmps = {
+/*   245 */                 "n": n,
+/*   246 */                 "$compareres123": $compareres123,
+/*   247 */                 "$jfalse124": $jfalse124,
+/*   248 */                 "$boolopsucc125": $boolopsucc125,
+/*   249 */                 "$jtrue126": $jtrue126,
+/*   250 */                 "$compareres127": $compareres127,
+/*   251 */                 "$loadgbl131": $loadgbl131,
+/*   252 */                 "$binop132": $binop132,
+/*   253 */                 "$call133": $call133,
+/*   254 */                 "$loadgbl134": $loadgbl134,
+/*   255 */                 "$binop135": $binop135
+/*   256 */             };
+/*   257 */             return susp;
+/*   258 */         };
+/*   259 */         var $blk = 0,
+/*   260 */             $exc = [],
+/*   261 */             $loc = {},
+/*   262 */             $gbl = this,
+/*   263 */             $err = undefined,
+/*   264 */             $ret = undefined,
+/*   265 */             $postfinally = undefined,
+/*   266 */             $currLineNo = undefined,
+/*   267 */             $currColNo = undefined;
+/*   268 */         if (typeof Sk.execStart === 'undefined') {
+/*   269 */             Sk.execStart = Date.now()
+/*   270 */         }
+/*   271 */         if (typeof Sk.lastYield === 'undefined') {
+/*   272 */             Sk.lastYield = Date.now()
+/*   273 */         }
+/*   274 */         if ($scope121.$wakingSuspension !== undefined) {
+/*   275 */             $wakeFromSuspension();
+/*   276 */         } else {
+/*   277 */             Sk.builtin.pyCheckArgs("fib", arguments, 1, 1, false, false);
+/*   278 */         }
+/*   279 */         while (true) {
+/*   280 */             try {
+/*   281 */                 var $dateNow = Date.now();
+/*   282 */                 if ($dateNow - Sk.execStart > Sk.execLimit) {
+/*   283 */                     throw new Sk.builtin.TimeLimitError(Sk.timeoutMsg())
+/*   284 */                 }
+/*   285 */                 if ($dateNow - Sk.lastYield > Sk.yieldLimit) {
+/*   286 */                     var $susp = $saveSuspension({
+/*   287 */                         data: {
+/*   288 */                             type: 'Sk.yield'
+/*   289 */                         },
+/*   290 */                         resume: function() {}
+/*   291 */                     }, '/home/sbaxter/benchmarks/skulpt/fib/main.py', $currLineNo, $currColNo);
+/*   292 */                     $susp.$blk = $blk;
+/*   293 */                     $susp.optional = true;
+/*   294 */                     return $susp;
+/*   295 */                 }
+/*   296 */                 switch ($blk) {
+/*   297 */                 case 0:
+/*   298 */                     /* --- codeobj entry --- */
+/*   299 */                     if (n === undefined) {
+/*   300 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   301 */                     }
+/*   302 */ 
+/*   303 */                     //
+/*   304 */                     // line 3:
+/*   305 */                     //     if n == 0 or n == 1:
+/*   306 */                     //     ^
+/*   307 */                     //
+/*   308 */                     $currLineNo = 3;
+/*   309 */                     $currColNo = 4;
+/*   310 */ 
+/*   311 */                     if (n === undefined) {
+/*   312 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   313 */                     }
+/*   314 */                     var $compareres123 = null;
+/*   315 */                     $ret = Sk.builtin.bool(Sk.misceval.richCompareBool(n, new Sk.builtin.int_(0), 'Eq', true));
+/*   316 */                     $blk = 4; /* allowing case fallthrough */
+/*   317 */                 case 4:
+/*   318 */                     /* --- function return or resume suspension --- */
+/*   319 */                     if ($ret && $ret.$isSuspension) {
+/*   320 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 3, 7);
 /*   321 */                     }
-/*   322 */                     $blk = 2; /* allowing case fallthrough */
-/*   323 */                 case 2:
-/*   324 */                     /* --- end of boolop --- */
-/*   325 */                     var $jfalse130 = ($boolopsucc125 === false || !Sk.misceval.isTrue($boolopsucc125));
-/*   326 */                     if ($jfalse130) { /*test failed */
-/*   327 */                         $blk = 1;
-/*   328 */                         continue;
-/*   329 */                     }
-/*   330 */                     //
-/*   331 */                     // line 4:
-/*   332 */                     //         return 1
-/*   333 */                     //         ^
-/*   334 */                     //
-/*   335 */                     $currLineNo = 4;
-/*   336 */                     $currColNo = 8;
-/*   337 */ 
-/*   338 */                     return new Sk.builtin.int_(1);
-/*   339 */                     $blk = 1; /* allowing case fallthrough */
-/*   340 */                 case 1:
-/*   341 */                     /* --- end of if --- */
-/*   342 */                     //
-/*   343 */                     // line 5:
-/*   344 */                     //     return fib(n - 1) + fib(n - 2)
-/*   345 */                     //     ^
-/*   346 */                     //
-/*   347 */                     $currLineNo = 5;
-/*   348 */                     $currColNo = 4;
-/*   349 */ 
-/*   350 */                     var $loadgbl131 = Sk.misceval.loadname('fib', $gbl);
-/*   351 */                     if (n === undefined) {
-/*   352 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   353 */                     }
-/*   354 */                     var $binop132 = Sk.abstr.numberBinOp(n, new Sk.builtin.int_(1), 'Sub');
-/*   355 */                     $ret;
-/*   356 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl131, $binop132);
-/*   357 */                     $blk = 7; /* allowing case fallthrough */
-/*   358 */                 case 7:
-/*   359 */                     /* --- function return or resume suspension --- */
-/*   360 */                     if ($ret && $ret.$isSuspension) {
-/*   361 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 5, 11);
-/*   362 */                     }
-/*   363 */                     var $call133 = $ret;
-/*   364 */                     //
-/*   365 */                     // line 5:
-/*   366 */                     //     return fib(n - 1) + fib(n - 2)
-/*   367 */                     //            ^
-/*   368 */                     //
-/*   369 */                     $currLineNo = 5;
-/*   370 */                     $currColNo = 11;
-/*   371 */ 
-/*   372 */                     var $loadgbl134 = Sk.misceval.loadname('fib', $gbl);
-/*   373 */                     if (n === undefined) {
-/*   374 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   375 */                     }
-/*   376 */                     var $binop135 = Sk.abstr.numberBinOp(n, new Sk.builtin.int_(2), 'Sub');
-/*   377 */                     $ret;
-/*   378 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl134, $binop135);
-/*   379 */                     $blk = 8; /* allowing case fallthrough */
-/*   380 */                 case 8:
-/*   381 */                     /* --- function return or resume suspension --- */
-/*   382 */                     if ($ret && $ret.$isSuspension) {
-/*   383 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 5, 24);
-/*   384 */                     }
-/*   385 */                     var $call136 = $ret;
-/*   386 */                     //
-/*   387 */                     // line 5:
-/*   388 */                     //     return fib(n - 1) + fib(n - 2)
-/*   389 */                     //                         ^
-/*   390 */                     //
-/*   391 */                     $currLineNo = 5;
-/*   392 */                     $currColNo = 24;
-/*   393 */ 
-/*   394 */                     var $binop137 = Sk.abstr.numberBinOp($call133, $call136, 'Add');
-/*   395 */                     return $binop137;
-/*   396 */                     return Sk.builtin.none.none$;
-/*   397 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
-/*   398 */                 }
-/*   399 */             } catch (err) {
-/*   400 */                 if (!(err instanceof Sk.builtin.BaseException)) {
-/*   401 */                     err = new Sk.builtin.ExternalError(err);
-/*   402 */                 }
-/*   403 */                 err.traceback.push({
-/*   404 */                     lineno: $currLineNo,
-/*   405 */                     colno: $currColNo,
-/*   406 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
-/*   407 */                 });
-/*   408 */                 if ($exc.length > 0) {
-/*   409 */                     $err = err;
-/*   410 */                     $blk = $exc.pop();
-/*   411 */                     continue;
-/*   412 */                 } else {
-/*   413 */                     throw err;
-/*   414 */                 }
-/*   415 */             }
-/*   416 */         }
-/*   417 */     });
-/*   418 */     var $scope139 = (function $f140$(n) {
-/*   419 */         var i, k, times; /* locals */
-/*   420 */         var i, k, n, n, times, $loadgbl142, $iter144, $loadgbl142, $call143, $iter144, $loadgbl146, $iter148, $loadgbl146, $call147, $iter148, $loadgbl150;
-/*   421 */         var $wakeFromSuspension = function() {
-/*   422 */             var susp = $scope139.$wakingSuspension;
-/*   423 */             delete $scope139.$wakingSuspension;
-/*   424 */             $blk = susp.$blk;
-/*   425 */             $loc = susp.$loc;
-/*   426 */             $gbl = susp.$gbl;
-/*   427 */             $exc = susp.$exc;
-/*   428 */             $err = susp.$err;
-/*   429 */             $postfinally = susp.$postfinally;
-/*   430 */             $currLineNo = susp.$lineno;
-/*   431 */             $currColNo = susp.$colno;
-/*   432 */             Sk.lastYield = Date.now();
-/*   433 */             i = susp.$tmps.i;
-/*   434 */             k = susp.$tmps.k;
-/*   435 */             n = susp.$tmps.n;
-/*   436 */             times = susp.$tmps.times;
-/*   437 */             $loadgbl142 = susp.$tmps.$loadgbl142;
-/*   438 */             $iter144 = susp.$tmps.$iter144;
-/*   439 */             $call143 = susp.$tmps.$call143;
-/*   440 */             $loadgbl146 = susp.$tmps.$loadgbl146;
-/*   441 */             $iter148 = susp.$tmps.$iter148;
-/*   442 */             $call147 = susp.$tmps.$call147;
-/*   443 */             $loadgbl150 = susp.$tmps.$loadgbl150;
-/*   444 */             try {
-/*   445 */                 $ret = susp.child.resume();
-/*   446 */             } catch (err) {
-/*   447 */                 if (!(err instanceof Sk.builtin.BaseException)) {
-/*   448 */                     err = new Sk.builtin.ExternalError(err);
-/*   449 */                 }
-/*   450 */                 err.traceback.push({
-/*   451 */                     lineno: $currLineNo,
-/*   452 */                     colno: $currColNo,
-/*   453 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
-/*   454 */                 });
-/*   455 */                 if ($exc.length > 0) {
-/*   456 */                     $err = err;
-/*   457 */                     $blk = $exc.pop();
-/*   458 */                 } else {
-/*   459 */                     throw err;
-/*   460 */                 }
-/*   461 */             }
-/*   462 */         };
-/*   463 */         var $saveSuspension = function($child, $filename, $lineno, $colno) {
-/*   464 */             var susp = new Sk.misceval.Suspension();
-/*   465 */             susp.child = $child;
-/*   466 */             susp.resume = function() {
-/*   467 */                 $scope139.$wakingSuspension = susp;
-/*   468 */                 return $scope139();
-/*   469 */             };
-/*   470 */             susp.data = susp.child.data;
-/*   471 */             susp.$blk = $blk;
-/*   472 */             susp.$loc = $loc;
-/*   473 */             susp.$gbl = $gbl;
-/*   474 */             susp.$exc = $exc;
-/*   475 */             susp.$err = $err;
-/*   476 */             susp.$postfinally = $postfinally;
-/*   477 */             susp.$filename = $filename;
-/*   478 */             susp.$lineno = $lineno;
-/*   479 */             susp.$colno = $colno;
-/*   480 */             susp.optional = susp.child.optional;
-/*   481 */             susp.$tmps = {
-/*   482 */                 "i": i,
-/*   483 */                 "k": k,
-/*   484 */                 "n": n,
-/*   485 */                 "times": times,
-/*   486 */                 "$loadgbl142": $loadgbl142,
-/*   487 */                 "$iter144": $iter144,
-/*   488 */                 "$call143": $call143,
-/*   489 */                 "$loadgbl146": $loadgbl146,
-/*   490 */                 "$iter148": $iter148,
-/*   491 */                 "$call147": $call147,
-/*   492 */                 "$loadgbl150": $loadgbl150
-/*   493 */             };
-/*   494 */             return susp;
-/*   495 */         };
-/*   496 */         var $blk = 0,
-/*   497 */             $exc = [],
-/*   498 */             $loc = {},
-/*   499 */             $gbl = this,
-/*   500 */             $err = undefined,
-/*   501 */             $ret = undefined,
-/*   502 */             $postfinally = undefined,
-/*   503 */             $currLineNo = undefined,
-/*   504 */             $currColNo = undefined;
-/*   505 */         if ($scope139.$wakingSuspension !== undefined) {
-/*   506 */             $wakeFromSuspension();
-/*   507 */         } else {
-/*   508 */             Sk.builtin.pyCheckArgs("f", arguments, 1, 1, false, false);
-/*   509 */         }
-/*   510 */         while (true) {
-/*   511 */             try {
-/*   512 */                 switch ($blk) {
-/*   513 */                 case 0:
-/*   514 */                     /* --- codeobj entry --- */
-/*   515 */                     if (n === undefined) {
-/*   516 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   517 */                     }
-/*   518 */ 
-/*   519 */                     //
-/*   520 */                     // line 8:
-/*   521 */                     //     times = []
-/*   522 */                     //     ^
-/*   523 */                     //
-/*   524 */                     $currLineNo = 8;
-/*   525 */                     $currColNo = 4;
-/*   526 */ 
-/*   527 */                     var $loadlist141 = new Sk.builtins['list']([]);
-/*   528 */                     times = $loadlist141;
-/*   529 */                     //
-/*   530 */                     // line 9:
-/*   531 */                     //     for k in range(n):
-/*   532 */                     //     ^
-/*   533 */                     //
-/*   534 */                     $currLineNo = 9;
-/*   535 */                     $currColNo = 4;
-/*   536 */ 
-/*   537 */                     var $loadgbl142 = Sk.misceval.loadname('range', $gbl);
-/*   538 */                     if (n === undefined) {
-/*   539 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   540 */                     }
-/*   541 */                     $ret;
-/*   542 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl142, n);
-/*   543 */                     $blk = 4; /* allowing case fallthrough */
-/*   544 */                 case 4:
-/*   545 */                     /* --- function return or resume suspension --- */
-/*   546 */                     if ($ret && $ret.$isSuspension) {
-/*   547 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 9, 13);
-/*   548 */                     }
-/*   549 */                     var $call143 = $ret;
-/*   550 */                     //
-/*   551 */                     // line 9:
-/*   552 */                     //     for k in range(n):
-/*   553 */                     //              ^
-/*   554 */                     //
-/*   555 */                     $currLineNo = 9;
-/*   556 */                     $currColNo = 13;
-/*   557 */ 
-/*   558 */                     var $iter144 = Sk.abstr.iter($call143);
-/*   559 */                     $blk = 1; /* allowing case fallthrough */
-/*   560 */                 case 1:
-/*   561 */                     /* --- for start --- */
-/*   562 */                     $ret = Sk.abstr.iternext($iter144, true);
-/*   563 */                     $blk = 5; /* allowing case fallthrough */
-/*   564 */                 case 5:
-/*   565 */                     /* --- function return or resume suspension --- */
-/*   566 */                     if ($ret && $ret.$isSuspension) {
-/*   567 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 9, 4);
-/*   568 */                     }
-/*   569 */                     var $next145 = $ret;
-/*   570 */                     if ($next145 === undefined) {
-/*   571 */                         $blk = 2;
-/*   572 */                         continue;
-/*   573 */                     }
-/*   574 */                     k = $next145;
-/*   575 */                     //
-/*   576 */                     // line 10:
-/*   577 */                     //         for i in range(2000):
-/*   578 */                     //         ^
-/*   579 */                     //
-/*   580 */                     $currLineNo = 10;
-/*   581 */                     $currColNo = 8;
-/*   582 */ 
-/*   583 */                     var $loadgbl146 = Sk.misceval.loadname('range', $gbl);
-/*   584 */                     $ret;
-/*   585 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl146, new Sk.builtin.int_(2000));
-/*   586 */                     $blk = 9; /* allowing case fallthrough */
-/*   587 */                 case 9:
-/*   588 */                     /* --- function return or resume suspension --- */
-/*   589 */                     if ($ret && $ret.$isSuspension) {
-/*   590 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 10, 17);
-/*   591 */                     }
-/*   592 */                     var $call147 = $ret;
-/*   593 */                     //
-/*   594 */                     // line 10:
-/*   595 */                     //         for i in range(2000):
-/*   596 */                     //                  ^
-/*   597 */                     //
-/*   598 */                     $currLineNo = 10;
-/*   599 */                     $currColNo = 17;
-/*   600 */ 
-/*   601 */                     var $iter148 = Sk.abstr.iter($call147);
-/*   602 */                     $blk = 6; /* allowing case fallthrough */
-/*   603 */                 case 6:
-/*   604 */                     /* --- for start --- */
-/*   605 */                     $ret = Sk.abstr.iternext($iter148, true);
-/*   606 */                     $blk = 10; /* allowing case fallthrough */
-/*   607 */                 case 10:
+/*   322 */                     $compareres123 = $ret;
+/*   323 */                     var $jfalse124 = ($ret === false || !Sk.misceval.isTrue($ret));
+/*   324 */                     if ($jfalse124) { /*test failed */
+/*   325 */                         $blk = 3;
+/*   326 */                         continue;
+/*   327 */                     }
+/*   328 */                     $blk = 3; /* allowing case fallthrough */
+/*   329 */                 case 3:
+/*   330 */                     /* --- done --- */
+/*   331 */                     var $boolopsucc125 = $compareres123;
+/*   332 */                     $boolopsucc125 = $compareres123;
+/*   333 */                     var $jtrue126 = ($compareres123 === true || Sk.misceval.isTrue($compareres123));
+/*   334 */                     if ($jtrue126) { /*test passed */
+/*   335 */                         $blk = 2;
+/*   336 */                         continue;
+/*   337 */                     }
+/*   338 */                     if (n === undefined) {
+/*   339 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   340 */                     }
+/*   341 */                     var $compareres127 = null;
+/*   342 */                     $ret = Sk.builtin.bool(Sk.misceval.richCompareBool(n, new Sk.builtin.int_(1), 'Eq', true));
+/*   343 */                     $blk = 6; /* allowing case fallthrough */
+/*   344 */                 case 6:
+/*   345 */                     /* --- function return or resume suspension --- */
+/*   346 */                     if ($ret && $ret.$isSuspension) {
+/*   347 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 3, 17);
+/*   348 */                     }
+/*   349 */                     $compareres127 = $ret;
+/*   350 */                     var $jfalse128 = ($ret === false || !Sk.misceval.isTrue($ret));
+/*   351 */                     if ($jfalse128) { /*test failed */
+/*   352 */                         $blk = 5;
+/*   353 */                         continue;
+/*   354 */                     }
+/*   355 */                     $blk = 5; /* allowing case fallthrough */
+/*   356 */                 case 5:
+/*   357 */                     /* --- done --- */
+/*   358 */                     $boolopsucc125 = $compareres127;
+/*   359 */                     var $jtrue129 = ($compareres127 === true || Sk.misceval.isTrue($compareres127));
+/*   360 */                     if ($jtrue129) { /*test passed */
+/*   361 */                         $blk = 2;
+/*   362 */                         continue;
+/*   363 */                     }
+/*   364 */                     $blk = 2; /* allowing case fallthrough */
+/*   365 */                 case 2:
+/*   366 */                     /* --- end of boolop --- */
+/*   367 */                     var $jfalse130 = ($boolopsucc125 === false || !Sk.misceval.isTrue($boolopsucc125));
+/*   368 */                     if ($jfalse130) { /*test failed */
+/*   369 */                         $blk = 1;
+/*   370 */                         continue;
+/*   371 */                     }
+/*   372 */                     //
+/*   373 */                     // line 4:
+/*   374 */                     //         return 1
+/*   375 */                     //         ^
+/*   376 */                     //
+/*   377 */                     $currLineNo = 4;
+/*   378 */                     $currColNo = 8;
+/*   379 */ 
+/*   380 */                     return new Sk.builtin.int_(1);
+/*   381 */                     $blk = 1; /* allowing case fallthrough */
+/*   382 */                 case 1:
+/*   383 */                     /* --- end of if --- */
+/*   384 */                     //
+/*   385 */                     // line 5:
+/*   386 */                     //     return fib(n - 1) + fib(n - 2)
+/*   387 */                     //     ^
+/*   388 */                     //
+/*   389 */                     $currLineNo = 5;
+/*   390 */                     $currColNo = 4;
+/*   391 */ 
+/*   392 */                     var $loadgbl131 = Sk.misceval.loadname('fib', $gbl);
+/*   393 */                     if (n === undefined) {
+/*   394 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   395 */                     }
+/*   396 */                     var $binop132 = Sk.abstr.numberBinOp(n, new Sk.builtin.int_(1), 'Sub');
+/*   397 */                     $ret;
+/*   398 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl131, $binop132);
+/*   399 */                     $blk = 7; /* allowing case fallthrough */
+/*   400 */                 case 7:
+/*   401 */                     /* --- function return or resume suspension --- */
+/*   402 */                     if ($ret && $ret.$isSuspension) {
+/*   403 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 5, 11);
+/*   404 */                     }
+/*   405 */                     var $call133 = $ret;
+/*   406 */                     //
+/*   407 */                     // line 5:
+/*   408 */                     //     return fib(n - 1) + fib(n - 2)
+/*   409 */                     //            ^
+/*   410 */                     //
+/*   411 */                     $currLineNo = 5;
+/*   412 */                     $currColNo = 11;
+/*   413 */ 
+/*   414 */                     var $loadgbl134 = Sk.misceval.loadname('fib', $gbl);
+/*   415 */                     if (n === undefined) {
+/*   416 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   417 */                     }
+/*   418 */                     var $binop135 = Sk.abstr.numberBinOp(n, new Sk.builtin.int_(2), 'Sub');
+/*   419 */                     $ret;
+/*   420 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl134, $binop135);
+/*   421 */                     $blk = 8; /* allowing case fallthrough */
+/*   422 */                 case 8:
+/*   423 */                     /* --- function return or resume suspension --- */
+/*   424 */                     if ($ret && $ret.$isSuspension) {
+/*   425 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 5, 24);
+/*   426 */                     }
+/*   427 */                     var $call136 = $ret;
+/*   428 */                     //
+/*   429 */                     // line 5:
+/*   430 */                     //     return fib(n - 1) + fib(n - 2)
+/*   431 */                     //                         ^
+/*   432 */                     //
+/*   433 */                     $currLineNo = 5;
+/*   434 */                     $currColNo = 24;
+/*   435 */ 
+/*   436 */                     var $binop137 = Sk.abstr.numberBinOp($call133, $call136, 'Add');
+/*   437 */                     return $binop137;
+/*   438 */                     return Sk.builtin.none.none$;
+/*   439 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
+/*   440 */                 }
+/*   441 */             } catch (err) {
+/*   442 */                 if (!(err instanceof Sk.builtin.BaseException)) {
+/*   443 */                     err = new Sk.builtin.ExternalError(err);
+/*   444 */                 }
+/*   445 */                 err.traceback.push({
+/*   446 */                     lineno: $currLineNo,
+/*   447 */                     colno: $currColNo,
+/*   448 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
+/*   449 */                 });
+/*   450 */                 if ($exc.length > 0) {
+/*   451 */                     $err = err;
+/*   452 */                     $blk = $exc.pop();
+/*   453 */                     continue;
+/*   454 */                 } else {
+/*   455 */                     throw err;
+/*   456 */                 }
+/*   457 */             }
+/*   458 */         }
+/*   459 */     });
+/*   460 */     var $scope139 = (function $f140$(n) {
+/*   461 */         var i, k, times; /* locals */
+/*   462 */         var i, k, n, n, times, $loadgbl142, $iter144, $loadgbl142, $call143, $iter144, $loadgbl146, $iter148, $loadgbl146, $call147, $iter148, $loadgbl150;
+/*   463 */         var $wakeFromSuspension = function() {
+/*   464 */             var susp = $scope139.$wakingSuspension;
+/*   465 */             delete $scope139.$wakingSuspension;
+/*   466 */             $blk = susp.$blk;
+/*   467 */             $loc = susp.$loc;
+/*   468 */             $gbl = susp.$gbl;
+/*   469 */             $exc = susp.$exc;
+/*   470 */             $err = susp.$err;
+/*   471 */             $postfinally = susp.$postfinally;
+/*   472 */             $currLineNo = susp.$lineno;
+/*   473 */             $currColNo = susp.$colno;
+/*   474 */             Sk.lastYield = Date.now();
+/*   475 */             i = susp.$tmps.i;
+/*   476 */             k = susp.$tmps.k;
+/*   477 */             n = susp.$tmps.n;
+/*   478 */             times = susp.$tmps.times;
+/*   479 */             $loadgbl142 = susp.$tmps.$loadgbl142;
+/*   480 */             $iter144 = susp.$tmps.$iter144;
+/*   481 */             $call143 = susp.$tmps.$call143;
+/*   482 */             $loadgbl146 = susp.$tmps.$loadgbl146;
+/*   483 */             $iter148 = susp.$tmps.$iter148;
+/*   484 */             $call147 = susp.$tmps.$call147;
+/*   485 */             $loadgbl150 = susp.$tmps.$loadgbl150;
+/*   486 */             try {
+/*   487 */                 $ret = susp.child.resume();
+/*   488 */             } catch (err) {
+/*   489 */                 if (!(err instanceof Sk.builtin.BaseException)) {
+/*   490 */                     err = new Sk.builtin.ExternalError(err);
+/*   491 */                 }
+/*   492 */                 err.traceback.push({
+/*   493 */                     lineno: $currLineNo,
+/*   494 */                     colno: $currColNo,
+/*   495 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
+/*   496 */                 });
+/*   497 */                 if ($exc.length > 0) {
+/*   498 */                     $err = err;
+/*   499 */                     $blk = $exc.pop();
+/*   500 */                 } else {
+/*   501 */                     throw err;
+/*   502 */                 }
+/*   503 */             }
+/*   504 */         };
+/*   505 */         var $saveSuspension = function($child, $filename, $lineno, $colno) {
+/*   506 */             var susp = new Sk.misceval.Suspension();
+/*   507 */             susp.child = $child;
+/*   508 */             susp.resume = function() {
+/*   509 */                 $scope139.$wakingSuspension = susp;
+/*   510 */                 return $scope139();
+/*   511 */             };
+/*   512 */             susp.data = susp.child.data;
+/*   513 */             susp.$blk = $blk;
+/*   514 */             susp.$loc = $loc;
+/*   515 */             susp.$gbl = $gbl;
+/*   516 */             susp.$exc = $exc;
+/*   517 */             susp.$err = $err;
+/*   518 */             susp.$postfinally = $postfinally;
+/*   519 */             susp.$filename = $filename;
+/*   520 */             susp.$lineno = $lineno;
+/*   521 */             susp.$colno = $colno;
+/*   522 */             susp.optional = susp.child.optional;
+/*   523 */             susp.$tmps = {
+/*   524 */                 "i": i,
+/*   525 */                 "k": k,
+/*   526 */                 "n": n,
+/*   527 */                 "times": times,
+/*   528 */                 "$loadgbl142": $loadgbl142,
+/*   529 */                 "$iter144": $iter144,
+/*   530 */                 "$call143": $call143,
+/*   531 */                 "$loadgbl146": $loadgbl146,
+/*   532 */                 "$iter148": $iter148,
+/*   533 */                 "$call147": $call147,
+/*   534 */                 "$loadgbl150": $loadgbl150
+/*   535 */             };
+/*   536 */             return susp;
+/*   537 */         };
+/*   538 */         var $blk = 0,
+/*   539 */             $exc = [],
+/*   540 */             $loc = {},
+/*   541 */             $gbl = this,
+/*   542 */             $err = undefined,
+/*   543 */             $ret = undefined,
+/*   544 */             $postfinally = undefined,
+/*   545 */             $currLineNo = undefined,
+/*   546 */             $currColNo = undefined;
+/*   547 */         if (typeof Sk.execStart === 'undefined') {
+/*   548 */             Sk.execStart = Date.now()
+/*   549 */         }
+/*   550 */         if (typeof Sk.lastYield === 'undefined') {
+/*   551 */             Sk.lastYield = Date.now()
+/*   552 */         }
+/*   553 */         if ($scope139.$wakingSuspension !== undefined) {
+/*   554 */             $wakeFromSuspension();
+/*   555 */         } else {
+/*   556 */             Sk.builtin.pyCheckArgs("f", arguments, 1, 1, false, false);
+/*   557 */         }
+/*   558 */         while (true) {
+/*   559 */             try {
+/*   560 */                 var $dateNow = Date.now();
+/*   561 */                 if ($dateNow - Sk.execStart > Sk.execLimit) {
+/*   562 */                     throw new Sk.builtin.TimeLimitError(Sk.timeoutMsg())
+/*   563 */                 }
+/*   564 */                 if ($dateNow - Sk.lastYield > Sk.yieldLimit) {
+/*   565 */                     var $susp = $saveSuspension({
+/*   566 */                         data: {
+/*   567 */                             type: 'Sk.yield'
+/*   568 */                         },
+/*   569 */                         resume: function() {}
+/*   570 */                     }, '/home/sbaxter/benchmarks/skulpt/fib/main.py', $currLineNo, $currColNo);
+/*   571 */                     $susp.$blk = $blk;
+/*   572 */                     $susp.optional = true;
+/*   573 */                     return $susp;
+/*   574 */                 }
+/*   575 */                 switch ($blk) {
+/*   576 */                 case 0:
+/*   577 */                     /* --- codeobj entry --- */
+/*   578 */                     if (n === undefined) {
+/*   579 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   580 */                     }
+/*   581 */ 
+/*   582 */                     //
+/*   583 */                     // line 8:
+/*   584 */                     //     times = []
+/*   585 */                     //     ^
+/*   586 */                     //
+/*   587 */                     $currLineNo = 8;
+/*   588 */                     $currColNo = 4;
+/*   589 */ 
+/*   590 */                     var $loadlist141 = new Sk.builtins['list']([]);
+/*   591 */                     times = $loadlist141;
+/*   592 */                     //
+/*   593 */                     // line 9:
+/*   594 */                     //     for k in range(n):
+/*   595 */                     //     ^
+/*   596 */                     //
+/*   597 */                     $currLineNo = 9;
+/*   598 */                     $currColNo = 4;
+/*   599 */ 
+/*   600 */                     var $loadgbl142 = Sk.misceval.loadname('range', $gbl);
+/*   601 */                     if (n === undefined) {
+/*   602 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   603 */                     }
+/*   604 */                     $ret;
+/*   605 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl142, n);
+/*   606 */                     $blk = 4; /* allowing case fallthrough */
+/*   607 */                 case 4:
 /*   608 */                     /* --- function return or resume suspension --- */
 /*   609 */                     if ($ret && $ret.$isSuspension) {
-/*   610 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 10, 8);
+/*   610 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 9, 13);
 /*   611 */                     }
-/*   612 */                     var $next149 = $ret;
-/*   613 */                     if ($next149 === undefined) {
-/*   614 */                         $blk = 7;
-/*   615 */                         continue;
-/*   616 */                     }
-/*   617 */                     i = $next149;
-/*   618 */                     //
-/*   619 */                     // line 11:
-/*   620 */                     //             fib(20)
-/*   621 */                     //             ^
-/*   622 */                     //
-/*   623 */                     $currLineNo = 11;
-/*   624 */                     $currColNo = 12;
-/*   625 */ 
-/*   626 */                     var $loadgbl150 = Sk.misceval.loadname('fib', $gbl);
-/*   627 */                     $ret;
-/*   628 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl150, new Sk.builtin.int_(20));
-/*   629 */                     $blk = 11; /* allowing case fallthrough */
-/*   630 */                 case 11:
-/*   631 */                     /* --- function return or resume suspension --- */
-/*   632 */                     if ($ret && $ret.$isSuspension) {
-/*   633 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 11, 12);
-/*   634 */                     }
-/*   635 */                     var $call151 = $ret;
-/*   636 */                     //
-/*   637 */                     // line 11:
-/*   638 */                     //             fib(20)
-/*   639 */                     //             ^
-/*   640 */                     //
-/*   641 */                     $currLineNo = 11;
-/*   642 */                     $currColNo = 12;
-/*   643 */ 
-/*   644 */                     $blk = 6; /* jump */
-/*   645 */                     continue;
-/*   646 */                 case 2:
-/*   647 */                     /* --- for cleanup --- */
-/*   648 */                     $blk = 3; /* allowing case fallthrough */
-/*   649 */                 case 3:
-/*   650 */                     /* --- for end --- */
-/*   651 */                     return Sk.builtin.none.none$;
-/*   652 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
-/*   653 */                 case 7:
-/*   654 */                     /* --- for cleanup --- */
-/*   655 */                     $blk = 8; /* allowing case fallthrough */
-/*   656 */                 case 8:
-/*   657 */                     /* --- for end --- */
-/*   658 */                     $blk = 1; /* jump */
-/*   659 */                     continue;
-/*   660 */                 }
-/*   661 */             } catch (err) {
-/*   662 */                 if (!(err instanceof Sk.builtin.BaseException)) {
-/*   663 */                     err = new Sk.builtin.ExternalError(err);
-/*   664 */                 }
-/*   665 */                 err.traceback.push({
-/*   666 */                     lineno: $currLineNo,
-/*   667 */                     colno: $currColNo,
-/*   668 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
-/*   669 */                 });
-/*   670 */                 if ($exc.length > 0) {
-/*   671 */                     $err = err;
-/*   672 */                     $blk = $exc.pop();
-/*   673 */                     continue;
-/*   674 */                 } else {
-/*   675 */                     throw err;
-/*   676 */                 }
-/*   677 */             }
-/*   678 */         }
-/*   679 */     });
-/*   680 */     return $scope120;
-/*   681 */ }();
+/*   612 */                     var $call143 = $ret;
+/*   613 */                     //
+/*   614 */                     // line 9:
+/*   615 */                     //     for k in range(n):
+/*   616 */                     //              ^
+/*   617 */                     //
+/*   618 */                     $currLineNo = 9;
+/*   619 */                     $currColNo = 13;
+/*   620 */ 
+/*   621 */                     var $iter144 = Sk.abstr.iter($call143);
+/*   622 */                     $blk = 1; /* allowing case fallthrough */
+/*   623 */                 case 1:
+/*   624 */                     /* --- for start --- */
+/*   625 */                     $ret = Sk.abstr.iternext($iter144, true);
+/*   626 */                     $blk = 5; /* allowing case fallthrough */
+/*   627 */                 case 5:
+/*   628 */                     /* --- function return or resume suspension --- */
+/*   629 */                     if ($ret && $ret.$isSuspension) {
+/*   630 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 9, 4);
+/*   631 */                     }
+/*   632 */                     var $next145 = $ret;
+/*   633 */                     if ($next145 === undefined) {
+/*   634 */                         $blk = 2;
+/*   635 */                         continue;
+/*   636 */                     }
+/*   637 */                     k = $next145;
+/*   638 */                     //
+/*   639 */                     // line 10:
+/*   640 */                     //         for i in range(2000):
+/*   641 */                     //         ^
+/*   642 */                     //
+/*   643 */                     $currLineNo = 10;
+/*   644 */                     $currColNo = 8;
+/*   645 */ 
+/*   646 */                     var $loadgbl146 = Sk.misceval.loadname('range', $gbl);
+/*   647 */                     $ret;
+/*   648 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl146, new Sk.builtin.int_(2000));
+/*   649 */                     $blk = 9; /* allowing case fallthrough */
+/*   650 */                 case 9:
+/*   651 */                     /* --- function return or resume suspension --- */
+/*   652 */                     if ($ret && $ret.$isSuspension) {
+/*   653 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 10, 17);
+/*   654 */                     }
+/*   655 */                     var $call147 = $ret;
+/*   656 */                     //
+/*   657 */                     // line 10:
+/*   658 */                     //         for i in range(2000):
+/*   659 */                     //                  ^
+/*   660 */                     //
+/*   661 */                     $currLineNo = 10;
+/*   662 */                     $currColNo = 17;
+/*   663 */ 
+/*   664 */                     var $iter148 = Sk.abstr.iter($call147);
+/*   665 */                     $blk = 6; /* allowing case fallthrough */
+/*   666 */                 case 6:
+/*   667 */                     /* --- for start --- */
+/*   668 */                     $ret = Sk.abstr.iternext($iter148, true);
+/*   669 */                     $blk = 10; /* allowing case fallthrough */
+/*   670 */                 case 10:
+/*   671 */                     /* --- function return or resume suspension --- */
+/*   672 */                     if ($ret && $ret.$isSuspension) {
+/*   673 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 10, 8);
+/*   674 */                     }
+/*   675 */                     var $next149 = $ret;
+/*   676 */                     if ($next149 === undefined) {
+/*   677 */                         $blk = 7;
+/*   678 */                         continue;
+/*   679 */                     }
+/*   680 */                     i = $next149;
+/*   681 */                     //
+/*   682 */                     // line 11:
+/*   683 */                     //             fib(20)
+/*   684 */                     //             ^
+/*   685 */                     //
+/*   686 */                     $currLineNo = 11;
+/*   687 */                     $currColNo = 12;
+/*   688 */ 
+/*   689 */                     var $loadgbl150 = Sk.misceval.loadname('fib', $gbl);
+/*   690 */                     $ret;
+/*   691 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl150, new Sk.builtin.int_(20));
+/*   692 */                     $blk = 11; /* allowing case fallthrough */
+/*   693 */                 case 11:
+/*   694 */                     /* --- function return or resume suspension --- */
+/*   695 */                     if ($ret && $ret.$isSuspension) {
+/*   696 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/fib/main.py', 11, 12);
+/*   697 */                     }
+/*   698 */                     var $call151 = $ret;
+/*   699 */                     //
+/*   700 */                     // line 11:
+/*   701 */                     //             fib(20)
+/*   702 */                     //             ^
+/*   703 */                     //
+/*   704 */                     $currLineNo = 11;
+/*   705 */                     $currColNo = 12;
+/*   706 */ 
+/*   707 */                     $blk = 6; /* jump */
+/*   708 */                     continue;
+/*   709 */                 case 2:
+/*   710 */                     /* --- for cleanup --- */
+/*   711 */                     $blk = 3; /* allowing case fallthrough */
+/*   712 */                 case 3:
+/*   713 */                     /* --- for end --- */
+/*   714 */                     return Sk.builtin.none.none$;
+/*   715 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
+/*   716 */                 case 7:
+/*   717 */                     /* --- for cleanup --- */
+/*   718 */                     $blk = 8; /* allowing case fallthrough */
+/*   719 */                 case 8:
+/*   720 */                     /* --- for end --- */
+/*   721 */                     $blk = 1; /* jump */
+/*   722 */                     continue;
+/*   723 */                 }
+/*   724 */             } catch (err) {
+/*   725 */                 if (!(err instanceof Sk.builtin.BaseException)) {
+/*   726 */                     err = new Sk.builtin.ExternalError(err);
+/*   727 */                 }
+/*   728 */                 err.traceback.push({
+/*   729 */                     lineno: $currLineNo,
+/*   730 */                     colno: $currColNo,
+/*   731 */                     filename: '/home/sbaxter/benchmarks/skulpt/fib/main.py'
+/*   732 */                 });
+/*   733 */                 if ($exc.length > 0) {
+/*   734 */                     $err = err;
+/*   735 */                     $blk = $exc.pop();
+/*   736 */                     continue;
+/*   737 */                 } else {
+/*   738 */                     throw err;
+/*   739 */                 }
+/*   740 */             }
+/*   741 */         }
+/*   742 */     });
+/*   743 */     return $scope120;
+/*   744 */ }();

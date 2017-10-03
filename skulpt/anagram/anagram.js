@@ -73,827 +73,869 @@
 /*    73 */             $postfinally = undefined,
 /*    74 */             $currLineNo = undefined,
 /*    75 */             $currColNo = undefined;
-/*    76 */         if ($scope120.$wakingSuspension !== undefined) {
-/*    77 */             $wakeFromSuspension();
+/*    76 */         if (typeof Sk.execStart === 'undefined') {
+/*    77 */             Sk.execStart = Date.now()
 /*    78 */         }
-/*    79 */         if (Sk.retainGlobals) {
-/*    80 */             if (Sk.globals) {
-/*    81 */                 $gbl = Sk.globals;
-/*    82 */                 Sk.globals = $gbl;
-/*    83 */                 $loc = $gbl;
-/*    84 */             } else {
-/*    85 */                 Sk.globals = $gbl;
-/*    86 */             }
-/*    87 */         } else {
-/*    88 */             Sk.globals = $gbl;
-/*    89 */         }
-/*    90 */         while (true) {
-/*    91 */             try {
-/*    92 */                 switch ($blk) {
-/*    93 */                 case 0:
-/*    94 */                     /* --- module entry --- */
-/*    95 */                     //
-/*    96 */                     // line 2:
-/*    97 */                     // import sys
-/*    98 */                     // ^
-/*    99 */                     //
-/*   100 */                     $currLineNo = 2;
-/*   101 */                     $currColNo = 0;
-/*   102 */ 
-/*   103 */                     $ret = Sk.builtin.__import__('sys', $gbl, $loc, []);
-/*   104 */                     $blk = 1; /* allowing case fallthrough */
-/*   105 */                 case 1:
-/*   106 */                     /* --- function return or resume suspension --- */
-/*   107 */                     if ($ret && $ret.$isSuspension) {
-/*   108 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 2, 0);
-/*   109 */                     }
-/*   110 */                     var $module121 = $ret;
-/*   111 */                     $loc.sys = $module121;
-/*   112 */                     //
-/*   113 */                     // line 4:
-/*   114 */                     // def scrambler(word):
-/*   115 */                     // ^
+/*    79 */         if (typeof Sk.lastYield === 'undefined') {
+/*    80 */             Sk.lastYield = Date.now()
+/*    81 */         }
+/*    82 */         if ($scope120.$wakingSuspension !== undefined) {
+/*    83 */             $wakeFromSuspension();
+/*    84 */         }
+/*    85 */         if (Sk.retainGlobals) {
+/*    86 */             if (Sk.globals) {
+/*    87 */                 $gbl = Sk.globals;
+/*    88 */                 Sk.globals = $gbl;
+/*    89 */                 $loc = $gbl;
+/*    90 */             } else {
+/*    91 */                 Sk.globals = $gbl;
+/*    92 */             }
+/*    93 */         } else {
+/*    94 */             Sk.globals = $gbl;
+/*    95 */         }
+/*    96 */         while (true) {
+/*    97 */             try {
+/*    98 */                 var $dateNow = Date.now();
+/*    99 */                 if ($dateNow - Sk.execStart > Sk.execLimit) {
+/*   100 */                     throw new Sk.builtin.TimeLimitError(Sk.timeoutMsg())
+/*   101 */                 }
+/*   102 */                 if ($dateNow - Sk.lastYield > Sk.yieldLimit) {
+/*   103 */                     var $susp = $saveSuspension({
+/*   104 */                         data: {
+/*   105 */                             type: 'Sk.yield'
+/*   106 */                         },
+/*   107 */                         resume: function() {}
+/*   108 */                     }, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
+/*   109 */                     $susp.$blk = $blk;
+/*   110 */                     $susp.optional = true;
+/*   111 */                     return $susp;
+/*   112 */                 }
+/*   113 */                 switch ($blk) {
+/*   114 */                 case 0:
+/*   115 */                     /* --- module entry --- */
 /*   116 */                     //
-/*   117 */                     $currLineNo = 4;
-/*   118 */                     $currColNo = 0;
-/*   119 */ 
-/*   120 */                     $scope122.co_name = new Sk.builtins['str']('scrambler');
-/*   121 */                     $scope122.co_varnames = ['word'];
-/*   122 */                     var $funcobj169 = new Sk.builtins['function']($scope122, $gbl);
-/*   123 */                     $loc.scrambler = $funcobj169;
-/*   124 */                     //
-/*   125 */                     // line 20:
-/*   126 */                     // scrambles = scrambler("berrycakes")
-/*   127 */                     // ^
-/*   128 */                     //
-/*   129 */                     $currLineNo = 20;
-/*   130 */                     $currColNo = 0;
-/*   131 */ 
-/*   132 */                     var $loadname170 = $loc.scrambler !== undefined ? $loc.scrambler : Sk.misceval.loadname('scrambler', $gbl);;
-/*   133 */                     var $str171 = new Sk.builtins['str']('berrycakes');
-/*   134 */                     $ret;
-/*   135 */                     $ret = Sk.misceval.callsimOrSuspend($loadname170, $str171);
-/*   136 */                     $blk = 2; /* allowing case fallthrough */
-/*   137 */                 case 2:
-/*   138 */                     /* --- function return or resume suspension --- */
-/*   139 */                     if ($ret && $ret.$isSuspension) {
-/*   140 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 20, 12);
-/*   141 */                     }
-/*   142 */                     var $call172 = $ret;
-/*   143 */                     //
-/*   144 */                     // line 20:
-/*   145 */                     // scrambles = scrambler("berrycakes")
-/*   146 */                     //             ^
-/*   147 */                     //
-/*   148 */                     $currLineNo = 20;
-/*   149 */                     $currColNo = 12;
-/*   150 */ 
-/*   151 */                     $loc.scrambles = $call172;
-/*   152 */                     //
-/*   153 */                     // line 21:
-/*   154 */                     // print len(scrambles)
-/*   155 */                     // ^
-/*   156 */                     //
-/*   157 */                     $currLineNo = 21;
-/*   158 */                     $currColNo = 0;
-/*   159 */ 
-/*   160 */                     var $loadname173 = $loc.len !== undefined ? $loc.len : Sk.misceval.loadname('len', $gbl);;
-/*   161 */                     var $loadname174 = $loc.scrambles !== undefined ? $loc.scrambles : Sk.misceval.loadname('scrambles', $gbl);;
-/*   162 */                     $ret;
-/*   163 */                     $ret = Sk.misceval.callsimOrSuspend($loadname173, $loadname174);
-/*   164 */                     $blk = 3; /* allowing case fallthrough */
-/*   165 */                 case 3:
-/*   166 */                     /* --- function return or resume suspension --- */
-/*   167 */                     if ($ret && $ret.$isSuspension) {
-/*   168 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 21, 6);
-/*   169 */                     }
-/*   170 */                     var $call175 = $ret;
-/*   171 */                     //
-/*   172 */                     // line 21:
-/*   173 */                     // print len(scrambles)
-/*   174 */                     //       ^
-/*   175 */                     //
-/*   176 */                     $currLineNo = 21;
-/*   177 */                     $currColNo = 6;
-/*   178 */ 
-/*   179 */                     Sk.misceval.print_(new Sk.builtins['str']($call175).v);
-/*   180 */                     Sk.misceval.print_("\n");
-/*   181 */                     return $loc;
-/*   182 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
-/*   183 */                 }
-/*   184 */             } catch (err) {
-/*   185 */                 if (!(err instanceof Sk.builtin.BaseException)) {
-/*   186 */                     err = new Sk.builtin.ExternalError(err);
-/*   187 */                 }
-/*   188 */                 err.traceback.push({
-/*   189 */                     lineno: $currLineNo,
-/*   190 */                     colno: $currColNo,
-/*   191 */                     filename: '/home/sbaxter/benchmarks/skulpt/anagram/main.py'
-/*   192 */                 });
-/*   193 */                 if ($exc.length > 0) {
-/*   194 */                     $err = err;
-/*   195 */                     $blk = $exc.pop();
-/*   196 */                     continue;
-/*   197 */                 } else {
-/*   198 */                     throw err;
-/*   199 */                 }
-/*   200 */             }
-/*   201 */         }
-/*   202 */     });
-/*   203 */     var $scope122 = (function $scrambler123$(word) {
-/*   204 */         var char_$rw$, finals, i, n, newfinal, nstrings, tail, uniqueList; /* locals */
-/*   205 */         var char_$rw$, char_$rw$, finals, finals, finals, i, i, i, n, n, n, n, n, newfinal, newfinal, nstrings, nstrings, nstrings, nstrings, tail, tail, uniqueList, uniqueList, uniqueList, word, word, word, word, $loadgbl124, $loadgbl124, $call125, $compareres126, $loadgbl131, $str135, $str135, $lattr136, $slice137, $str135, $lattr136, $slice137, $lsubscr138, $loadgbl140, $loadgbl141, $loadgbl142, $loadgbl140, $loadgbl141, $loadgbl142, $call143, $loadgbl140, $loadgbl141, $loadgbl142, $call143, $call144, $iter146, $iter146, $loadgbl148, $loadgbl149, $loadgbl148, $loadgbl149, $call150, $binop151, $iter153, $loadgbl148, $loadgbl149, $call150, $binop151, $call152, $iter153, $slice155, $slice155, $lsubscr156, $binop157, $loadgbl158, $slice155, $lsubscr156, $binop157, $loadgbl158, $call159, $slice160, $lattr163, $loadgbl165, $loadgbl166, $loadgbl165, $loadgbl166, $call167;
-/*   206 */         var $wakeFromSuspension = function() {
-/*   207 */             var susp = $scope122.$wakingSuspension;
-/*   208 */             delete $scope122.$wakingSuspension;
-/*   209 */             $blk = susp.$blk;
-/*   210 */             $loc = susp.$loc;
-/*   211 */             $gbl = susp.$gbl;
-/*   212 */             $exc = susp.$exc;
-/*   213 */             $err = susp.$err;
-/*   214 */             $postfinally = susp.$postfinally;
-/*   215 */             $currLineNo = susp.$lineno;
-/*   216 */             $currColNo = susp.$colno;
-/*   217 */             Sk.lastYield = Date.now();
-/*   218 */             char_$rw$ = susp.$tmps.char_$rw$;
-/*   219 */             finals = susp.$tmps.finals;
-/*   220 */             i = susp.$tmps.i;
-/*   221 */             n = susp.$tmps.n;
-/*   222 */             newfinal = susp.$tmps.newfinal;
-/*   223 */             nstrings = susp.$tmps.nstrings;
-/*   224 */             tail = susp.$tmps.tail;
-/*   225 */             uniqueList = susp.$tmps.uniqueList;
-/*   226 */             word = susp.$tmps.word;
-/*   227 */             $loadgbl124 = susp.$tmps.$loadgbl124;
-/*   228 */             $call125 = susp.$tmps.$call125;
-/*   229 */             $compareres126 = susp.$tmps.$compareres126;
-/*   230 */             $loadgbl131 = susp.$tmps.$loadgbl131;
-/*   231 */             $str135 = susp.$tmps.$str135;
-/*   232 */             $lattr136 = susp.$tmps.$lattr136;
-/*   233 */             $slice137 = susp.$tmps.$slice137;
-/*   234 */             $lsubscr138 = susp.$tmps.$lsubscr138;
-/*   235 */             $loadgbl140 = susp.$tmps.$loadgbl140;
-/*   236 */             $loadgbl141 = susp.$tmps.$loadgbl141;
-/*   237 */             $loadgbl142 = susp.$tmps.$loadgbl142;
-/*   238 */             $call143 = susp.$tmps.$call143;
-/*   239 */             $call144 = susp.$tmps.$call144;
-/*   240 */             $iter146 = susp.$tmps.$iter146;
-/*   241 */             $loadgbl148 = susp.$tmps.$loadgbl148;
-/*   242 */             $loadgbl149 = susp.$tmps.$loadgbl149;
-/*   243 */             $call150 = susp.$tmps.$call150;
-/*   244 */             $binop151 = susp.$tmps.$binop151;
-/*   245 */             $iter153 = susp.$tmps.$iter153;
-/*   246 */             $call152 = susp.$tmps.$call152;
-/*   247 */             $slice155 = susp.$tmps.$slice155;
-/*   248 */             $lsubscr156 = susp.$tmps.$lsubscr156;
-/*   249 */             $binop157 = susp.$tmps.$binop157;
-/*   250 */             $loadgbl158 = susp.$tmps.$loadgbl158;
-/*   251 */             $call159 = susp.$tmps.$call159;
-/*   252 */             $slice160 = susp.$tmps.$slice160;
-/*   253 */             $lattr163 = susp.$tmps.$lattr163;
-/*   254 */             $loadgbl165 = susp.$tmps.$loadgbl165;
-/*   255 */             $loadgbl166 = susp.$tmps.$loadgbl166;
-/*   256 */             $call167 = susp.$tmps.$call167;
-/*   257 */             try {
-/*   258 */                 $ret = susp.child.resume();
-/*   259 */             } catch (err) {
-/*   260 */                 if (!(err instanceof Sk.builtin.BaseException)) {
-/*   261 */                     err = new Sk.builtin.ExternalError(err);
-/*   262 */                 }
-/*   263 */                 err.traceback.push({
-/*   264 */                     lineno: $currLineNo,
-/*   265 */                     colno: $currColNo,
-/*   266 */                     filename: '/home/sbaxter/benchmarks/skulpt/anagram/main.py'
-/*   267 */                 });
-/*   268 */                 if ($exc.length > 0) {
-/*   269 */                     $err = err;
-/*   270 */                     $blk = $exc.pop();
-/*   271 */                 } else {
-/*   272 */                     throw err;
-/*   273 */                 }
-/*   274 */             }
-/*   275 */         };
-/*   276 */         var $saveSuspension = function($child, $filename, $lineno, $colno) {
-/*   277 */             var susp = new Sk.misceval.Suspension();
-/*   278 */             susp.child = $child;
-/*   279 */             susp.resume = function() {
-/*   280 */                 $scope122.$wakingSuspension = susp;
-/*   281 */                 return $scope122();
-/*   282 */             };
-/*   283 */             susp.data = susp.child.data;
-/*   284 */             susp.$blk = $blk;
-/*   285 */             susp.$loc = $loc;
-/*   286 */             susp.$gbl = $gbl;
-/*   287 */             susp.$exc = $exc;
-/*   288 */             susp.$err = $err;
-/*   289 */             susp.$postfinally = $postfinally;
-/*   290 */             susp.$filename = $filename;
-/*   291 */             susp.$lineno = $lineno;
-/*   292 */             susp.$colno = $colno;
-/*   293 */             susp.optional = susp.child.optional;
-/*   294 */             susp.$tmps = {
-/*   295 */                 "char_$rw$": char_$rw$,
-/*   296 */                 "finals": finals,
-/*   297 */                 "i": i,
-/*   298 */                 "n": n,
-/*   299 */                 "newfinal": newfinal,
-/*   300 */                 "nstrings": nstrings,
-/*   301 */                 "tail": tail,
-/*   302 */                 "uniqueList": uniqueList,
-/*   303 */                 "word": word,
-/*   304 */                 "$loadgbl124": $loadgbl124,
-/*   305 */                 "$call125": $call125,
-/*   306 */                 "$compareres126": $compareres126,
-/*   307 */                 "$loadgbl131": $loadgbl131,
-/*   308 */                 "$str135": $str135,
-/*   309 */                 "$lattr136": $lattr136,
-/*   310 */                 "$slice137": $slice137,
-/*   311 */                 "$lsubscr138": $lsubscr138,
-/*   312 */                 "$loadgbl140": $loadgbl140,
-/*   313 */                 "$loadgbl141": $loadgbl141,
-/*   314 */                 "$loadgbl142": $loadgbl142,
-/*   315 */                 "$call143": $call143,
-/*   316 */                 "$call144": $call144,
-/*   317 */                 "$iter146": $iter146,
-/*   318 */                 "$loadgbl148": $loadgbl148,
-/*   319 */                 "$loadgbl149": $loadgbl149,
-/*   320 */                 "$call150": $call150,
-/*   321 */                 "$binop151": $binop151,
-/*   322 */                 "$iter153": $iter153,
-/*   323 */                 "$call152": $call152,
-/*   324 */                 "$slice155": $slice155,
-/*   325 */                 "$lsubscr156": $lsubscr156,
-/*   326 */                 "$binop157": $binop157,
-/*   327 */                 "$loadgbl158": $loadgbl158,
-/*   328 */                 "$call159": $call159,
-/*   329 */                 "$slice160": $slice160,
-/*   330 */                 "$lattr163": $lattr163,
-/*   331 */                 "$loadgbl165": $loadgbl165,
-/*   332 */                 "$loadgbl166": $loadgbl166,
-/*   333 */                 "$call167": $call167
-/*   334 */             };
-/*   335 */             return susp;
-/*   336 */         };
-/*   337 */         var $blk = 0,
-/*   338 */             $exc = [],
-/*   339 */             $loc = {},
-/*   340 */             $gbl = this,
-/*   341 */             $err = undefined,
-/*   342 */             $ret = undefined,
-/*   343 */             $postfinally = undefined,
-/*   344 */             $currLineNo = undefined,
-/*   345 */             $currColNo = undefined;
-/*   346 */         if ($scope122.$wakingSuspension !== undefined) {
-/*   347 */             $wakeFromSuspension();
-/*   348 */         } else {
-/*   349 */             Sk.builtin.pyCheckArgs("scrambler", arguments, 1, 1, false, false);
-/*   350 */         }
-/*   351 */         while (true) {
-/*   352 */             try {
-/*   353 */                 switch ($blk) {
-/*   354 */                 case 0:
-/*   355 */                     /* --- codeobj entry --- */
-/*   356 */                     if (word === undefined) {
-/*   357 */                         throw new Sk.builtin.UnboundLocalError('local variable \'word\' referenced before assignment');
-/*   358 */                     }
-/*   359 */ 
-/*   360 */                     //
-/*   361 */                     // line 5:
-/*   362 */                     // 	if len(word) == 1:
-/*   363 */                     //  ^
-/*   364 */                     //
-/*   365 */                     $currLineNo = 5;
-/*   366 */                     $currColNo = 1;
-/*   367 */ 
-/*   368 */                     var $loadgbl124 = Sk.misceval.loadname('len', $gbl);
-/*   369 */                     if (word === undefined) {
-/*   370 */                         throw new Sk.builtin.UnboundLocalError('local variable \'word\' referenced before assignment');
-/*   371 */                     }
-/*   372 */                     $ret;
-/*   373 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl124, word);
-/*   374 */                     $blk = 3; /* allowing case fallthrough */
-/*   375 */                 case 3:
-/*   376 */                     /* --- function return or resume suspension --- */
-/*   377 */                     if ($ret && $ret.$isSuspension) {
-/*   378 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 5, 4);
-/*   379 */                     }
-/*   380 */                     var $call125 = $ret;
-/*   381 */                     //
-/*   382 */                     // line 5:
-/*   383 */                     // 	if len(word) == 1:
-/*   384 */                     //     ^
-/*   385 */                     //
-/*   386 */                     $currLineNo = 5;
-/*   387 */                     $currColNo = 4;
-/*   388 */ 
-/*   389 */                     var $compareres126 = null;
-/*   390 */                     $ret = Sk.builtin.bool(Sk.misceval.richCompareBool($call125, new Sk.builtin.int_(1), 'Eq', true));
-/*   391 */                     $blk = 5; /* allowing case fallthrough */
-/*   392 */                 case 5:
-/*   393 */                     /* --- function return or resume suspension --- */
-/*   394 */                     if ($ret && $ret.$isSuspension) {
-/*   395 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 5, 4);
-/*   396 */                     }
-/*   397 */                     $compareres126 = $ret;
-/*   398 */                     var $jfalse127 = ($ret === false || !Sk.misceval.isTrue($ret));
-/*   399 */                     if ($jfalse127) { /*test failed */
-/*   400 */                         $blk = 4;
-/*   401 */                         continue;
-/*   402 */                     }
-/*   403 */                     $blk = 4; /* allowing case fallthrough */
-/*   404 */                 case 4:
-/*   405 */                     /* --- done --- */
-/*   406 */                     var $jfalse128 = ($compareres126 === false || !Sk.misceval.isTrue($compareres126));
-/*   407 */                     if ($jfalse128) { /*test failed */
-/*   408 */                         $blk = 2;
-/*   409 */                         continue;
-/*   410 */                     }
-/*   411 */                     //
-/*   412 */                     // line 6:
-/*   413 */                     // 		nstrings = [word]
-/*   414 */                     //   ^
-/*   415 */                     //
-/*   416 */                     $currLineNo = 6;
-/*   417 */                     $currColNo = 2;
-/*   418 */ 
-/*   419 */                     if (word === undefined) {
-/*   420 */                         throw new Sk.builtin.UnboundLocalError('local variable \'word\' referenced before assignment');
+/*   117 */                     // line 2:
+/*   118 */                     // import sys
+/*   119 */                     // ^
+/*   120 */                     //
+/*   121 */                     $currLineNo = 2;
+/*   122 */                     $currColNo = 0;
+/*   123 */ 
+/*   124 */                     $ret = Sk.builtin.__import__('sys', $gbl, $loc, []);
+/*   125 */                     $blk = 1; /* allowing case fallthrough */
+/*   126 */                 case 1:
+/*   127 */                     /* --- function return or resume suspension --- */
+/*   128 */                     if ($ret && $ret.$isSuspension) {
+/*   129 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 2, 0);
+/*   130 */                     }
+/*   131 */                     var $module121 = $ret;
+/*   132 */                     $loc.sys = $module121;
+/*   133 */                     //
+/*   134 */                     // line 4:
+/*   135 */                     // def scrambler(word):
+/*   136 */                     // ^
+/*   137 */                     //
+/*   138 */                     $currLineNo = 4;
+/*   139 */                     $currColNo = 0;
+/*   140 */ 
+/*   141 */                     $scope122.co_name = new Sk.builtins['str']('scrambler');
+/*   142 */                     $scope122.co_varnames = ['word'];
+/*   143 */                     var $funcobj169 = new Sk.builtins['function']($scope122, $gbl);
+/*   144 */                     $loc.scrambler = $funcobj169;
+/*   145 */                     //
+/*   146 */                     // line 20:
+/*   147 */                     // scrambles = scrambler("berrycakes")
+/*   148 */                     // ^
+/*   149 */                     //
+/*   150 */                     $currLineNo = 20;
+/*   151 */                     $currColNo = 0;
+/*   152 */ 
+/*   153 */                     var $loadname170 = $loc.scrambler !== undefined ? $loc.scrambler : Sk.misceval.loadname('scrambler', $gbl);;
+/*   154 */                     var $str171 = new Sk.builtins['str']('berrycakes');
+/*   155 */                     $ret;
+/*   156 */                     $ret = Sk.misceval.callsimOrSuspend($loadname170, $str171);
+/*   157 */                     $blk = 2; /* allowing case fallthrough */
+/*   158 */                 case 2:
+/*   159 */                     /* --- function return or resume suspension --- */
+/*   160 */                     if ($ret && $ret.$isSuspension) {
+/*   161 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 20, 12);
+/*   162 */                     }
+/*   163 */                     var $call172 = $ret;
+/*   164 */                     //
+/*   165 */                     // line 20:
+/*   166 */                     // scrambles = scrambler("berrycakes")
+/*   167 */                     //             ^
+/*   168 */                     //
+/*   169 */                     $currLineNo = 20;
+/*   170 */                     $currColNo = 12;
+/*   171 */ 
+/*   172 */                     $loc.scrambles = $call172;
+/*   173 */                     //
+/*   174 */                     // line 21:
+/*   175 */                     // print len(scrambles)
+/*   176 */                     // ^
+/*   177 */                     //
+/*   178 */                     $currLineNo = 21;
+/*   179 */                     $currColNo = 0;
+/*   180 */ 
+/*   181 */                     var $loadname173 = $loc.len !== undefined ? $loc.len : Sk.misceval.loadname('len', $gbl);;
+/*   182 */                     var $loadname174 = $loc.scrambles !== undefined ? $loc.scrambles : Sk.misceval.loadname('scrambles', $gbl);;
+/*   183 */                     $ret;
+/*   184 */                     $ret = Sk.misceval.callsimOrSuspend($loadname173, $loadname174);
+/*   185 */                     $blk = 3; /* allowing case fallthrough */
+/*   186 */                 case 3:
+/*   187 */                     /* --- function return or resume suspension --- */
+/*   188 */                     if ($ret && $ret.$isSuspension) {
+/*   189 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 21, 6);
+/*   190 */                     }
+/*   191 */                     var $call175 = $ret;
+/*   192 */                     //
+/*   193 */                     // line 21:
+/*   194 */                     // print len(scrambles)
+/*   195 */                     //       ^
+/*   196 */                     //
+/*   197 */                     $currLineNo = 21;
+/*   198 */                     $currColNo = 6;
+/*   199 */ 
+/*   200 */                     Sk.misceval.print_(new Sk.builtins['str']($call175).v);
+/*   201 */                     Sk.misceval.print_("\n");
+/*   202 */                     return $loc;
+/*   203 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
+/*   204 */                 }
+/*   205 */             } catch (err) {
+/*   206 */                 if (!(err instanceof Sk.builtin.BaseException)) {
+/*   207 */                     err = new Sk.builtin.ExternalError(err);
+/*   208 */                 }
+/*   209 */                 err.traceback.push({
+/*   210 */                     lineno: $currLineNo,
+/*   211 */                     colno: $currColNo,
+/*   212 */                     filename: '/home/sbaxter/benchmarks/skulpt/anagram/main.py'
+/*   213 */                 });
+/*   214 */                 if ($exc.length > 0) {
+/*   215 */                     $err = err;
+/*   216 */                     $blk = $exc.pop();
+/*   217 */                     continue;
+/*   218 */                 } else {
+/*   219 */                     throw err;
+/*   220 */                 }
+/*   221 */             }
+/*   222 */         }
+/*   223 */     });
+/*   224 */     var $scope122 = (function $scrambler123$(word) {
+/*   225 */         var char_$rw$, finals, i, n, newfinal, nstrings, tail, uniqueList; /* locals */
+/*   226 */         var char_$rw$, char_$rw$, finals, finals, finals, i, i, i, n, n, n, n, n, newfinal, newfinal, nstrings, nstrings, nstrings, nstrings, tail, tail, uniqueList, uniqueList, uniqueList, word, word, word, word, $loadgbl124, $loadgbl124, $call125, $compareres126, $loadgbl131, $str135, $str135, $lattr136, $slice137, $str135, $lattr136, $slice137, $lsubscr138, $loadgbl140, $loadgbl141, $loadgbl142, $loadgbl140, $loadgbl141, $loadgbl142, $call143, $loadgbl140, $loadgbl141, $loadgbl142, $call143, $call144, $iter146, $iter146, $loadgbl148, $loadgbl149, $loadgbl148, $loadgbl149, $call150, $binop151, $iter153, $loadgbl148, $loadgbl149, $call150, $binop151, $call152, $iter153, $slice155, $slice155, $lsubscr156, $binop157, $loadgbl158, $slice155, $lsubscr156, $binop157, $loadgbl158, $call159, $slice160, $lattr163, $loadgbl165, $loadgbl166, $loadgbl165, $loadgbl166, $call167;
+/*   227 */         var $wakeFromSuspension = function() {
+/*   228 */             var susp = $scope122.$wakingSuspension;
+/*   229 */             delete $scope122.$wakingSuspension;
+/*   230 */             $blk = susp.$blk;
+/*   231 */             $loc = susp.$loc;
+/*   232 */             $gbl = susp.$gbl;
+/*   233 */             $exc = susp.$exc;
+/*   234 */             $err = susp.$err;
+/*   235 */             $postfinally = susp.$postfinally;
+/*   236 */             $currLineNo = susp.$lineno;
+/*   237 */             $currColNo = susp.$colno;
+/*   238 */             Sk.lastYield = Date.now();
+/*   239 */             char_$rw$ = susp.$tmps.char_$rw$;
+/*   240 */             finals = susp.$tmps.finals;
+/*   241 */             i = susp.$tmps.i;
+/*   242 */             n = susp.$tmps.n;
+/*   243 */             newfinal = susp.$tmps.newfinal;
+/*   244 */             nstrings = susp.$tmps.nstrings;
+/*   245 */             tail = susp.$tmps.tail;
+/*   246 */             uniqueList = susp.$tmps.uniqueList;
+/*   247 */             word = susp.$tmps.word;
+/*   248 */             $loadgbl124 = susp.$tmps.$loadgbl124;
+/*   249 */             $call125 = susp.$tmps.$call125;
+/*   250 */             $compareres126 = susp.$tmps.$compareres126;
+/*   251 */             $loadgbl131 = susp.$tmps.$loadgbl131;
+/*   252 */             $str135 = susp.$tmps.$str135;
+/*   253 */             $lattr136 = susp.$tmps.$lattr136;
+/*   254 */             $slice137 = susp.$tmps.$slice137;
+/*   255 */             $lsubscr138 = susp.$tmps.$lsubscr138;
+/*   256 */             $loadgbl140 = susp.$tmps.$loadgbl140;
+/*   257 */             $loadgbl141 = susp.$tmps.$loadgbl141;
+/*   258 */             $loadgbl142 = susp.$tmps.$loadgbl142;
+/*   259 */             $call143 = susp.$tmps.$call143;
+/*   260 */             $call144 = susp.$tmps.$call144;
+/*   261 */             $iter146 = susp.$tmps.$iter146;
+/*   262 */             $loadgbl148 = susp.$tmps.$loadgbl148;
+/*   263 */             $loadgbl149 = susp.$tmps.$loadgbl149;
+/*   264 */             $call150 = susp.$tmps.$call150;
+/*   265 */             $binop151 = susp.$tmps.$binop151;
+/*   266 */             $iter153 = susp.$tmps.$iter153;
+/*   267 */             $call152 = susp.$tmps.$call152;
+/*   268 */             $slice155 = susp.$tmps.$slice155;
+/*   269 */             $lsubscr156 = susp.$tmps.$lsubscr156;
+/*   270 */             $binop157 = susp.$tmps.$binop157;
+/*   271 */             $loadgbl158 = susp.$tmps.$loadgbl158;
+/*   272 */             $call159 = susp.$tmps.$call159;
+/*   273 */             $slice160 = susp.$tmps.$slice160;
+/*   274 */             $lattr163 = susp.$tmps.$lattr163;
+/*   275 */             $loadgbl165 = susp.$tmps.$loadgbl165;
+/*   276 */             $loadgbl166 = susp.$tmps.$loadgbl166;
+/*   277 */             $call167 = susp.$tmps.$call167;
+/*   278 */             try {
+/*   279 */                 $ret = susp.child.resume();
+/*   280 */             } catch (err) {
+/*   281 */                 if (!(err instanceof Sk.builtin.BaseException)) {
+/*   282 */                     err = new Sk.builtin.ExternalError(err);
+/*   283 */                 }
+/*   284 */                 err.traceback.push({
+/*   285 */                     lineno: $currLineNo,
+/*   286 */                     colno: $currColNo,
+/*   287 */                     filename: '/home/sbaxter/benchmarks/skulpt/anagram/main.py'
+/*   288 */                 });
+/*   289 */                 if ($exc.length > 0) {
+/*   290 */                     $err = err;
+/*   291 */                     $blk = $exc.pop();
+/*   292 */                 } else {
+/*   293 */                     throw err;
+/*   294 */                 }
+/*   295 */             }
+/*   296 */         };
+/*   297 */         var $saveSuspension = function($child, $filename, $lineno, $colno) {
+/*   298 */             var susp = new Sk.misceval.Suspension();
+/*   299 */             susp.child = $child;
+/*   300 */             susp.resume = function() {
+/*   301 */                 $scope122.$wakingSuspension = susp;
+/*   302 */                 return $scope122();
+/*   303 */             };
+/*   304 */             susp.data = susp.child.data;
+/*   305 */             susp.$blk = $blk;
+/*   306 */             susp.$loc = $loc;
+/*   307 */             susp.$gbl = $gbl;
+/*   308 */             susp.$exc = $exc;
+/*   309 */             susp.$err = $err;
+/*   310 */             susp.$postfinally = $postfinally;
+/*   311 */             susp.$filename = $filename;
+/*   312 */             susp.$lineno = $lineno;
+/*   313 */             susp.$colno = $colno;
+/*   314 */             susp.optional = susp.child.optional;
+/*   315 */             susp.$tmps = {
+/*   316 */                 "char_$rw$": char_$rw$,
+/*   317 */                 "finals": finals,
+/*   318 */                 "i": i,
+/*   319 */                 "n": n,
+/*   320 */                 "newfinal": newfinal,
+/*   321 */                 "nstrings": nstrings,
+/*   322 */                 "tail": tail,
+/*   323 */                 "uniqueList": uniqueList,
+/*   324 */                 "word": word,
+/*   325 */                 "$loadgbl124": $loadgbl124,
+/*   326 */                 "$call125": $call125,
+/*   327 */                 "$compareres126": $compareres126,
+/*   328 */                 "$loadgbl131": $loadgbl131,
+/*   329 */                 "$str135": $str135,
+/*   330 */                 "$lattr136": $lattr136,
+/*   331 */                 "$slice137": $slice137,
+/*   332 */                 "$lsubscr138": $lsubscr138,
+/*   333 */                 "$loadgbl140": $loadgbl140,
+/*   334 */                 "$loadgbl141": $loadgbl141,
+/*   335 */                 "$loadgbl142": $loadgbl142,
+/*   336 */                 "$call143": $call143,
+/*   337 */                 "$call144": $call144,
+/*   338 */                 "$iter146": $iter146,
+/*   339 */                 "$loadgbl148": $loadgbl148,
+/*   340 */                 "$loadgbl149": $loadgbl149,
+/*   341 */                 "$call150": $call150,
+/*   342 */                 "$binop151": $binop151,
+/*   343 */                 "$iter153": $iter153,
+/*   344 */                 "$call152": $call152,
+/*   345 */                 "$slice155": $slice155,
+/*   346 */                 "$lsubscr156": $lsubscr156,
+/*   347 */                 "$binop157": $binop157,
+/*   348 */                 "$loadgbl158": $loadgbl158,
+/*   349 */                 "$call159": $call159,
+/*   350 */                 "$slice160": $slice160,
+/*   351 */                 "$lattr163": $lattr163,
+/*   352 */                 "$loadgbl165": $loadgbl165,
+/*   353 */                 "$loadgbl166": $loadgbl166,
+/*   354 */                 "$call167": $call167
+/*   355 */             };
+/*   356 */             return susp;
+/*   357 */         };
+/*   358 */         var $blk = 0,
+/*   359 */             $exc = [],
+/*   360 */             $loc = {},
+/*   361 */             $gbl = this,
+/*   362 */             $err = undefined,
+/*   363 */             $ret = undefined,
+/*   364 */             $postfinally = undefined,
+/*   365 */             $currLineNo = undefined,
+/*   366 */             $currColNo = undefined;
+/*   367 */         if (typeof Sk.execStart === 'undefined') {
+/*   368 */             Sk.execStart = Date.now()
+/*   369 */         }
+/*   370 */         if (typeof Sk.lastYield === 'undefined') {
+/*   371 */             Sk.lastYield = Date.now()
+/*   372 */         }
+/*   373 */         if ($scope122.$wakingSuspension !== undefined) {
+/*   374 */             $wakeFromSuspension();
+/*   375 */         } else {
+/*   376 */             Sk.builtin.pyCheckArgs("scrambler", arguments, 1, 1, false, false);
+/*   377 */         }
+/*   378 */         while (true) {
+/*   379 */             try {
+/*   380 */                 var $dateNow = Date.now();
+/*   381 */                 if ($dateNow - Sk.execStart > Sk.execLimit) {
+/*   382 */                     throw new Sk.builtin.TimeLimitError(Sk.timeoutMsg())
+/*   383 */                 }
+/*   384 */                 if ($dateNow - Sk.lastYield > Sk.yieldLimit) {
+/*   385 */                     var $susp = $saveSuspension({
+/*   386 */                         data: {
+/*   387 */                             type: 'Sk.yield'
+/*   388 */                         },
+/*   389 */                         resume: function() {}
+/*   390 */                     }, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
+/*   391 */                     $susp.$blk = $blk;
+/*   392 */                     $susp.optional = true;
+/*   393 */                     return $susp;
+/*   394 */                 }
+/*   395 */                 switch ($blk) {
+/*   396 */                 case 0:
+/*   397 */                     /* --- codeobj entry --- */
+/*   398 */                     if (word === undefined) {
+/*   399 */                         throw new Sk.builtin.UnboundLocalError('local variable \'word\' referenced before assignment');
+/*   400 */                     }
+/*   401 */ 
+/*   402 */                     //
+/*   403 */                     // line 5:
+/*   404 */                     // 	if len(word) == 1:
+/*   405 */                     //  ^
+/*   406 */                     //
+/*   407 */                     $currLineNo = 5;
+/*   408 */                     $currColNo = 1;
+/*   409 */ 
+/*   410 */                     var $loadgbl124 = Sk.misceval.loadname('len', $gbl);
+/*   411 */                     if (word === undefined) {
+/*   412 */                         throw new Sk.builtin.UnboundLocalError('local variable \'word\' referenced before assignment');
+/*   413 */                     }
+/*   414 */                     $ret;
+/*   415 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl124, word);
+/*   416 */                     $blk = 3; /* allowing case fallthrough */
+/*   417 */                 case 3:
+/*   418 */                     /* --- function return or resume suspension --- */
+/*   419 */                     if ($ret && $ret.$isSuspension) {
+/*   420 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 5, 4);
 /*   421 */                     }
-/*   422 */                     var $elem129 = word;
-/*   423 */                     var $loadlist130 = new Sk.builtins['list']([$elem129]);
-/*   424 */                     nstrings = $loadlist130;
-/*   425 */                     //
-/*   426 */                     // line 7:
-/*   427 */                     // 		return nstrings
-/*   428 */                     //   ^
-/*   429 */                     //
-/*   430 */                     $currLineNo = 7;
-/*   431 */                     $currColNo = 2;
-/*   432 */ 
-/*   433 */                     if (nstrings === undefined) {
-/*   434 */                         throw new Sk.builtin.UnboundLocalError('local variable \'nstrings\' referenced before assignment');
-/*   435 */                     }
-/*   436 */                     return nstrings;
-/*   437 */                     $blk = 1; /* allowing case fallthrough */
-/*   438 */                 case 1:
-/*   439 */                     /* --- end of if --- */
-/*   440 */                     return Sk.builtin.none.none$;
-/*   441 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
-/*   442 */                 case 2:
-/*   443 */                     /* --- next branch of if --- */
-/*   444 */                     //
-/*   445 */                     // line 9:
-/*   446 */                     // 		uniqueList = list(word)
-/*   447 */                     //   ^
-/*   448 */                     //
-/*   449 */                     $currLineNo = 9;
-/*   450 */                     $currColNo = 2;
-/*   451 */ 
-/*   452 */                     var $loadgbl131 = Sk.misceval.loadname('list', $gbl);
-/*   453 */                     if (word === undefined) {
-/*   454 */                         throw new Sk.builtin.UnboundLocalError('local variable \'word\' referenced before assignment');
-/*   455 */                     }
-/*   456 */                     $ret;
-/*   457 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl131, word);
-/*   458 */                     $blk = 6; /* allowing case fallthrough */
-/*   459 */                 case 6:
-/*   460 */                     /* --- function return or resume suspension --- */
-/*   461 */                     if ($ret && $ret.$isSuspension) {
-/*   462 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 9, 15);
+/*   422 */                     var $call125 = $ret;
+/*   423 */                     //
+/*   424 */                     // line 5:
+/*   425 */                     // 	if len(word) == 1:
+/*   426 */                     //     ^
+/*   427 */                     //
+/*   428 */                     $currLineNo = 5;
+/*   429 */                     $currColNo = 4;
+/*   430 */ 
+/*   431 */                     var $compareres126 = null;
+/*   432 */                     $ret = Sk.builtin.bool(Sk.misceval.richCompareBool($call125, new Sk.builtin.int_(1), 'Eq', true));
+/*   433 */                     $blk = 5; /* allowing case fallthrough */
+/*   434 */                 case 5:
+/*   435 */                     /* --- function return or resume suspension --- */
+/*   436 */                     if ($ret && $ret.$isSuspension) {
+/*   437 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 5, 4);
+/*   438 */                     }
+/*   439 */                     $compareres126 = $ret;
+/*   440 */                     var $jfalse127 = ($ret === false || !Sk.misceval.isTrue($ret));
+/*   441 */                     if ($jfalse127) { /*test failed */
+/*   442 */                         $blk = 4;
+/*   443 */                         continue;
+/*   444 */                     }
+/*   445 */                     $blk = 4; /* allowing case fallthrough */
+/*   446 */                 case 4:
+/*   447 */                     /* --- done --- */
+/*   448 */                     var $jfalse128 = ($compareres126 === false || !Sk.misceval.isTrue($compareres126));
+/*   449 */                     if ($jfalse128) { /*test failed */
+/*   450 */                         $blk = 2;
+/*   451 */                         continue;
+/*   452 */                     }
+/*   453 */                     //
+/*   454 */                     // line 6:
+/*   455 */                     // 		nstrings = [word]
+/*   456 */                     //   ^
+/*   457 */                     //
+/*   458 */                     $currLineNo = 6;
+/*   459 */                     $currColNo = 2;
+/*   460 */ 
+/*   461 */                     if (word === undefined) {
+/*   462 */                         throw new Sk.builtin.UnboundLocalError('local variable \'word\' referenced before assignment');
 /*   463 */                     }
-/*   464 */                     var $call132 = $ret;
-/*   465 */                     //
-/*   466 */                     // line 9:
-/*   467 */                     // 		uniqueList = list(word)
-/*   468 */                     //                ^
-/*   469 */                     //
-/*   470 */                     $currLineNo = 9;
-/*   471 */                     $currColNo = 15;
-/*   472 */ 
-/*   473 */                     uniqueList = $call132;
-/*   474 */                     //
-/*   475 */                     // line 10:
-/*   476 */                     // 		finals = []
-/*   477 */                     //   ^
-/*   478 */                     //
-/*   479 */                     $currLineNo = 10;
-/*   480 */                     $currColNo = 2;
-/*   481 */ 
-/*   482 */                     var $loadlist133 = new Sk.builtins['list']([]);
-/*   483 */                     finals = $loadlist133;
-/*   484 */                     //
-/*   485 */                     // line 11:
-/*   486 */                     // 		char = uniqueList[0]
-/*   487 */                     //   ^
-/*   488 */                     //
-/*   489 */                     $currLineNo = 11;
-/*   490 */                     $currColNo = 2;
-/*   491 */ 
-/*   492 */                     if (uniqueList === undefined) {
-/*   493 */                         throw new Sk.builtin.UnboundLocalError('local variable \'uniqueList\' referenced before assignment');
-/*   494 */                     }
-/*   495 */                     $ret = Sk.abstr.objectGetItem(uniqueList, new Sk.builtin.int_(0), true);
-/*   496 */                     $blk = 7; /* allowing case fallthrough */
-/*   497 */                 case 7:
-/*   498 */                     /* --- function return or resume suspension --- */
-/*   499 */                     if ($ret && $ret.$isSuspension) {
-/*   500 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
-/*   501 */                     }
-/*   502 */                     var $lsubscr134 = $ret;
-/*   503 */                     char_$rw$ = $lsubscr134;
-/*   504 */                     //
-/*   505 */                     // line 12:
-/*   506 */                     // 		tail = ''.join(uniqueList[1:])
-/*   507 */                     //   ^
-/*   508 */                     //
-/*   509 */                     $currLineNo = 12;
-/*   510 */                     $currColNo = 2;
-/*   511 */ 
-/*   512 */                     var $str135 = new Sk.builtins['str']('');
-/*   513 */                     $ret = Sk.abstr.gattr($str135, 'join', true);
-/*   514 */                     $blk = 8; /* allowing case fallthrough */
-/*   515 */                 case 8:
-/*   516 */                     /* --- function return or resume suspension --- */
-/*   517 */                     if ($ret && $ret.$isSuspension) {
-/*   518 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 12, 9);
-/*   519 */                     }
-/*   520 */                     var $lattr136 = $ret;
-/*   521 */                     if (uniqueList === undefined) {
-/*   522 */                         throw new Sk.builtin.UnboundLocalError('local variable \'uniqueList\' referenced before assignment');
-/*   523 */                     }
-/*   524 */                     var $slice137 = new Sk.builtins['slice'](new Sk.builtin.int_(1), new Sk.builtin.int_(2147483647), Sk.builtin.none.none$);
-/*   525 */                     $ret = Sk.abstr.objectGetItem(uniqueList, $slice137, true);
-/*   526 */                     $blk = 9; /* allowing case fallthrough */
-/*   527 */                 case 9:
-/*   528 */                     /* --- function return or resume suspension --- */
-/*   529 */                     if ($ret && $ret.$isSuspension) {
-/*   530 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
-/*   531 */                     }
-/*   532 */                     var $lsubscr138 = $ret;
-/*   533 */                     $ret;
-/*   534 */                     $ret = Sk.misceval.callsimOrSuspend($lattr136, $lsubscr138);
-/*   535 */                     $blk = 10; /* allowing case fallthrough */
-/*   536 */                 case 10:
-/*   537 */                     /* --- function return or resume suspension --- */
-/*   538 */                     if ($ret && $ret.$isSuspension) {
-/*   539 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 12, 9);
-/*   540 */                     }
-/*   541 */                     var $call139 = $ret;
-/*   542 */                     //
-/*   543 */                     // line 12:
-/*   544 */                     // 		tail = ''.join(uniqueList[1:])
-/*   545 */                     //          ^
+/*   464 */                     var $elem129 = word;
+/*   465 */                     var $loadlist130 = new Sk.builtins['list']([$elem129]);
+/*   466 */                     nstrings = $loadlist130;
+/*   467 */                     //
+/*   468 */                     // line 7:
+/*   469 */                     // 		return nstrings
+/*   470 */                     //   ^
+/*   471 */                     //
+/*   472 */                     $currLineNo = 7;
+/*   473 */                     $currColNo = 2;
+/*   474 */ 
+/*   475 */                     if (nstrings === undefined) {
+/*   476 */                         throw new Sk.builtin.UnboundLocalError('local variable \'nstrings\' referenced before assignment');
+/*   477 */                     }
+/*   478 */                     return nstrings;
+/*   479 */                     $blk = 1; /* allowing case fallthrough */
+/*   480 */                 case 1:
+/*   481 */                     /* --- end of if --- */
+/*   482 */                     return Sk.builtin.none.none$;
+/*   483 */                     throw new Sk.builtin.SystemError('internal error: unterminated block');
+/*   484 */                 case 2:
+/*   485 */                     /* --- next branch of if --- */
+/*   486 */                     //
+/*   487 */                     // line 9:
+/*   488 */                     // 		uniqueList = list(word)
+/*   489 */                     //   ^
+/*   490 */                     //
+/*   491 */                     $currLineNo = 9;
+/*   492 */                     $currColNo = 2;
+/*   493 */ 
+/*   494 */                     var $loadgbl131 = Sk.misceval.loadname('list', $gbl);
+/*   495 */                     if (word === undefined) {
+/*   496 */                         throw new Sk.builtin.UnboundLocalError('local variable \'word\' referenced before assignment');
+/*   497 */                     }
+/*   498 */                     $ret;
+/*   499 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl131, word);
+/*   500 */                     $blk = 6; /* allowing case fallthrough */
+/*   501 */                 case 6:
+/*   502 */                     /* --- function return or resume suspension --- */
+/*   503 */                     if ($ret && $ret.$isSuspension) {
+/*   504 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 9, 15);
+/*   505 */                     }
+/*   506 */                     var $call132 = $ret;
+/*   507 */                     //
+/*   508 */                     // line 9:
+/*   509 */                     // 		uniqueList = list(word)
+/*   510 */                     //                ^
+/*   511 */                     //
+/*   512 */                     $currLineNo = 9;
+/*   513 */                     $currColNo = 15;
+/*   514 */ 
+/*   515 */                     uniqueList = $call132;
+/*   516 */                     //
+/*   517 */                     // line 10:
+/*   518 */                     // 		finals = []
+/*   519 */                     //   ^
+/*   520 */                     //
+/*   521 */                     $currLineNo = 10;
+/*   522 */                     $currColNo = 2;
+/*   523 */ 
+/*   524 */                     var $loadlist133 = new Sk.builtins['list']([]);
+/*   525 */                     finals = $loadlist133;
+/*   526 */                     //
+/*   527 */                     // line 11:
+/*   528 */                     // 		char = uniqueList[0]
+/*   529 */                     //   ^
+/*   530 */                     //
+/*   531 */                     $currLineNo = 11;
+/*   532 */                     $currColNo = 2;
+/*   533 */ 
+/*   534 */                     if (uniqueList === undefined) {
+/*   535 */                         throw new Sk.builtin.UnboundLocalError('local variable \'uniqueList\' referenced before assignment');
+/*   536 */                     }
+/*   537 */                     $ret = Sk.abstr.objectGetItem(uniqueList, new Sk.builtin.int_(0), true);
+/*   538 */                     $blk = 7; /* allowing case fallthrough */
+/*   539 */                 case 7:
+/*   540 */                     /* --- function return or resume suspension --- */
+/*   541 */                     if ($ret && $ret.$isSuspension) {
+/*   542 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
+/*   543 */                     }
+/*   544 */                     var $lsubscr134 = $ret;
+/*   545 */                     char_$rw$ = $lsubscr134;
 /*   546 */                     //
-/*   547 */                     $currLineNo = 12;
-/*   548 */                     $currColNo = 9;
-/*   549 */ 
-/*   550 */                     tail = $call139;
-/*   551 */                     //
-/*   552 */                     // line 13:
-/*   553 */                     // 		nstrings = list(set(scrambler(tail)))
-/*   554 */                     //   ^
-/*   555 */                     //
-/*   556 */                     $currLineNo = 13;
-/*   557 */                     $currColNo = 2;
-/*   558 */ 
-/*   559 */                     var $loadgbl140 = Sk.misceval.loadname('list', $gbl);
-/*   560 */                     var $loadgbl141 = Sk.misceval.loadname('set', $gbl);
-/*   561 */                     var $loadgbl142 = Sk.misceval.loadname('scrambler', $gbl);
-/*   562 */                     if (tail === undefined) {
-/*   563 */                         throw new Sk.builtin.UnboundLocalError('local variable \'tail\' referenced before assignment');
-/*   564 */                     }
-/*   565 */                     $ret;
-/*   566 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl142, tail);
-/*   567 */                     $blk = 11; /* allowing case fallthrough */
-/*   568 */                 case 11:
-/*   569 */                     /* --- function return or resume suspension --- */
-/*   570 */                     if ($ret && $ret.$isSuspension) {
-/*   571 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 13, 22);
-/*   572 */                     }
-/*   573 */                     var $call143 = $ret;
-/*   574 */                     //
-/*   575 */                     // line 13:
-/*   576 */                     // 		nstrings = list(set(scrambler(tail)))
-/*   577 */                     //                       ^
-/*   578 */                     //
-/*   579 */                     $currLineNo = 13;
-/*   580 */                     $currColNo = 22;
-/*   581 */ 
-/*   582 */                     $ret;
-/*   583 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl141, $call143);
-/*   584 */                     $blk = 12; /* allowing case fallthrough */
-/*   585 */                 case 12:
-/*   586 */                     /* --- function return or resume suspension --- */
-/*   587 */                     if ($ret && $ret.$isSuspension) {
-/*   588 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 13, 18);
-/*   589 */                     }
-/*   590 */                     var $call144 = $ret;
-/*   591 */                     //
-/*   592 */                     // line 13:
-/*   593 */                     // 		nstrings = list(set(scrambler(tail)))
-/*   594 */                     //                   ^
-/*   595 */                     //
-/*   596 */                     $currLineNo = 13;
-/*   597 */                     $currColNo = 18;
-/*   598 */ 
-/*   599 */                     $ret;
-/*   600 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl140, $call144);
-/*   601 */                     $blk = 13; /* allowing case fallthrough */
-/*   602 */                 case 13:
-/*   603 */                     /* --- function return or resume suspension --- */
-/*   604 */                     if ($ret && $ret.$isSuspension) {
-/*   605 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 13, 13);
+/*   547 */                     // line 12:
+/*   548 */                     // 		tail = ''.join(uniqueList[1:])
+/*   549 */                     //   ^
+/*   550 */                     //
+/*   551 */                     $currLineNo = 12;
+/*   552 */                     $currColNo = 2;
+/*   553 */ 
+/*   554 */                     var $str135 = new Sk.builtins['str']('');
+/*   555 */                     $ret = Sk.abstr.gattr($str135, 'join', true);
+/*   556 */                     $blk = 8; /* allowing case fallthrough */
+/*   557 */                 case 8:
+/*   558 */                     /* --- function return or resume suspension --- */
+/*   559 */                     if ($ret && $ret.$isSuspension) {
+/*   560 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 12, 9);
+/*   561 */                     }
+/*   562 */                     var $lattr136 = $ret;
+/*   563 */                     if (uniqueList === undefined) {
+/*   564 */                         throw new Sk.builtin.UnboundLocalError('local variable \'uniqueList\' referenced before assignment');
+/*   565 */                     }
+/*   566 */                     var $slice137 = new Sk.builtins['slice'](new Sk.builtin.int_(1), new Sk.builtin.int_(2147483647), Sk.builtin.none.none$);
+/*   567 */                     $ret = Sk.abstr.objectGetItem(uniqueList, $slice137, true);
+/*   568 */                     $blk = 9; /* allowing case fallthrough */
+/*   569 */                 case 9:
+/*   570 */                     /* --- function return or resume suspension --- */
+/*   571 */                     if ($ret && $ret.$isSuspension) {
+/*   572 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
+/*   573 */                     }
+/*   574 */                     var $lsubscr138 = $ret;
+/*   575 */                     $ret;
+/*   576 */                     $ret = Sk.misceval.callsimOrSuspend($lattr136, $lsubscr138);
+/*   577 */                     $blk = 10; /* allowing case fallthrough */
+/*   578 */                 case 10:
+/*   579 */                     /* --- function return or resume suspension --- */
+/*   580 */                     if ($ret && $ret.$isSuspension) {
+/*   581 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 12, 9);
+/*   582 */                     }
+/*   583 */                     var $call139 = $ret;
+/*   584 */                     //
+/*   585 */                     // line 12:
+/*   586 */                     // 		tail = ''.join(uniqueList[1:])
+/*   587 */                     //          ^
+/*   588 */                     //
+/*   589 */                     $currLineNo = 12;
+/*   590 */                     $currColNo = 9;
+/*   591 */ 
+/*   592 */                     tail = $call139;
+/*   593 */                     //
+/*   594 */                     // line 13:
+/*   595 */                     // 		nstrings = list(set(scrambler(tail)))
+/*   596 */                     //   ^
+/*   597 */                     //
+/*   598 */                     $currLineNo = 13;
+/*   599 */                     $currColNo = 2;
+/*   600 */ 
+/*   601 */                     var $loadgbl140 = Sk.misceval.loadname('list', $gbl);
+/*   602 */                     var $loadgbl141 = Sk.misceval.loadname('set', $gbl);
+/*   603 */                     var $loadgbl142 = Sk.misceval.loadname('scrambler', $gbl);
+/*   604 */                     if (tail === undefined) {
+/*   605 */                         throw new Sk.builtin.UnboundLocalError('local variable \'tail\' referenced before assignment');
 /*   606 */                     }
-/*   607 */                     var $call145 = $ret;
-/*   608 */                     //
-/*   609 */                     // line 13:
-/*   610 */                     // 		nstrings = list(set(scrambler(tail)))
-/*   611 */                     //              ^
-/*   612 */                     //
-/*   613 */                     $currLineNo = 13;
-/*   614 */                     $currColNo = 13;
-/*   615 */ 
-/*   616 */                     nstrings = $call145;
-/*   617 */                     //
-/*   618 */                     // line 14:
-/*   619 */                     // 		for n in nstrings:
-/*   620 */                     //   ^
-/*   621 */                     //
-/*   622 */                     $currLineNo = 14;
-/*   623 */                     $currColNo = 2;
-/*   624 */ 
-/*   625 */                     if (nstrings === undefined) {
-/*   626 */                         throw new Sk.builtin.UnboundLocalError('local variable \'nstrings\' referenced before assignment');
-/*   627 */                     }
-/*   628 */                     var $iter146 = Sk.abstr.iter(nstrings);
-/*   629 */                     $blk = 14; /* allowing case fallthrough */
-/*   630 */                 case 14:
-/*   631 */                     /* --- for start --- */
-/*   632 */                     $ret = Sk.abstr.iternext($iter146, true);
-/*   633 */                     $blk = 17; /* allowing case fallthrough */
-/*   634 */                 case 17:
-/*   635 */                     /* --- function return or resume suspension --- */
-/*   636 */                     if ($ret && $ret.$isSuspension) {
-/*   637 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 14, 2);
-/*   638 */                     }
-/*   639 */                     var $next147 = $ret;
-/*   640 */                     if ($next147 === undefined) {
-/*   641 */                         $blk = 15;
-/*   642 */                         continue;
-/*   643 */                     }
-/*   644 */                     n = $next147;
-/*   645 */                     //
-/*   646 */                     // line 15:
-/*   647 */                     // 			for i in range(0,len(n)+1):
-/*   648 */                     //    ^
-/*   649 */                     //
-/*   650 */                     $currLineNo = 15;
-/*   651 */                     $currColNo = 3;
-/*   652 */ 
-/*   653 */                     var $loadgbl148 = Sk.misceval.loadname('range', $gbl);
-/*   654 */                     var $loadgbl149 = Sk.misceval.loadname('len', $gbl);
-/*   655 */                     if (n === undefined) {
-/*   656 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   657 */                     }
-/*   658 */                     $ret;
-/*   659 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl149, n);
-/*   660 */                     $blk = 21; /* allowing case fallthrough */
-/*   661 */                 case 21:
-/*   662 */                     /* --- function return or resume suspension --- */
-/*   663 */                     if ($ret && $ret.$isSuspension) {
-/*   664 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 15, 20);
-/*   665 */                     }
-/*   666 */                     var $call150 = $ret;
-/*   667 */                     //
-/*   668 */                     // line 15:
-/*   669 */                     // 			for i in range(0,len(n)+1):
-/*   670 */                     //                     ^
-/*   671 */                     //
-/*   672 */                     $currLineNo = 15;
-/*   673 */                     $currColNo = 20;
-/*   674 */ 
-/*   675 */                     var $binop151 = Sk.abstr.numberBinOp($call150, new Sk.builtin.int_(1), 'Add');
-/*   676 */                     $ret;
-/*   677 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl148, new Sk.builtin.int_(0), $binop151);
-/*   678 */                     $blk = 22; /* allowing case fallthrough */
-/*   679 */                 case 22:
-/*   680 */                     /* --- function return or resume suspension --- */
-/*   681 */                     if ($ret && $ret.$isSuspension) {
-/*   682 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 15, 12);
-/*   683 */                     }
-/*   684 */                     var $call152 = $ret;
-/*   685 */                     //
-/*   686 */                     // line 15:
-/*   687 */                     // 			for i in range(0,len(n)+1):
-/*   688 */                     //             ^
-/*   689 */                     //
-/*   690 */                     $currLineNo = 15;
-/*   691 */                     $currColNo = 12;
-/*   692 */ 
-/*   693 */                     var $iter153 = Sk.abstr.iter($call152);
-/*   694 */                     $blk = 18; /* allowing case fallthrough */
-/*   695 */                 case 18:
-/*   696 */                     /* --- for start --- */
-/*   697 */                     $ret = Sk.abstr.iternext($iter153, true);
-/*   698 */                     $blk = 23; /* allowing case fallthrough */
-/*   699 */                 case 23:
-/*   700 */                     /* --- function return or resume suspension --- */
-/*   701 */                     if ($ret && $ret.$isSuspension) {
-/*   702 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 15, 3);
-/*   703 */                     }
-/*   704 */                     var $next154 = $ret;
-/*   705 */                     if ($next154 === undefined) {
-/*   706 */                         $blk = 19;
-/*   707 */                         continue;
-/*   708 */                     }
-/*   709 */                     i = $next154;
-/*   710 */                     //
-/*   711 */                     // line 16:
-/*   712 */                     // 				newfinal = n[0:i]+char+n[i:len(n)]
-/*   713 */                     //     ^
-/*   714 */                     //
-/*   715 */                     $currLineNo = 16;
-/*   716 */                     $currColNo = 4;
-/*   717 */ 
-/*   718 */                     if (n === undefined) {
-/*   719 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   720 */                     }
-/*   721 */                     if (i === undefined) {
-/*   722 */                         throw new Sk.builtin.UnboundLocalError('local variable \'i\' referenced before assignment');
-/*   723 */                     }
-/*   724 */                     var $slice155 = new Sk.builtins['slice'](new Sk.builtin.int_(0), i, Sk.builtin.none.none$);
-/*   725 */                     $ret = Sk.abstr.objectGetItem(n, $slice155, true);
-/*   726 */                     $blk = 24; /* allowing case fallthrough */
-/*   727 */                 case 24:
-/*   728 */                     /* --- function return or resume suspension --- */
-/*   729 */                     if ($ret && $ret.$isSuspension) {
-/*   730 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
-/*   731 */                     }
-/*   732 */                     var $lsubscr156 = $ret;
-/*   733 */                     if (char_$rw$ === undefined) {
-/*   734 */                         throw new Sk.builtin.UnboundLocalError('local variable \'char_$rw$\' referenced before assignment');
-/*   735 */                     }
-/*   736 */                     var $binop157 = Sk.abstr.numberBinOp($lsubscr156, char_$rw$, 'Add');
-/*   737 */                     if (n === undefined) {
-/*   738 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   739 */                     }
-/*   740 */                     if (i === undefined) {
-/*   741 */                         throw new Sk.builtin.UnboundLocalError('local variable \'i\' referenced before assignment');
-/*   742 */                     }
-/*   743 */                     var $loadgbl158 = Sk.misceval.loadname('len', $gbl);
-/*   744 */                     if (n === undefined) {
-/*   745 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
-/*   746 */                     }
-/*   747 */                     $ret;
-/*   748 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl158, n);
-/*   749 */                     $blk = 25; /* allowing case fallthrough */
-/*   750 */                 case 25:
-/*   751 */                     /* --- function return or resume suspension --- */
-/*   752 */                     if ($ret && $ret.$isSuspension) {
-/*   753 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 16, 31);
-/*   754 */                     }
-/*   755 */                     var $call159 = $ret;
+/*   607 */                     $ret;
+/*   608 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl142, tail);
+/*   609 */                     $blk = 11; /* allowing case fallthrough */
+/*   610 */                 case 11:
+/*   611 */                     /* --- function return or resume suspension --- */
+/*   612 */                     if ($ret && $ret.$isSuspension) {
+/*   613 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 13, 22);
+/*   614 */                     }
+/*   615 */                     var $call143 = $ret;
+/*   616 */                     //
+/*   617 */                     // line 13:
+/*   618 */                     // 		nstrings = list(set(scrambler(tail)))
+/*   619 */                     //                       ^
+/*   620 */                     //
+/*   621 */                     $currLineNo = 13;
+/*   622 */                     $currColNo = 22;
+/*   623 */ 
+/*   624 */                     $ret;
+/*   625 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl141, $call143);
+/*   626 */                     $blk = 12; /* allowing case fallthrough */
+/*   627 */                 case 12:
+/*   628 */                     /* --- function return or resume suspension --- */
+/*   629 */                     if ($ret && $ret.$isSuspension) {
+/*   630 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 13, 18);
+/*   631 */                     }
+/*   632 */                     var $call144 = $ret;
+/*   633 */                     //
+/*   634 */                     // line 13:
+/*   635 */                     // 		nstrings = list(set(scrambler(tail)))
+/*   636 */                     //                   ^
+/*   637 */                     //
+/*   638 */                     $currLineNo = 13;
+/*   639 */                     $currColNo = 18;
+/*   640 */ 
+/*   641 */                     $ret;
+/*   642 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl140, $call144);
+/*   643 */                     $blk = 13; /* allowing case fallthrough */
+/*   644 */                 case 13:
+/*   645 */                     /* --- function return or resume suspension --- */
+/*   646 */                     if ($ret && $ret.$isSuspension) {
+/*   647 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 13, 13);
+/*   648 */                     }
+/*   649 */                     var $call145 = $ret;
+/*   650 */                     //
+/*   651 */                     // line 13:
+/*   652 */                     // 		nstrings = list(set(scrambler(tail)))
+/*   653 */                     //              ^
+/*   654 */                     //
+/*   655 */                     $currLineNo = 13;
+/*   656 */                     $currColNo = 13;
+/*   657 */ 
+/*   658 */                     nstrings = $call145;
+/*   659 */                     //
+/*   660 */                     // line 14:
+/*   661 */                     // 		for n in nstrings:
+/*   662 */                     //   ^
+/*   663 */                     //
+/*   664 */                     $currLineNo = 14;
+/*   665 */                     $currColNo = 2;
+/*   666 */ 
+/*   667 */                     if (nstrings === undefined) {
+/*   668 */                         throw new Sk.builtin.UnboundLocalError('local variable \'nstrings\' referenced before assignment');
+/*   669 */                     }
+/*   670 */                     var $iter146 = Sk.abstr.iter(nstrings);
+/*   671 */                     $blk = 14; /* allowing case fallthrough */
+/*   672 */                 case 14:
+/*   673 */                     /* --- for start --- */
+/*   674 */                     $ret = Sk.abstr.iternext($iter146, true);
+/*   675 */                     $blk = 17; /* allowing case fallthrough */
+/*   676 */                 case 17:
+/*   677 */                     /* --- function return or resume suspension --- */
+/*   678 */                     if ($ret && $ret.$isSuspension) {
+/*   679 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 14, 2);
+/*   680 */                     }
+/*   681 */                     var $next147 = $ret;
+/*   682 */                     if ($next147 === undefined) {
+/*   683 */                         $blk = 15;
+/*   684 */                         continue;
+/*   685 */                     }
+/*   686 */                     n = $next147;
+/*   687 */                     //
+/*   688 */                     // line 15:
+/*   689 */                     // 			for i in range(0,len(n)+1):
+/*   690 */                     //    ^
+/*   691 */                     //
+/*   692 */                     $currLineNo = 15;
+/*   693 */                     $currColNo = 3;
+/*   694 */ 
+/*   695 */                     var $loadgbl148 = Sk.misceval.loadname('range', $gbl);
+/*   696 */                     var $loadgbl149 = Sk.misceval.loadname('len', $gbl);
+/*   697 */                     if (n === undefined) {
+/*   698 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   699 */                     }
+/*   700 */                     $ret;
+/*   701 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl149, n);
+/*   702 */                     $blk = 21; /* allowing case fallthrough */
+/*   703 */                 case 21:
+/*   704 */                     /* --- function return or resume suspension --- */
+/*   705 */                     if ($ret && $ret.$isSuspension) {
+/*   706 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 15, 20);
+/*   707 */                     }
+/*   708 */                     var $call150 = $ret;
+/*   709 */                     //
+/*   710 */                     // line 15:
+/*   711 */                     // 			for i in range(0,len(n)+1):
+/*   712 */                     //                     ^
+/*   713 */                     //
+/*   714 */                     $currLineNo = 15;
+/*   715 */                     $currColNo = 20;
+/*   716 */ 
+/*   717 */                     var $binop151 = Sk.abstr.numberBinOp($call150, new Sk.builtin.int_(1), 'Add');
+/*   718 */                     $ret;
+/*   719 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl148, new Sk.builtin.int_(0), $binop151);
+/*   720 */                     $blk = 22; /* allowing case fallthrough */
+/*   721 */                 case 22:
+/*   722 */                     /* --- function return or resume suspension --- */
+/*   723 */                     if ($ret && $ret.$isSuspension) {
+/*   724 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 15, 12);
+/*   725 */                     }
+/*   726 */                     var $call152 = $ret;
+/*   727 */                     //
+/*   728 */                     // line 15:
+/*   729 */                     // 			for i in range(0,len(n)+1):
+/*   730 */                     //             ^
+/*   731 */                     //
+/*   732 */                     $currLineNo = 15;
+/*   733 */                     $currColNo = 12;
+/*   734 */ 
+/*   735 */                     var $iter153 = Sk.abstr.iter($call152);
+/*   736 */                     $blk = 18; /* allowing case fallthrough */
+/*   737 */                 case 18:
+/*   738 */                     /* --- for start --- */
+/*   739 */                     $ret = Sk.abstr.iternext($iter153, true);
+/*   740 */                     $blk = 23; /* allowing case fallthrough */
+/*   741 */                 case 23:
+/*   742 */                     /* --- function return or resume suspension --- */
+/*   743 */                     if ($ret && $ret.$isSuspension) {
+/*   744 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 15, 3);
+/*   745 */                     }
+/*   746 */                     var $next154 = $ret;
+/*   747 */                     if ($next154 === undefined) {
+/*   748 */                         $blk = 19;
+/*   749 */                         continue;
+/*   750 */                     }
+/*   751 */                     i = $next154;
+/*   752 */                     //
+/*   753 */                     // line 16:
+/*   754 */                     // 				newfinal = n[0:i]+char+n[i:len(n)]
+/*   755 */                     //     ^
 /*   756 */                     //
-/*   757 */                     // line 16:
-/*   758 */                     // 				newfinal = n[0:i]+char+n[i:len(n)]
-/*   759 */                     //                                ^
-/*   760 */                     //
-/*   761 */                     $currLineNo = 16;
-/*   762 */                     $currColNo = 31;
-/*   763 */ 
-/*   764 */                     var $slice160 = new Sk.builtins['slice'](i, $call159, Sk.builtin.none.none$);
-/*   765 */                     $ret = Sk.abstr.objectGetItem(n, $slice160, true);
-/*   766 */                     $blk = 26; /* allowing case fallthrough */
-/*   767 */                 case 26:
-/*   768 */                     /* --- function return or resume suspension --- */
-/*   769 */                     if ($ret && $ret.$isSuspension) {
-/*   770 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
-/*   771 */                     }
-/*   772 */                     var $lsubscr161 = $ret;
-/*   773 */                     var $binop162 = Sk.abstr.numberBinOp($binop157, $lsubscr161, 'Add');
-/*   774 */                     newfinal = $binop162;
-/*   775 */                     //
-/*   776 */                     // line 17:
-/*   777 */                     // 				finals.append(newfinal)
-/*   778 */                     //     ^
-/*   779 */                     //
-/*   780 */                     $currLineNo = 17;
-/*   781 */                     $currColNo = 4;
-/*   782 */ 
-/*   783 */                     if (finals === undefined) {
-/*   784 */                         throw new Sk.builtin.UnboundLocalError('local variable \'finals\' referenced before assignment');
-/*   785 */                     }
-/*   786 */                     $ret = Sk.abstr.gattr(finals, 'append', true);
-/*   787 */                     $blk = 27; /* allowing case fallthrough */
-/*   788 */                 case 27:
-/*   789 */                     /* --- function return or resume suspension --- */
-/*   790 */                     if ($ret && $ret.$isSuspension) {
-/*   791 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 17, 4);
-/*   792 */                     }
-/*   793 */                     var $lattr163 = $ret;
-/*   794 */                     if (newfinal === undefined) {
-/*   795 */                         throw new Sk.builtin.UnboundLocalError('local variable \'newfinal\' referenced before assignment');
+/*   757 */                     $currLineNo = 16;
+/*   758 */                     $currColNo = 4;
+/*   759 */ 
+/*   760 */                     if (n === undefined) {
+/*   761 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   762 */                     }
+/*   763 */                     if (i === undefined) {
+/*   764 */                         throw new Sk.builtin.UnboundLocalError('local variable \'i\' referenced before assignment');
+/*   765 */                     }
+/*   766 */                     var $slice155 = new Sk.builtins['slice'](new Sk.builtin.int_(0), i, Sk.builtin.none.none$);
+/*   767 */                     $ret = Sk.abstr.objectGetItem(n, $slice155, true);
+/*   768 */                     $blk = 24; /* allowing case fallthrough */
+/*   769 */                 case 24:
+/*   770 */                     /* --- function return or resume suspension --- */
+/*   771 */                     if ($ret && $ret.$isSuspension) {
+/*   772 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
+/*   773 */                     }
+/*   774 */                     var $lsubscr156 = $ret;
+/*   775 */                     if (char_$rw$ === undefined) {
+/*   776 */                         throw new Sk.builtin.UnboundLocalError('local variable \'char_$rw$\' referenced before assignment');
+/*   777 */                     }
+/*   778 */                     var $binop157 = Sk.abstr.numberBinOp($lsubscr156, char_$rw$, 'Add');
+/*   779 */                     if (n === undefined) {
+/*   780 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   781 */                     }
+/*   782 */                     if (i === undefined) {
+/*   783 */                         throw new Sk.builtin.UnboundLocalError('local variable \'i\' referenced before assignment');
+/*   784 */                     }
+/*   785 */                     var $loadgbl158 = Sk.misceval.loadname('len', $gbl);
+/*   786 */                     if (n === undefined) {
+/*   787 */                         throw new Sk.builtin.UnboundLocalError('local variable \'n\' referenced before assignment');
+/*   788 */                     }
+/*   789 */                     $ret;
+/*   790 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl158, n);
+/*   791 */                     $blk = 25; /* allowing case fallthrough */
+/*   792 */                 case 25:
+/*   793 */                     /* --- function return or resume suspension --- */
+/*   794 */                     if ($ret && $ret.$isSuspension) {
+/*   795 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 16, 31);
 /*   796 */                     }
-/*   797 */                     $ret;
-/*   798 */                     $ret = Sk.misceval.callsimOrSuspend($lattr163, newfinal);
-/*   799 */                     $blk = 28; /* allowing case fallthrough */
-/*   800 */                 case 28:
-/*   801 */                     /* --- function return or resume suspension --- */
-/*   802 */                     if ($ret && $ret.$isSuspension) {
-/*   803 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 17, 4);
-/*   804 */                     }
-/*   805 */                     var $call164 = $ret;
-/*   806 */                     //
-/*   807 */                     // line 17:
-/*   808 */                     // 				finals.append(newfinal)
-/*   809 */                     //     ^
-/*   810 */                     //
-/*   811 */                     $currLineNo = 17;
-/*   812 */                     $currColNo = 4;
-/*   813 */ 
-/*   814 */                     $blk = 18; /* jump */
-/*   815 */                     continue;
-/*   816 */                 case 15:
-/*   817 */                     /* --- for cleanup --- */
-/*   818 */                     $blk = 16; /* allowing case fallthrough */
-/*   819 */                 case 16:
-/*   820 */                     /* --- for end --- */
+/*   797 */                     var $call159 = $ret;
+/*   798 */                     //
+/*   799 */                     // line 16:
+/*   800 */                     // 				newfinal = n[0:i]+char+n[i:len(n)]
+/*   801 */                     //                                ^
+/*   802 */                     //
+/*   803 */                     $currLineNo = 16;
+/*   804 */                     $currColNo = 31;
+/*   805 */ 
+/*   806 */                     var $slice160 = new Sk.builtins['slice'](i, $call159, Sk.builtin.none.none$);
+/*   807 */                     $ret = Sk.abstr.objectGetItem(n, $slice160, true);
+/*   808 */                     $blk = 26; /* allowing case fallthrough */
+/*   809 */                 case 26:
+/*   810 */                     /* --- function return or resume suspension --- */
+/*   811 */                     if ($ret && $ret.$isSuspension) {
+/*   812 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', $currLineNo, $currColNo);
+/*   813 */                     }
+/*   814 */                     var $lsubscr161 = $ret;
+/*   815 */                     var $binop162 = Sk.abstr.numberBinOp($binop157, $lsubscr161, 'Add');
+/*   816 */                     newfinal = $binop162;
+/*   817 */                     //
+/*   818 */                     // line 17:
+/*   819 */                     // 				finals.append(newfinal)
+/*   820 */                     //     ^
 /*   821 */                     //
-/*   822 */                     // line 18:
-/*   823 */                     // 		return list(set(finals))
-/*   824 */                     //   ^
-/*   825 */                     //
-/*   826 */                     $currLineNo = 18;
-/*   827 */                     $currColNo = 2;
-/*   828 */ 
-/*   829 */                     var $loadgbl165 = Sk.misceval.loadname('list', $gbl);
-/*   830 */                     var $loadgbl166 = Sk.misceval.loadname('set', $gbl);
-/*   831 */                     if (finals === undefined) {
-/*   832 */                         throw new Sk.builtin.UnboundLocalError('local variable \'finals\' referenced before assignment');
-/*   833 */                     }
-/*   834 */                     $ret;
-/*   835 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl166, finals);
-/*   836 */                     $blk = 29; /* allowing case fallthrough */
-/*   837 */                 case 29:
-/*   838 */                     /* --- function return or resume suspension --- */
-/*   839 */                     if ($ret && $ret.$isSuspension) {
-/*   840 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 18, 14);
-/*   841 */                     }
-/*   842 */                     var $call167 = $ret;
-/*   843 */                     //
-/*   844 */                     // line 18:
-/*   845 */                     // 		return list(set(finals))
-/*   846 */                     //               ^
-/*   847 */                     //
-/*   848 */                     $currLineNo = 18;
-/*   849 */                     $currColNo = 14;
-/*   850 */ 
-/*   851 */                     $ret;
-/*   852 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl165, $call167);
-/*   853 */                     $blk = 30; /* allowing case fallthrough */
-/*   854 */                 case 30:
-/*   855 */                     /* --- function return or resume suspension --- */
-/*   856 */                     if ($ret && $ret.$isSuspension) {
-/*   857 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 18, 9);
-/*   858 */                     }
-/*   859 */                     var $call168 = $ret;
-/*   860 */                     //
-/*   861 */                     // line 18:
-/*   862 */                     // 		return list(set(finals))
-/*   863 */                     //          ^
-/*   864 */                     //
-/*   865 */                     $currLineNo = 18;
-/*   866 */                     $currColNo = 9;
-/*   867 */ 
-/*   868 */                     return $call168;
-/*   869 */                     $blk = 1; /* jump */
-/*   870 */                     continue;
-/*   871 */                 case 19:
-/*   872 */                     /* --- for cleanup --- */
-/*   873 */                     $blk = 20; /* allowing case fallthrough */
-/*   874 */                 case 20:
-/*   875 */                     /* --- for end --- */
-/*   876 */                     $blk = 14; /* jump */
-/*   877 */                     continue;
-/*   878 */                 }
-/*   879 */             } catch (err) {
-/*   880 */                 if (!(err instanceof Sk.builtin.BaseException)) {
-/*   881 */                     err = new Sk.builtin.ExternalError(err);
-/*   882 */                 }
-/*   883 */                 err.traceback.push({
-/*   884 */                     lineno: $currLineNo,
-/*   885 */                     colno: $currColNo,
-/*   886 */                     filename: '/home/sbaxter/benchmarks/skulpt/anagram/main.py'
-/*   887 */                 });
-/*   888 */                 if ($exc.length > 0) {
-/*   889 */                     $err = err;
-/*   890 */                     $blk = $exc.pop();
-/*   891 */                     continue;
-/*   892 */                 } else {
-/*   893 */                     throw err;
-/*   894 */                 }
-/*   895 */             }
-/*   896 */         }
-/*   897 */     });
-/*   898 */     return $scope120;
-/*   899 */ }();
+/*   822 */                     $currLineNo = 17;
+/*   823 */                     $currColNo = 4;
+/*   824 */ 
+/*   825 */                     if (finals === undefined) {
+/*   826 */                         throw new Sk.builtin.UnboundLocalError('local variable \'finals\' referenced before assignment');
+/*   827 */                     }
+/*   828 */                     $ret = Sk.abstr.gattr(finals, 'append', true);
+/*   829 */                     $blk = 27; /* allowing case fallthrough */
+/*   830 */                 case 27:
+/*   831 */                     /* --- function return or resume suspension --- */
+/*   832 */                     if ($ret && $ret.$isSuspension) {
+/*   833 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 17, 4);
+/*   834 */                     }
+/*   835 */                     var $lattr163 = $ret;
+/*   836 */                     if (newfinal === undefined) {
+/*   837 */                         throw new Sk.builtin.UnboundLocalError('local variable \'newfinal\' referenced before assignment');
+/*   838 */                     }
+/*   839 */                     $ret;
+/*   840 */                     $ret = Sk.misceval.callsimOrSuspend($lattr163, newfinal);
+/*   841 */                     $blk = 28; /* allowing case fallthrough */
+/*   842 */                 case 28:
+/*   843 */                     /* --- function return or resume suspension --- */
+/*   844 */                     if ($ret && $ret.$isSuspension) {
+/*   845 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 17, 4);
+/*   846 */                     }
+/*   847 */                     var $call164 = $ret;
+/*   848 */                     //
+/*   849 */                     // line 17:
+/*   850 */                     // 				finals.append(newfinal)
+/*   851 */                     //     ^
+/*   852 */                     //
+/*   853 */                     $currLineNo = 17;
+/*   854 */                     $currColNo = 4;
+/*   855 */ 
+/*   856 */                     $blk = 18; /* jump */
+/*   857 */                     continue;
+/*   858 */                 case 15:
+/*   859 */                     /* --- for cleanup --- */
+/*   860 */                     $blk = 16; /* allowing case fallthrough */
+/*   861 */                 case 16:
+/*   862 */                     /* --- for end --- */
+/*   863 */                     //
+/*   864 */                     // line 18:
+/*   865 */                     // 		return list(set(finals))
+/*   866 */                     //   ^
+/*   867 */                     //
+/*   868 */                     $currLineNo = 18;
+/*   869 */                     $currColNo = 2;
+/*   870 */ 
+/*   871 */                     var $loadgbl165 = Sk.misceval.loadname('list', $gbl);
+/*   872 */                     var $loadgbl166 = Sk.misceval.loadname('set', $gbl);
+/*   873 */                     if (finals === undefined) {
+/*   874 */                         throw new Sk.builtin.UnboundLocalError('local variable \'finals\' referenced before assignment');
+/*   875 */                     }
+/*   876 */                     $ret;
+/*   877 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl166, finals);
+/*   878 */                     $blk = 29; /* allowing case fallthrough */
+/*   879 */                 case 29:
+/*   880 */                     /* --- function return or resume suspension --- */
+/*   881 */                     if ($ret && $ret.$isSuspension) {
+/*   882 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 18, 14);
+/*   883 */                     }
+/*   884 */                     var $call167 = $ret;
+/*   885 */                     //
+/*   886 */                     // line 18:
+/*   887 */                     // 		return list(set(finals))
+/*   888 */                     //               ^
+/*   889 */                     //
+/*   890 */                     $currLineNo = 18;
+/*   891 */                     $currColNo = 14;
+/*   892 */ 
+/*   893 */                     $ret;
+/*   894 */                     $ret = Sk.misceval.callsimOrSuspend($loadgbl165, $call167);
+/*   895 */                     $blk = 30; /* allowing case fallthrough */
+/*   896 */                 case 30:
+/*   897 */                     /* --- function return or resume suspension --- */
+/*   898 */                     if ($ret && $ret.$isSuspension) {
+/*   899 */                         return $saveSuspension($ret, '/home/sbaxter/benchmarks/skulpt/anagram/main.py', 18, 9);
+/*   900 */                     }
+/*   901 */                     var $call168 = $ret;
+/*   902 */                     //
+/*   903 */                     // line 18:
+/*   904 */                     // 		return list(set(finals))
+/*   905 */                     //          ^
+/*   906 */                     //
+/*   907 */                     $currLineNo = 18;
+/*   908 */                     $currColNo = 9;
+/*   909 */ 
+/*   910 */                     return $call168;
+/*   911 */                     $blk = 1; /* jump */
+/*   912 */                     continue;
+/*   913 */                 case 19:
+/*   914 */                     /* --- for cleanup --- */
+/*   915 */                     $blk = 20; /* allowing case fallthrough */
+/*   916 */                 case 20:
+/*   917 */                     /* --- for end --- */
+/*   918 */                     $blk = 14; /* jump */
+/*   919 */                     continue;
+/*   920 */                 }
+/*   921 */             } catch (err) {
+/*   922 */                 if (!(err instanceof Sk.builtin.BaseException)) {
+/*   923 */                     err = new Sk.builtin.ExternalError(err);
+/*   924 */                 }
+/*   925 */                 err.traceback.push({
+/*   926 */                     lineno: $currLineNo,
+/*   927 */                     colno: $currColNo,
+/*   928 */                     filename: '/home/sbaxter/benchmarks/skulpt/anagram/main.py'
+/*   929 */                 });
+/*   930 */                 if ($exc.length > 0) {
+/*   931 */                     $err = err;
+/*   932 */                     $blk = $exc.pop();
+/*   933 */                     continue;
+/*   934 */                 } else {
+/*   935 */                     throw err;
+/*   936 */                 }
+/*   937 */             }
+/*   938 */         }
+/*   939 */     });
+/*   940 */     return $scope120;
+/*   941 */ }();

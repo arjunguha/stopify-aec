@@ -44,7 +44,6 @@ const before = Date.now();
 Sk.configure({
   output: console.log,
   read: builtinRead,
-  yieldLimit: 100,
 });
 
 Sk.misceval.asyncToPromise(function () {
