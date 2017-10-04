@@ -2,7 +2,7 @@ import 'dart:math' as Math;
 import 'dart:typed_data';
 import './BenchmarkBase.dart';
 
-void main(args) {
+main() {
   new Nbody().report();
 }
 
