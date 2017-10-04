@@ -7,8 +7,8 @@ console.log({src, dst});
 
 fs.writeFile(dst + '.html', `<html>
   <head>
-    <script src="http://www.skulpt.org/static/skulpt.min.js" type="text/javascript"></script>
-    <script src="http://www.skulpt.org/static/skulpt-stdlib.js" type="text/javascript"></script>
+    <script src="../skulpt.min.js" type="text/javascript"></script>
+    <script src="../skulpt-stdlib.js" type="text/javascript"></script>
   <body>
     <textarea id="data" width="100%" height="100%"></textarea>
     <script src="${path.relative(path.dirname(dst), src)}" type="text/javascript"></script>
@@ -47,7 +47,7 @@ Sk.configure({
 });
 
 Sk.misceval.asyncToPromise(function () {
-  return $compiledmod("${path.basename(dst)}");
+  return Sk.misceval.callsimOrSuspend($compiledmod, "${path.basename(dst)}");
 }).then(() => {
   const rt = Date.now() - before;
   const textarea = document.getElementById('data');
