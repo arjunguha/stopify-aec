@@ -1,3 +1,12 @@
+/* The Computer Language Benchmarks game
+   http://benchmarksgame.alioth.debian.org/
+
+   contributed by Jos Hirth, transliterated from Jarkko Miettinen's Java program
+ *reset*
+
+ Modified by Rachit Nigam on 10.04.2017
+ */
+
 import "./BenchmarkBase.dart";
 final int minDepth = 4;
 

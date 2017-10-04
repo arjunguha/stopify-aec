@@ -1,3 +1,11 @@
+// The Computer Language Benchmarks Game
+// http://benchmarksgame.alioth.debian.org/
+//
+// contributed by Jos Hirth
+// based on the JavaScript version by Ian Osgood with modifications by Isaac Gouy
+
+// Modified by Rachit Nigam on 10.04.2017
+
 import 'dart:math' as Math;
 import 'dart:typed_data';
 import './BenchmarkBase.dart';

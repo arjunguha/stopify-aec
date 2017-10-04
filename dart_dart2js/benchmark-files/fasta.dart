@@ -1,3 +1,10 @@
+/* The Computer Language Benchmarks Game
+   http://benchmarksgame.alioth.debian.org/
+
+   contributed by James Wendel
+
+   Modified by Rachit Nigam on 10.04.2017
+   */
 import './BenchmarkBase.dart';
 import 'dart:io';
 import 'dart:typed_data';

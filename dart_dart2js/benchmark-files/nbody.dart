@@ -1,3 +1,12 @@
+/* The Computer Language Benchmarks Game
+   http://benchmarksgame.alioth.debian.org/
+
+   contributed by Jos Hirth,
+   modified by Srdjan Mitrovic (typed-data),
+   transliterated from Isaac Gouy and Robert F. Tobler's C# program
+
+   Modified by Rachit Nigam on 10.04.2017
+   */
 import 'dart:math' as Math;
 import 'dart:typed_data';
 import './BenchmarkBase.dart';
