@@ -11,7 +11,6 @@ js-build:
 
 js-build/%.js: $(BDIR)/%.dart | js-build
 		dart2js $^ -o $@
-			browserify $@ -o $@
 
 clean:
 		rm -rf js-build

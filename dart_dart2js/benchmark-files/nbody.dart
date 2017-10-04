@@ -1,12 +1,26 @@
 import 'dart:math' as Math;
 import 'dart:typed_data';
+import './BenchmarkBase.dart';
 
 void main(args) {
-  int n = 5000000;
+  new Nbody().report();
+}
 
-  NBodySystem system = new NBodySystem();
-  for (int i = 0; i < n; i++) {
-    system.advance(0.01);
+class Nbody extends BenchmarkBase {
+  const Nbody(): super('NBody');
+  void run() {
+    int n = 5000000;
+
+    NBodySystem system = new NBodySystem();
+    for (int i = 0; i < n; i++) {
+      system.advance(0.01);
+    }
+  }
+  void exercise() {
+    run();
+  }
+  void main() {
+    run();
   }
 }
 

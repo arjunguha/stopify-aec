@@ -1,26 +1,43 @@
+import "./BenchmarkBase.dart";
 final int minDepth = 4;
 
-void main(args){
-  int n = 21;
+main(){
+  new BinaryTree().report();
+}
 
-  int maxDepth = (minDepth + 2 > n) ? minDepth + 2 : n;
-  int stretchDepth = maxDepth + 1;
+class BinaryTree extends BenchmarkBase {
+  const BinaryTree() : super('BinaryTree');
 
-  int check = (TreeNode.bottomUpTree(stretchDepth)).itemCheck();
-  print("stretch tree of depth $stretchDepth\t check: $check");
+  void setup() {}
+  void teardown() {}
+  void run () {
+    int n = 20;
 
-  TreeNode longLivedTree = TreeNode.bottomUpTree(maxDepth);
+    int maxDepth = (minDepth + 2 > n) ? minDepth + 2 : n;
+    int stretchDepth = maxDepth + 1;
 
-  for (int depth = minDepth; depth <= maxDepth; depth += 2){
-    int iterations = 1 << (maxDepth - depth + minDepth);
-    check = 0;
+    int check = (TreeNode.bottomUpTree(stretchDepth)).itemCheck();
 
-    for (int i = 1; i <= iterations; i++){
-      check += (TreeNode.bottomUpTree(depth)).itemCheck();
+    TreeNode longLivedTree = TreeNode.bottomUpTree(maxDepth);
+
+    for (int depth = minDepth; depth <= maxDepth; depth += 2){
+      int iterations = 1 << (maxDepth - depth + minDepth);
+      check = 0;
+
+      for (int i = 1; i <= iterations; i++){
+        check += (TreeNode.bottomUpTree(depth)).itemCheck();
+      }
     }
-    print("${iterations}\t trees of depth $depth\t check: $check");
   }
-  print("long lived tree of depth $maxDepth\t check: ${longLivedTree.itemCheck()}");
+  void main() {
+    run();
+  }
+  void warmup() {
+    run();
+  }
+  void exercise() {
+    run();
+  }
 }
 
 

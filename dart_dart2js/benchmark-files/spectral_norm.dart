@@ -1,5 +1,27 @@
 import 'dart:math' as Math;
 import 'dart:typed_data';
+import './BenchmarkBase.dart';
+
+main() {
+  new SpectralNorm().report();
+}
+
+class SpectralNorm extends BenchmarkBase {
+  const SpectralNorm(): super('SpectralNorm');
+
+  void run() {
+    int n = 5500;
+    spectralNorm(n).toStringAsFixed(9);
+  }
+
+  void exercise() {
+    run();
+  }
+
+  void main() {
+    run();
+  }
+}
 
 double A(int i, int j) {
   int div = ((i + j) * (i + j + 1) >> 1) + i + 1;
@@ -35,10 +57,10 @@ void AtAu(Float64List u, Float64List v, Float64List w) {
 
 double spectralNorm(n) {
   var u = new Float64List(n)..fillRange(0, n, 1.0),
-      v = new Float64List(n),
-      w = new Float64List(n),
-      vv = 0.0,
-      vBv = 0.0;
+  v = new Float64List(n),
+  w = new Float64List(n),
+  vv = 0.0,
+  vBv = 0.0;
 
   for (int i = 0; i < 10; ++i) {
     AtAu(u, v, w);
@@ -49,9 +71,4 @@ double spectralNorm(n) {
     vv  += v[i] * v[i];
   }
   return Math.sqrt(vBv / vv);
-}
-
-void main(args) {
-  int n = 5500;
-  print(spectralNorm(n).toStringAsFixed(9));
 }
