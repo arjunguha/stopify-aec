@@ -1,4 +1,4 @@
-
+import './BenchmarkBase.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -92,9 +92,7 @@ class Frequency {
   }
 }
 
-makeRepeatFasta(String id, String desc, String alu, int _nChars, IOSink writer) {
-  writer.write(">${id} ${desc}\n");
-
+makeRepeatFasta(String id, String desc, String alu, int _nChars) {
   int aluIndex = 0;
   final List<int> aluCode = alu.codeUnits;
   final int aluLength = aluCode.length;
@@ -107,7 +105,6 @@ makeRepeatFasta(String id, String desc, String alu, int _nChars, IOSink writer) 
     final int chunkSize = nChars >= LINE_LENGTH ? LINE_LENGTH : nChars;
 
     if (bufferIndex == BUFFER_SIZE) {
-      writer.add(new Uint8List.view(buffer.buffer, 0, bufferIndex));
       buffer = new Uint8List(BUFFER_SIZE);
       bufferIndex = 0;
     }
@@ -131,15 +128,9 @@ makeRepeatFasta(String id, String desc, String alu, int _nChars, IOSink writer) 
 
     nChars -= chunkSize;
   }
-
-  writer.add(new Uint8List.view(buffer.buffer, 0, bufferIndex));
 }
 
-
-
-void makeRandomFasta(String id, String desc, Frequency fpf, int nChars, IOSink writer) {
-  writer.write(">${id} ${desc}\n");
-
+void makeRandomFasta(String id, String desc, Frequency fpf, int nChars) {
   Uint8List buffer = new Uint8List(BUFFER_SIZE);
 
   int bufferIndex = 0;
@@ -147,7 +138,6 @@ void makeRandomFasta(String id, String desc, Frequency fpf, int nChars, IOSink w
     final int chunkSize = nChars >= LINE_LENGTH ? LINE_LENGTH : nChars;
 
     if (bufferIndex == BUFFER_SIZE) {
-      writer.add(new Uint8List.view(buffer.buffer, 0, bufferIndex));
       buffer = new Uint8List(BUFFER_SIZE);
       bufferIndex = 0;
     }
@@ -157,19 +147,31 @@ void makeRandomFasta(String id, String desc, Frequency fpf, int nChars, IOSink w
 
     nChars -= chunkSize;
   }
-
-  writer.add(new Uint8List.view(buffer.buffer, 0, bufferIndex));
 }
 
+main() {
+  new Fasta().report();
+}
 
-main(args) {
-  IOSink writer = stdout;
+class Fasta extends BenchmarkBase {
+  const Fasta(): super('Fasta');
 
-  int n = 250000;
+  void run() {
+    int n = 25000000;
 
-  makeRepeatFasta("ONE", "Homo sapiens alu", ALU, n * 2, writer);
-  IUB.last = 42;
-  makeRandomFasta("TWO", "IUB ambiguity codes", IUB, n * 3, writer);
-  HOMO_SAPIENS.last = IUB.last;
-  makeRandomFasta("THREE", "Homo sapiens frequency", HOMO_SAPIENS, n * 5, writer);
+    makeRepeatFasta("ONE", "Homo sapiens alu", ALU, n * 2);
+    IUB.last = 42;
+    makeRandomFasta("TWO", "IUB ambiguity codes", IUB, n * 3);
+    HOMO_SAPIENS.last = IUB.last;
+    makeRandomFasta(
+        "THREE", "Homo sapiens frequency", HOMO_SAPIENS, n * 5);
+  }
+
+  void exercise() {
+    run();
+  }
+
+  void main() {
+    run();
+  }
 }
