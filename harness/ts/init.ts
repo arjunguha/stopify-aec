@@ -5,6 +5,9 @@ import  * as csvStringify  from 'csv-stringify';
 import * as Database from 'better-sqlite3';
 import * as glob from 'glob';
 
+const edge = 'MicrosoftEdge';
+
+
 const db = new Database('results.sqlite');
 
 db.exec(`CREATE TABLE IF NOT EXISTS timing
@@ -21,7 +24,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS timing
    running_time INTEGER,
    num_yields INTEGER);`);
 
-const langs = [ 'python_pyjs' ];
+const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js', 'scala' ];
 
 function mayNull(x: any) {
   if (x === undefined) { 
@@ -63,7 +66,6 @@ function pythonBenchmark(name: string) {
     return;
   }
   for (let i = 0; i < 10; i++) {
-    const edge = 'MicrosoftEdge';
     initTiming(i, 'python_pyjs', name, 'native');
     initTiming(i, 'python_pyjs', name, 'chrome', 'original');
     initTiming(i, 'python_pyjs', name, 'firefox', 'original');
@@ -86,6 +88,7 @@ function pythonBenchmark(name: string) {
     initTiming(i, 'python_pyjs', name, 'chrome', 'retval', 'wrapper', 'sane', 'countdown', undefined,  1000000);
     initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'reservoir', undefined,  100);
     initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'direct', 'sane', 'reservoir', undefined,  100);
+    initTiming(i, 'python_pyjs', name, edge, 'lazy', 'direct', 'sane', 'reservoir', undefined,  100);
   }
 }
 
@@ -93,6 +96,18 @@ function benchmarksFor(lang: string, bench: string) {
   if (lang === 'python_pyjs') {
     pythonBenchmark(bench);
   }
+
+  for (let i = 0; i < 10; i++) {
+    initTiming(i, lang, bench, 'chrome', 'original');
+    initTiming(i, lang, bench, 'firefox', 'original');
+    initTiming(i, lang, bench, 'edge', 'original');
+    for (const transform of [ 'lazy', 'retval' ]) {
+      initTiming(i, lang, bench, 'chrome',  transform, 'wrapper', 'sane', 'reservoir', undefined,  100);
+      initTiming(i, lang, bench, 'firefox', transform, 'direct', 'sane', 'reservoir', undefined,  100);
+      initTiming(i, lang, bench, edge,      transform, 'direct', 'sane', 'reservoir', undefined,  100);
+    }
+  }
+
 }
 
 function createTimingTable() {
