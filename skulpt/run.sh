@@ -7,7 +7,7 @@ echo "Transform,Language,Benchmark,Platform,RunningTime" > $TIMING
 
 for i in {1..10}
 do
-  echo `Loop $i...`
+  echo Loop $i...
   for browser in chrome
   do
     # b, raytrace_simple, richards, and deltablue don't "just work" with skulpt.
