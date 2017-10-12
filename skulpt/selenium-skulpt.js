@@ -23,7 +23,7 @@ const driver = new selenium.Builder()
   .build();
 
 driver.get(src);
-driver.wait(selenium.until.titleIs('done'), 5 * 60 * 1000);
+driver.wait(selenium.until.titleIs('done'), 8 * 60 * 1000);
 
 driver.findElement(selenium.By.id('data'))
   .then(e => e.getAttribute("value"))
