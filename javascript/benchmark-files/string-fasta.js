@@ -76,15 +76,16 @@ function fastaRandom(n, table) {
   }
 }
 
-var ret = 0;
+for (let i = 0; i < 500; i++) {
+  var ret = 0;
 
-var count = 7;
-fastaRepeat(2*count*100000, ALU);
-fastaRandom(3*count*1000, IUB);
-fastaRandom(5*count*1000, HomoSap);
+  var count = 7;
+  fastaRepeat(2*count*100000, ALU);
+  fastaRandom(3*count*1000, IUB);
+  fastaRandom(5*count*1000, HomoSap);
 
-var expected = 1456000;
+  var expected = 1456000;
 
-if (ret != expected)
+  if (ret != expected)
     throw "ERROR: bad result: expected " + expected + " but got " + ret;
-
+}
