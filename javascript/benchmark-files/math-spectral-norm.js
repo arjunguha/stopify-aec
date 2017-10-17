@@ -46,14 +46,15 @@ function spectralnorm(n) {
   return Math.sqrt(vBv/vv);
 }
 
-var total = 0;
+for (let j = 0; j < 10000; j++) {
+  var total = 0;
 
-for (var i = 6; i <= 48; i *= 2) {
+  for (var i = 6; i <= 48; i *= 2) {
     total += spectralnorm(i);
-}
+  }
 
-var expected = 5.086694231303284;
+  var expected = 5.086694231303284;
 
-if (total != expected)
+  if (total != expected)
     throw "ERROR: bad result: expected " + expected + " but got " + total;
-
+}

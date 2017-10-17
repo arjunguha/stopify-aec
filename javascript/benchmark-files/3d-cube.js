@@ -341,8 +341,10 @@ function Init(CubeSize) {
     throw "Error: bad vector sum for CubeSize = " + CubeSize + "; expected " + validation[CubeSize] + " but got " + sum;
 }
 
-for ( var i = 20; i <= 160; i *= 2 ) {
-  Init(i);
+for (let j = 0; j < 1000; j++) {
+  for ( var i = 20; i <= 160; i *= 2 ) {
+    Init(i);
+  }
 }
 
 Q = null;

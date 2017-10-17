@@ -37,10 +37,10 @@ function sieve() {
     return sum;
 }
 
-var result = sieve();
+for (let i = 0; i < 2000; i++) {
+  var result = sieve();
 
-var expected = 14302;
-if (result != expected)
+  var expected = 14302;
+  if (result != expected)
     throw "ERROR: bad result: expected " + expected + " but got " + result;
-
-
+}
