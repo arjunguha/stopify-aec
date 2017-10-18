@@ -438,10 +438,11 @@ for (var y = 0; y < size; y++) {\n\
     return s;
 }
 
-var testOutput = arrayToCanvasCommands(raytraceScene());
+for (let i = 0; i < 1000; i++) {
+  var testOutput = arrayToCanvasCommands(raytraceScene());
 
-var expectedLength = 20970;
+  var expectedLength = 20970;
 
-if (testOutput.length != expectedLength)
+  if (testOutput.length != expectedLength)
     throw "Error: bad result: expected length " + expectedLength + " but got " + testOutput.length;
-
+}

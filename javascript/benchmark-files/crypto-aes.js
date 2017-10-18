@@ -418,9 +418,10 @@ And sails upon the bosom of the air.";
 
 var password = "O Romeo, Romeo! wherefore art thou Romeo?";
 
-var cipherText = AESEncryptCtr(plainText, password, 256);
-var decryptedText = AESDecryptCtr(cipherText, password, 256);
+for (let i = 0; i < 2000; i++) {
+  var cipherText = AESEncryptCtr(plainText, password, 256);
+  var decryptedText = AESDecryptCtr(cipherText, password, 256);
 
-if (decryptedText != plainText)
+  if (decryptedText != plainText)
     throw "ERROR: bad result: expected " + plainText + " but got " + decryptedText;
-
+}
