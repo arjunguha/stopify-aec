@@ -25,4 +25,4 @@ EOF
 
 cp $SOURCEFILE $WORKSPACE/Main.scala
 
-(cd $WORKSPACE; sbt fastOptJS 1>&2; cat target/scala-2.12/myscalaprogram-fastopt.js)
+(cd $WORKSPACE; sbt fastOptJS 1>&2; cat target/scala-2.12/myscalaprogram-fastopt.js;  sed 's/var $g =.*/var $g = window || global;/')
