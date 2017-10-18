@@ -1,7 +1,7 @@
 (function() {
     "use strict";
     var $env = typeof __ScalaJSEnv === "object" && __ScalaJSEnv ? __ScalaJSEnv : {};
-    var $g = window || global;
+    var $g = typeof window === "object" ? window : global;
     $env["global"] = $g;
     var $e = typeof $env["exportsNamespace"] === "object" && $env["exportsNamespace"] ? $env["exportsNamespace"] : $g;
     $env["exportsNamespace"] = $e;
