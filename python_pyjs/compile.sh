@@ -1,13 +1,16 @@
 #!/bin/bash
 
 set -e
+set -x
 COMPILER_ROOT=`dirname $0`
+NAME=$(basename `pwd`)
 
-if [ ! -f $1/main.py ]; then
-  echo "Expected $1/main.py"
+if [ ! -f main.py ]; then
+  echo "Expected main.py"
   exit 1
 fi
 
-cp $COMPILER_ROOT/prelude.js $1/main.js
-pyjscompile $1/main.py >> $1/main.js
-echo 'pygwtOnLoad();' >> $1/main.js
+cp $COMPILER_ROOT/prelude.js main.js
+pyjscompile main.py >> main.js
+echo 'pygwtOnLoad();' >> main.js
+mv main.js ../js-build/$NAME.js

@@ -1,4 +1,3 @@
-const window = global;
 const parent = window;
 
 // this is almost directly taken from Google's GWT which is now open source
@@ -13170,11 +13169,153 @@ r = Math['round'](n*x)/n;
 
 /* end module: pyjslib */
 
+/* start module: operator */
+$pyjs['loaded_modules']['operator'] = function (__mod_name__) {
+	if($pyjs['loaded_modules']['operator']['__was_initialized__']) return $pyjs['loaded_modules']['operator'];
+	var $m = $pyjs['loaded_modules']['operator'];
+	$m['__repr__'] = function() { return '<module: operator>'; };
+	$m['__was_initialized__'] = true;
+	if ((__mod_name__ === null) || (typeof __mod_name__ == 'undefined')) __mod_name__ = 'operator';
+	$m['__name__'] = __mod_name__;
+
+
+	$m['p'] = $p['___import___']('pyjslib', null, null, false);
+	$m['_noimpl'] = function() {
+		var args = $p['tuple']($pyjs_array_slice['call'](arguments,0,arguments['length']));
+
+
+		throw ($p['Exception']('This operator is not implemented'));
+		return null;
+	};
+	$m['_noimpl']['__name__'] = '_noimpl';
+
+	$m['_noimpl']['__bind_type__'] = 0;
+	$m['_noimpl']['__args__'] = ['args',null];
+	$m['lt'] = $m['_noimpl'];
+	$m['le'] = $m['_noimpl'];
+	$m['eq'] = $p['getattr']($m['p'], 'op_eq');
+	$m['ne'] = $m['_noimpl'];
+	$m['ge'] = $m['_noimpl'];
+	$m['gt'] = $m['_noimpl'];
+	$m['__lt__'] = $m['lt'];
+	$m['__le__'] = $m['le'];
+	$m['__eq__'] = $m['eq'];
+	$m['__ne__'] = $m['ne'];
+	$m['__ge__'] = $m['ge'];
+	$m['__gt__'] = $m['gt'];
+	$m['not_'] = $m['_noimpl'];
+	$m['__not__'] = $m['not_'];
+	$m['truth'] = $p['getattr']($m['p'], 'bool');
+	$m['is_'] = $p['getattr']($m['p'], 'op_is');
+	$m['is_not'] = function(a, b) {
+
+		return !$p['bool']($m['is_'](a, b));
+	};
+	$m['is_not']['__name__'] = 'is_not';
+
+	$m['is_not']['__bind_type__'] = 0;
+	$m['is_not']['__args__'] = [null,null,['a'],['b']];
+	$m['abs'] = $m['_noimpl'];
+	$m['__abs__'] = $m['abs'];
+	$m['and_'] = $m['_noimpl'];
+	$m['__and__'] = $m['and_'];
+	$m['floordiv'] = $p['getattr']($m['p'], 'op_floordiv');
+	$m['__floordiv__'] = $m['floordiv'];
+	$m['index'] = $m['_noimpl'];
+	$m['__index__'] = $m['index'];
+	$m['inv'] = $m['_noimpl'];
+	$m['invert'] = $p['getattr']($m['p'], 'op_invert');
+	$m['__inv__'] = $m['inv'];
+	$m['__invert__'] = $m['invert'];
+	$m['lshift'] = $p['getattr']($m['p'], 'op_bitshiftleft');
+	$m['__lshift__'] = $m['lshift'];
+	$m['mod'] = $p['getattr']($m['p'], 'op_mod');
+	$m['__mod__'] = $m['mod'];
+	$m['mul'] = $p['getattr']($m['p'], 'op_mul');
+	$m['__mul__'] = $m['mul'];
+	$m['neg'] = $p['getattr']($m['p'], 'op_usub');
+	$m['__neg__'] = $m['neg'];
+	$m['or_'] = $m['_noimpl'];
+	$m['oper__'] = $m['_noimpl'];
+	$m['pos'] = $p['getattr']($m['p'], 'op_uadd');
+	$m['__pos__'] = $m['pos'];
+	$m['pow'] = $p['getattr']($m['p'], 'op_pow');
+	$m['__pow__'] = $m['pow'];
+	$m['rshift'] = $p['getattr']($m['p'], 'op_bitshiftright');
+	$m['__rshift__'] = $m['rshift'];
+	$m['add'] = $p['getattr']($m['p'], '__op_add');
+	$m['__add__'] = $m['add'];
+	$m['sub'] = $p['getattr']($m['p'], 'op_sub');
+	$m['__sub__'] = $m['sub'];
+	$m['truediv'] = $p['getattr']($m['p'], 'op_truediv');
+	$m['__truediv__'] = $m['truediv'];
+	$m['xor'] = $m['_noimpl'];
+	$m['__xor__'] = $m['xor'];
+	$m['concat'] = $m['_noimpl'];
+	$m['__concat__'] = $m['concat'];
+	$m['contains'] = $m['_noimpl'];
+	$m['__contains__'] = $m['contains'];
+	$m['countOf'] = $m['_noimpl'];
+	$m['delitem'] = $m['_noimpl'];
+	$m['__delitem__'] = $m['delitem'];
+	$m['getitem'] = $m['_noimpl'];
+	$m['__getitem__'] = $m['getitem'];
+	$m['indexOf'] = $m['_noimpl'];
+	$m['setitem'] = $m['_noimpl'];
+	$m['__setitem__'] = $m['setitem'];
+	$m['attrgetter'] = $m['_noimpl'];
+	$m['itemgetter'] = $m['_noimpl'];
+	$m['methodcaller'] = $m['_noimpl'];
+	$m['iadd'] = $m['_noimpl'];
+	$m['__iadd__'] = $m['iadd'];
+	$m['iand'] = $m['_noimpl'];
+	$m['__iand__'] = $m['iand'];
+	$m['iconcat'] = $m['_noimpl'];
+	$m['__iconcat__'] = $m['iconcat'];
+	$m['ifloordiv'] = $m['_noimpl'];
+	$m['__ifloordiv__'] = $m['ifloordiv'];
+	$m['ilshift'] = $m['_noimpl'];
+	$m['__ilshift__'] = $m['ilshift'];
+	$m['imod'] = $m['_noimpl'];
+	$m['__imod__'] = $m['imod'];
+	$m['imul'] = $m['_noimpl'];
+	$m['__imul__'] = $m['imul'];
+	$m['ior'] = $m['_noimpl'];
+	$m['__ior__'] = $m['ior'];
+	$m['ipow'] = $m['_noimpl'];
+	$m['__ipow__'] = $m['ipow'];
+	$m['irshift'] = $m['_noimpl'];
+	$m['__irshift__'] = $m['irshift'];
+	$m['isub'] = $m['_noimpl'];
+	$m['__isub__'] = $m['isub'];
+	$m['itruediv'] = $m['_noimpl'];
+	$m['__itruediv__'] = $m['itruediv'];
+	$m['ixor'] = $m['_noimpl'];
+	$m['__ixor__'] = $m['ixor'];
+	$m['delslice'] = $p['getattr']($m['p'], '__delslice');
+	$m['getslice'] = $p['getattr']($m['p'], '__getslice');
+	$m['setslice'] = $p['getattr']($m['p'], '__setslice');
+	$m['div'] = $p['getattr']($m['p'], 'op_div');
+	$m['isCallable'] = $p['getattr']($m['p'], 'isFunction');
+	$m['isMappingType'] = $p['getattr']($m['p'], 'isIteratable');
+	$m['isNumberType'] = $p['getattr']($m['p'], 'isNumber');
+	$m['isSequenceType'] = $p['getattr']($m['p'], 'isIteratable');
+	$m['repeat'] = $m['_noimpl'];
+	return this;
+}; /* end operator */
+
+
+/* end module: operator */
+
+
+/*
+PYJS_DEPS: ['pyjslib']
+*/
+
 
 /*
 PYJS_DEPS: ['sys']
 */
-
 
 /* start module: sys */
 $pyjs['loaded_modules']['sys'] = function (__mod_name__) {
@@ -14279,6 +14420,12 @@ $pyjs.loaded_modules.random = function(__mod_name__) {
         // Math.random : () => { x:number | x >= 0 && x < 1 }
         return $p.float((hi - lo) * Math.random() + lo);
     }
+    $m.randrange = function(stop) {
+        const hi = stop.valueOf();
+        // Math.random : () => { x:number | x >= 0 && x < 1 }
+        return Math.floor(Math.random() * hi);
+    }
+    
     return this;
   }
   
