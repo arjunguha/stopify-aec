@@ -21,8 +21,13 @@ db.exec(`CREATE TABLE IF NOT EXISTS timing
    estimator TEXT NOT NULL,
    time_per_elapsed TEXT NOT NULL,
    yield_interval TEXT NOT NULL,
+   resample_interval TEXT NOT NULL,
    running_time INTEGER,
    num_yields INTEGER);`);
+
+db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS timing_index ON timing
+  (ix,lang,bench,platform,transform,new_method,es_mode,estimator,
+   time_per_elapsed,yield_interval,resample_interval);`);
 
 const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js', 'scala' ];
 
@@ -41,23 +46,17 @@ function initTiming(i: number,
   esMode?: string,
   estimator?: string,
   timePerElapsed?: number,
-  yieldInterval?: number) {
-  const exists = db.prepare(`SELECT * FROM timing WHERE ix = ? AND lang = ? AND
-    bench = ? AND platform = ? AND transform = ? AND new_method = ? AND es_mode = ? AND estimator = ? AND
-    time_per_elapsed = ? AND yield_interval = ?`).all(
-      i, lang, bench, platform, mayNull(transform), mayNull(newMethod),
-      mayNull(esMode), mayNull(estimator),
-      mayNull(timePerElapsed), mayNull(yieldInterval));
-  if (exists.length > 0) {
-    return;
-  }
-  console.error(`Creating configuration ${i},${lang},${bench},${platform},${transform},${newMethod},${esMode}, ${estimator}, ${timePerElapsed}, ${yieldInterval}`);
-  const r = db.prepare(`INSERT INTO timing (ix, lang, bench, platform, transform,
+  yieldInterval?: number,
+  resampleInterval?: number) {
+  const r = db.prepare(`INSERT OR IGNORE INTO timing (ix, lang, bench, platform, transform,
     new_method, es_mode, estimator, time_per_elapsed, yield_interval) VALUES
     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(i, lang, bench, platform, mayNull(transform), mayNull(newMethod),
     mayNull(esMode), mayNull(estimator),
       mayNull(timePerElapsed), mayNull(yieldInterval));
+  if (r.changes > 0) {
+    console.error(`Creating configuration ${i},${lang},${bench},${platform},${transform},${newMethod},${esMode},${estimator},${timePerElapsed},${yieldInterval},${resampleInterval}`);
+  }
 }
 
 function pythonBenchmark(name: string) {
@@ -92,12 +91,20 @@ function pythonBenchmark(name: string) {
   }
 }
 
+
 function benchmarksFor(lang: string, bench: string) {
   if (lang === 'python_pyjs') {
     pythonBenchmark(bench);
   }
 
   for (let i = 0; i < 10; i++) {
+    if (lang === 'scala' && bench === 'meteor') {
+      for (const resampleInterval of [ 100, 250, 500, 750, 1000 ]) {
+        initTiming(i, lang, bench, 'chrome', 'lazy', 'direct', 'sane', 'velocity',
+          undefined, 100, resampleInterval);
+      }
+      continue;
+    }
     initTiming(i, lang, bench, 'chrome', 'original');
     initTiming(i, lang, bench, 'firefox', 'original');
     initTiming(i, lang, bench, edge, 'original');
