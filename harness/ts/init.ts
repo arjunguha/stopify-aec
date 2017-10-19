@@ -49,11 +49,11 @@ function initTiming(i: number,
   yieldInterval?: number,
   resampleInterval?: number) {
   const r = db.prepare(`INSERT OR IGNORE INTO timing (ix, lang, bench, platform, transform,
-    new_method, es_mode, estimator, time_per_elapsed, yield_interval) VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    new_method, es_mode, estimator, time_per_elapsed, yield_interval, resample_interval) VALUES
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(i, lang, bench, platform, mayNull(transform), mayNull(newMethod),
     mayNull(esMode), mayNull(estimator),
-      mayNull(timePerElapsed), mayNull(yieldInterval));
+      mayNull(timePerElapsed), mayNull(yieldInterval), mayNull(resampleInterval));
   if (r.changes > 0) {
     console.error(`Creating configuration ${i},${lang},${bench},${platform},${transform},${newMethod},${esMode},${estimator},${timePerElapsed},${yieldInterval},${resampleInterval}`);
   }

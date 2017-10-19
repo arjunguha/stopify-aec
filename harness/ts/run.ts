@@ -20,7 +20,7 @@ const rows = db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL a
     const result = runBenchmark(row.lang, row.bench, row.platform,
       <any>unna(row.transform), <any>unna(row.new_method),
       <any>unna(row.es_mode), <any>unna(row.estimator),
-      unna(row.time_per_elapsed), unna(row.yield_interval));
+      unna(row.time_per_elapsed), unna(row.yield_interval), unna(row.resample_interval));
     if (result) {
       const n = db.prepare(`UPDATE timing SET running_time = ?, num_yields = ?
         WHERE rowid = ?`).run(
@@ -37,7 +37,8 @@ export function runBenchmark(lang: string,
   esMode?: 'sane' | 'es5',
   estimator?: 'countdown' | 'reservoir',
   timePerElapsed?: string,
-  yieldInterval?: string): { runningTime: number, numYields?: number } | undefined {
+  yieldInterval?: string,
+  resampleInterval?: string): { runningTime: number, numYields?: number } | undefined {
   if (platform === 'native') {
     if (lang === 'python_pyjs') {
       const filename = path.resolve(__dirname, `../../${lang}/${bench}/main.py`);
@@ -87,6 +88,9 @@ export function runBenchmark(lang: string,
     }
     if (yieldInterval) {
       args.push('-y', String(yieldInterval));
+    }
+    if (resampleInterval) {
+      args.push('-r', String(resampleInterval));
     }
     if (<any>platform === 'MicrosoftEdge') {
       args.push('--remote', 'http://10.9.0.100:4444/wd/hub',
