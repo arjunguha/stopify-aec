@@ -100,7 +100,7 @@ function benchmarksFor(lang: string, bench: string) {
   for (let i = 0; i < 10; i++) {
     initTiming(i, lang, bench, 'chrome', 'original');
     initTiming(i, lang, bench, 'firefox', 'original');
-    initTiming(i, lang, bench, 'edge', 'original');
+    initTiming(i, lang, bench, edge, 'original');
     for (const transform of [ 'lazy', 'retval' ]) {
       initTiming(i, lang, bench, 'chrome',  transform, 'wrapper', 'sane', 'reservoir', undefined,  100);
       initTiming(i, lang, bench, 'firefox', transform, 'direct', 'sane', 'reservoir', undefined,  100);
