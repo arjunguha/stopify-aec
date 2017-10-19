@@ -15,7 +15,7 @@ function unna(x: string): string | undefined {
 }
 
 function runBenchmarks() {
-const rows = db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL and platform != 'MicrosoftEdge' and ix < 3`).all();
+const rows = db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL and platform != 'MicrosoftEdge' and estimator = 'velocity' and ix < 3`).all();
   for (const row of rows) {
     const result = runBenchmark(row.lang, row.bench, row.platform,
       <any>unna(row.transform), <any>unna(row.new_method),
