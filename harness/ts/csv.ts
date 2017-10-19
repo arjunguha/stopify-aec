@@ -29,13 +29,14 @@ function na(x: any): string {
 
 fs.appendFileSync(fd,
   'Language,Benchmark,Platform,Transform,NewMethod,EsMode,Estimator,');
-fs.appendFileSync(fd, 'TimePerElapsed,YieldInterval,RunningTime,NumYields\n');
+fs.appendFileSync(fd, 'TimePerElapsed,YieldInterval,ResampleInterval,RunningTime,NumYields\n');
 for (const row of rows) {
   fs.appendFileSync(fd, `${row.lang},${row.bench},${row.platform},`);
   fs.appendFileSync(fd, `${na(row.transform)},${na(row.new_method)},`);
   fs.appendFileSync(fd, `${na(row.es_mode)},${na(row.estimator)},`);
   fs.appendFileSync(fd, `${na(row.time_per_elapsed)},`);
   fs.appendFileSync(fd, `${na(row.yield_interval)},`);
+  fs.appendFileSync(fd, `${na(row.resample_interval)},`);
   fs.appendFileSync(fd, `${na(row.running_time)},`);
   fs.appendFileSync(fd, `${na(row.num_yields)}\n`);
 }

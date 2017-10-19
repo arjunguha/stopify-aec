@@ -98,7 +98,7 @@ function benchmarksFor(lang: string, bench: string) {
   }
 
   for (let i = 0; i < 10; i++) {
-    if (lang === 'scala' && bench === 'Meteor') {
+    if (lang === 'scala') {
       for (const resampleInterval of [ 100, 250, 500, 750, 1000 ]) {
         initTiming(i, lang, bench, 'chrome', 'lazy', 'direct', 'sane', 'velocity',
           undefined, 100, resampleInterval);
