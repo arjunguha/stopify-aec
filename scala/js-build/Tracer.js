@@ -17,7 +17,7 @@
 var $env = (typeof __ScalaJSEnv === "object" && __ScalaJSEnv) ? __ScalaJSEnv : {};
 
 // Global scope
-var $$g = typeof window === "object" ? window : global;
+var $g = typeof window === "object" ? window : global;
 $env["global"] = $g;
 
 // Where to send exports
