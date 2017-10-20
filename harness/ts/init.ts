@@ -91,6 +91,13 @@ function pythonBenchmark(name: string) {
   }
 }
 
+function timeEstimatorComparisonBenchmarks() {
+  for (let i = 0; i < 10; i++) {
+    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'exact', undefined, 100);
+    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'countdown', undefined, 1000000);
+    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'velocity', undefined, 100, 250);
+  }
+}
 
 function benchmarksFor(lang: string, bench: string) {
   if (lang === 'python_pyjs') {
@@ -134,3 +141,4 @@ function createTimingTable() {
 }
 
 createTimingTable();
+timeEstimatorComparisonBenchmarks();
