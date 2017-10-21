@@ -99,6 +99,8 @@ function timeEstimatorComparisonBenchmarks() {
   }
 }
 
+const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari' ];
+
 function benchmarksFor(lang: string, bench: string) {
   if (lang === 'python_pyjs') {
     pythonBenchmark(bench);
@@ -110,11 +112,12 @@ function benchmarksFor(lang: string, bench: string) {
         initTiming(i, lang, bench, 'chrome', 'lazy', 'direct', 'sane', 'velocity',
           undefined, 100, resampleInterval);
       }
-      continue;
     }
-    initTiming(i, lang, bench, 'chrome', 'original');
-    initTiming(i, lang, bench, 'firefox', 'original');
-    initTiming(i, lang, bench, edge, 'original');
+
+    for (const browser of browsers) {
+      initTiming(i, lang, bench, browser, 'original');
+    }
+    initTiming(i, lang, bench, 'safari', 'lazy', 'direct', 'sane', 'reservoir', undefined, 100);
     for (const transform of [ 'lazy', 'retval' ]) {
       initTiming(i, lang, bench, 'chrome',  transform, 'wrapper', 'sane', 'reservoir', undefined,  100);
       initTiming(i, lang, bench, 'firefox', transform, 'direct', 'sane', 'reservoir', undefined,  100);

@@ -31,7 +31,7 @@ const rows = db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL a
 
 export function runBenchmark(lang: string,
   bench: string,
-  platform: 'native' | 'chrome' | 'firefox',
+  platform: 'native' | 'chrome' | 'firefox' | 'MicrosoftEdge' | 'safari',
   transform?: 'native' | 'original' | 'lazy' | 'eager' | 'retval',
   newMethod?: 'direct' | 'wrapper',
   esMode?: 'sane' | 'es5',
@@ -92,11 +92,16 @@ export function runBenchmark(lang: string,
     if (resampleInterval) {
       args.push('-r', String(resampleInterval));
     }
-    if (<any>platform === 'MicrosoftEdge') {
+    if (platform === 'MicrosoftEdge') {
       args.push('--remote', 'http://10.9.0.100:4444/wd/hub',
         '--local-host', '10.9.0.102');
     }
-       args.push(compiledFilename);
+    if (platform === 'safari') {
+      args.push('--remote', 'http://10.9.0.100:4444/wd/hub',
+      '--local-host', '10.9.0.102');
+    }
+    
+    args.push(compiledFilename);
     try {
       console.error(`Running ./bin/browser ${args.join(' ')}`);
       let proc = spawnSync('./bin/browser', args, {
