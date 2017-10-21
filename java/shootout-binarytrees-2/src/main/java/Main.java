@@ -5,13 +5,13 @@
    *reset*
 */
 
-public class binarytrees {
+public class Main {
 
    private final static int minDepth = 4;
    
    public static void main(String[] args){
-      int n = 0;
-      if (args.length > 0) n = Integer.parseInt(args[0]);
+      int n = 19;
+      //if (args.length > 0) n = Integer.parseInt("10");
       
       int maxDepth = (minDepth + 2 > n) ? minDepth + 2 : n;
       int stretchDepth = maxDepth + 1;

@@ -5,12 +5,11 @@
 */
 
 import java.io.IOException;
-import java.io.PrintStream;
 
-class mandelbrot {
+public class Main {
 
    public static void main(String[] args) throws Exception {
-       new Mandelbrot(Integer.parseInt(args[0])).compute();
+       new Mandelbrot(Integer.parseInt("5000")).compute();
    }
 
    public static class Mandelbrot {
@@ -19,11 +18,11 @@ class mandelbrot {
        public Mandelbrot(int size) {
          this.size = size;
          fac = 2.0 / size;
-         out = System.out;
+        //  out = System.out;
          shift = size % 8 == 0 ? 0 : (8- size % 8);
       }
       final int size;
-      final PrintStream out;
+    //   final PrintStream out;
       final byte [] buf = new byte[BUFFER_SIZE];
       int bufLen = 0;
       final double fac;
@@ -31,11 +30,11 @@ class mandelbrot {
 
       public void compute() throws IOException
       {
-         out.format("P4\n%d %d\n",size,size);
+         System.out.println(size);
          for (int y = 0; y<size; y++)
             computeRow(y);
-         out.write( buf, 0, bufLen);
-         out.close();
+        //  System.out.println(buf);
+        //  out.close();
       }
 
       private void computeRow(int y) throws IOException
@@ -64,7 +63,7 @@ class mandelbrot {
             if (x%8 == 7) {
                 bufLocal[bufLen++] = (byte) bits;
                 if ( bufLen == BUFFER_SIZE) {
-                    out.write(bufLocal, 0, BUFFER_SIZE);
+                    // System.out.println(bufLocal);
                     bufLen = 0;
                 }
                bits = 0;
@@ -74,7 +73,7 @@ class mandelbrot {
             bits = bits << shift;
             bufLocal[bufLen++] = (byte) bits;
             if ( bufLen == BUFFER_SIZE) {
-                out.write(bufLocal, 0, BUFFER_SIZE);
+                // System.out.println(bufLocal);
                 bufLen = 0;
             }
          }
