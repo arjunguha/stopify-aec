@@ -15,7 +15,7 @@ function unna(x: string): string | undefined {
 }
 
 function runBenchmarks() {
-const rows = db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL and platform != 'MicrosoftEdge' and estimator = 'velocity' and ix < 3`).all();
+const rows = db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL and platform != 'MicrosoftEdge' and ix < 3`).all();
   for (const row of rows) {
     const result = runBenchmark(row.lang, row.bench, row.platform,
       <any>unna(row.transform), <any>unna(row.new_method),
@@ -97,7 +97,7 @@ export function runBenchmark(lang: string,
         '--local-host', '10.9.0.102');
     }
     if (platform === 'safari') {
-      args.push('--remote', 'http://10.9.0.100:4444/wd/hub',
+      args.push('--remote', 'http://10.9.0.2:4444/wd/hub',
       '--local-host', '10.9.0.102');
     }
     
