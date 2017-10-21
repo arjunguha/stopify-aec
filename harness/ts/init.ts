@@ -29,7 +29,8 @@ db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS timing_index ON timing
   (ix,lang,bench,platform,transform,new_method,es_mode,estimator,
    time_per_elapsed,yield_interval,resample_interval);`);
 
-const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js', 'scala' ];
+// 3 more needed: Java, Pyret, JavaScript
+const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js', 'scala', 'c++', 'racket_racketscript' ];
 
 function mayNull(x: any) {
   if (x === undefined) { 
