@@ -6,19 +6,19 @@
  by Isaac Gouy
  */
  
-import java.text.DecimalFormat;
-import java.text.NumberFormat; 
+// import java.text.DecimalFormat;
+// import java.text.NumberFormat; 
 
-public class spectralnorm
+public class Main
 {
    
-   private static final NumberFormat formatter = new DecimalFormat("#.000000000");
+  //  private static final NumberFormat formatter = new DecimalFormat("#.000000000");
    
    public static void main(String[] args) {
-      int n = 100;
-      if (args.length > 0) n = Integer.parseInt(args[0]);
+      int n = 5000;
+      // if (args.length > 0) n = Integer.parseInt(args[0]);
       
-      System.out.println(formatter.format(new spectralnorm().Approximate(n)));
+      System.out.println(new Main().Approximate(n));
    }
    
    private final double Approximate(int n) {
