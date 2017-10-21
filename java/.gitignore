@@ -2,3 +2,4 @@ node_modules
 target
 benchmark-files/*/war
 benchmark-files/*/gwt-unitCache
+.jsweet
