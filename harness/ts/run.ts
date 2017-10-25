@@ -1,44 +1,30 @@
+import * as assert from 'assert';
 import * as path from 'path'
 import * as fs from 'fs';
 import { spawnSync } from 'child_process';
 import  * as csvStringify  from 'csv-stringify';
 import * as Database from 'better-sqlite3';
 import * as glob from 'glob';
-
+import * as common from './common';
 const db = new Database('results.sqlite');
 
-function unna(x: string): string | undefined {
-  if (x === 'NA') {
-    return undefined;
-  }
-  return x;
-}
-
 function runBenchmarks() {
-const rows = db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL and platform != 'MicrosoftEdge' and ix < 3`).all();
-  for (const row of rows) {
-    const result = runBenchmark(row.lang, row.bench, row.platform,
-      <any>unna(row.transform), <any>unna(row.new_method),
-      <any>unna(row.es_mode), <any>unna(row.estimator),
-      unna(row.time_per_elapsed), unna(row.yield_interval), unna(row.resample_interval));
+  const benchmarks = common.unfinishedBenchmarks(db);
+  for (const benchmark of benchmarks) {
+    const result = runBenchmark(benchmark);
     if (result) {
-      const n = db.prepare(`UPDATE timing SET running_time = ?, num_yields = ?
-        WHERE rowid = ?`).run(
-          result.runningTime, result.numYields, row.rowid).changes;
+      db.prepare(`UPDATE timing SET running_time = ?, num_yields = ?
+                  WHERE rowid = ?`).run(
+          result.runningTime, result.numYields, benchmark.rowId).changes;
     }
   }
 }
 
-export function runBenchmark(lang: string,
-  bench: string,
-  platform: 'native' | 'chrome' | 'firefox' | 'MicrosoftEdge' | 'safari',
-  transform?: 'native' | 'original' | 'lazy' | 'eager' | 'retval',
-  newMethod?: 'direct' | 'wrapper',
-  esMode?: 'sane' | 'es5',
-  estimator?: 'countdown' | 'reservoir',
-  timePerElapsed?: string,
-  yieldInterval?: string,
-  resampleInterval?: string): { runningTime: number, numYields?: number } | undefined {
+export function runBenchmark(benchmark: common.Benchmark):
+  { runningTime: number, numYields?: number } | undefined {
+  const { lang, bench, platform, transform, newMethod, esMode, estimator,
+          timePerElapsed, yieldInterval, resampleInterval } = benchmark;
+
   if (platform === 'native') {
     if (lang === 'python_pyjs') {
       const filename = path.resolve(__dirname, `../../${lang}/${bench}/main.py`);
@@ -53,32 +39,18 @@ export function runBenchmark(lang: string,
     else {
       return undefined;
     }
-
   }
   else {
     if (bench === 'gcbench' || bench == 'schulze') {
       return;
     }
-    const benchmarkFilename = `./benchmarks/${lang}/js-build/${bench}.js`;
-    const compiledFilename =
-      `./benchmarks/tmp/${lang}-${bench}-${transform}-${newMethod}-${esMode}.js`;
+
+    const compiledFilename = common.benchmarkCompiledFilename(benchmark);
     if (!fs.existsSync('../../' + compiledFilename)) {
-      const args = ['--webpack', '-t', transform!];
-      if (transform !== 'original') {
-        args.push('--new', newMethod!, '--es', esMode!); 
-      }
-      args.push(benchmarkFilename, compiledFilename);
-      try {
-        console.error(`Running ./bin/compile ${args.join(' ')} ...`);
-        spawnSync('./bin/compile', args, {
-          cwd: path.resolve(__dirname, '../../..')
-        });
-      }
-      catch (exn) {
-        console.error(`Exception running ./bin/compile ${args.join(' ')}`);
-        return;
-      }
+      console.error(`File not found ${compiledFilename}`);
+      return undefined;
     }
+
     const args = [ '--env', platform, '-t', transform!];
     if (estimator) {
       args.push('--estimator', estimator!);
@@ -92,6 +64,8 @@ export function runBenchmark(lang: string,
     if (resampleInterval) {
       args.push('-r', String(resampleInterval));
     }
+
+    // TODO(arjun): These should not be hardcoded
     if (platform === 'MicrosoftEdge') {
       args.push('--remote', 'http://10.9.0.100:4444/wd/hub',
         '--local-host', '10.9.0.102');
@@ -100,7 +74,7 @@ export function runBenchmark(lang: string,
       args.push('--remote', 'http://10.9.0.2:4444/wd/hub',
       '--local-host', '10.9.0.102');
     }
-    
+
     args.push(compiledFilename);
     try {
       console.error(`Running ./bin/browser ${args.join(' ')}`);
@@ -128,7 +102,7 @@ export function runBenchmark(lang: string,
   }
 }
 
-export function time(command: string, ...args: string[]): number | undefined {
+function time(command: string, ...args: string[]): number | undefined {
   const start = Date.now();
   console.error(`Running ${command} ${args.join(' ')} ...`);
   try {
@@ -140,22 +114,6 @@ export function time(command: string, ...args: string[]): number | undefined {
   }
   const end = Date.now();
   return  (end - start);
-}
-
-export function filenameWithoutExt(path: string): string {
-  return /([^/]*)\.[^.]*/.exec(path)![1];
-}
-
-function na(x: string | number | undefined): string {
-  if (x === undefined) {
-    return 'NA';
-  }
-  else if (typeof x === 'number') {
-    return String(x);
-  }
-  else {
-    return x;
-  }
 }
 
 runBenchmarks();

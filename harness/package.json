@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "minification script",
   "scripts": {
-    "install": "./node_modules/.bin/tsc",
+    "build": "./node_modules/.bin/tsc",
+    "compileJs": "node ./dist/compileJs",
     "csv": "node ./dist/csv",
     "init": "node ./dist/init",
     "run": "node ./dist/run"
