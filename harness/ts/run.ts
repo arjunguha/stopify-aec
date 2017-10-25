@@ -61,7 +61,7 @@ export function runBenchmark(lang: string,
     }
     const benchmarkFilename = `./benchmarks/${lang}/js-build/${bench}.js`;
     const compiledFilename =
-      `./benchmarks/scripts/workdir/${lang}-${bench}-${transform}-${newMethod}-${esMode}.js`;
+      `./benchmarks/tmp/${lang}-${bench}-${transform}-${newMethod}-${esMode}.js`;
     if (!fs.existsSync('../../' + compiledFilename)) {
       const args = ['--webpack', '-t', transform!];
       if (transform !== 'original') {
