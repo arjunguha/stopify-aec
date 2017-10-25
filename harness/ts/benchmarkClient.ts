@@ -1,3 +1,6 @@
+import * as common from './common';
+import { parseRuntimeOpts } from '../../../built/src/cli-parse';
+
 const benchmarkTimeout = 90; //seconds
 const checkInterval = 5; // seconds
 
@@ -6,12 +9,22 @@ const label = <HTMLDivElement>document.getElementById('label');
 var headers = new Headers();
 headers.append("Content-Type", "application/json");
 
-function runBenchmark(url: string): Promise<boolean> {
+export function benchmarkUrl(args: string[]) {
+  const opts = parseRuntimeOpts(args);
+  return encodeURIComponent(JSON.stringify(opts));
+}
+
+function runBenchmark(b: common.Benchmark): Promise<boolean> {
+  const url = '/benchmark.html#' +
+   benchmarkUrl([
+     ...common.benchmarkRunOpts(b),
+     '/benchmarks/' + common.benchmarkCompiledFilename(b)]);
+
   const iframe = document.createElement('iframe');
   iframe.src = url;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
-  label.innerText = url;
+  label.innerText = `${b.lang}-${b.bench}-${b.transform}-${b.esMode}-${b.newMethod}-${b.estimator}-${b.yieldInterval}`;
 
   return new Promise<boolean>((resolve, reject) => {
 
@@ -27,7 +40,7 @@ function runBenchmark(url: string): Promise<boolean> {
           headers: headers,
           body: JSON.stringify({
             output: data.value,
-            url: url
+            rowId: b.rowId
           })
         })).then(resp => {
           if (resp.status === 200) {
@@ -52,10 +65,10 @@ function runBenchmark(url: string): Promise<boolean> {
   });
 }
 
-function runAllBenchmarks(urls: string[]): Promise<boolean> {
+function runAllBenchmarks(benchmarks: common.Benchmark[]): Promise<boolean> {
   const progress = <HTMLDivElement>document.getElementById('progress');
   const progressText = <HTMLDivElement>document.getElementById('progressText');
-  const n = urls.length;
+  const n = benchmarks.length;
 
   let completed = 0;
   let failed = 0;
@@ -66,7 +79,7 @@ function runAllBenchmarks(urls: string[]): Promise<boolean> {
     if (i === n) {
       return Promise.resolve(true);
     } 
-    return runBenchmark(urls[i])
+    return runBenchmark(benchmarks[i])
       .then(() => {
         console.log('hi');
         completed++;

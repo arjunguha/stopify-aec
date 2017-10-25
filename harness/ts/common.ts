@@ -38,7 +38,7 @@ function unna<T extends string | number>(x: T): T | undefined {
   }
 }
 
-function parseBenchmarkRow(row: any): Benchmark {
+export function parseBenchmarkRow(row: any): Benchmark {
   return {
     rowId: row.rowid,
     lang: row.lang,

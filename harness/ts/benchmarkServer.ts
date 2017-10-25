@@ -10,32 +10,6 @@ import { parseRuntimeOpts } from '../../../built/src/cli-parse';
 
 const platforms: Platform[] = [ 'safari', 'firefox', 'MicrosoftEdge', 'chrome' ];
 
-type BenchmarkMap = Map<Platform, { url: String, rowId: number }[]>;
-
-function benchmarksByPlatform(db: Database) {
-  const all = common.unfinishedBenchmarks(db);
-
-  function forPlatform(platform: Platform) {
-    return all.filter(b => b.platform === platform)
-      .map(b => {
-        const p = '/benchmarks/' + common.benchmarkCompiledFilename(b);
-        const args = common.benchmarkRunOpts(b);
-        args.push(p);
-        const opts = parseRuntimeOpts(args);
-        return {
-          rowId: b.rowId,
-          url: `/benchmark.html#${encodeURIComponent(JSON.stringify(opts))}`
-        }
-      });
-  }
-
-  const benchmarkListMap: BenchmarkMap = new Map();
-  for (const platform of platforms) {
-    benchmarkListMap.set(platform, forPlatform(platform));
-  }
-  return benchmarkListMap;
-}
-
 function getPlatform(ua: string): Platform | undefined {
   const browser = detectBrowser.parseUserAgent(ua);
   switch (browser.name) {
@@ -50,9 +24,15 @@ function getPlatform(ua: string): Platform | undefined {
   }
 }
 
+function getBenchmarks(db: Database, platform : common.Platform): Benchmark[] {
+  return db.prepare(`SELECT rowid,* FROM timing WHERE platform = ? AND
+                     running_time IS NULL AND ix < 3`)
+    .all(platform)
+    .map(common.parseBenchmarkRow);
+}
+
 function serve(db: Database, port: number) {
 
-  const benchmarkMap = benchmarksByPlatform(db);
   const app = express();
 
   // Serve stopify.bundle.js and benchmark.html, which go in the IFRAME
@@ -72,20 +52,13 @@ function serve(db: Database, port: number) {
       res.sendStatus(404);
       return;
     }
-    const alist = benchmarkMap.get(platform)!;
-    res.send(JSON.stringify(alist.map(x => x.url)));
+    res.send(JSON.stringify(getBenchmarks(db, platform)));
   });
 
   app.post('/done', bodyParser.json(), (req, res) => {
     const ua = req.headers['user-agent'];
     const platform = getPlatform(<string>ua)!;
-    const { output, url } = req.body;
-    const bench = benchmarkMap.get(platform)!.find(b => b.url === url);
-    if (typeof bench === 'undefined') {
-      console.error(`Bad benchmark url from browser`);
-      res.sendStatus(404);
-      return;
-    }
+    const { output, rowId } = req.body;
     const result = common.parseBenchmarkOutput(output);
     if (typeof result === 'undefined') {
       console.error(`Could not parse benchmark output`);
@@ -94,7 +67,7 @@ function serve(db: Database, port: number) {
     }
     db.prepare(`UPDATE timing SET running_time = ?, num_yields = ?
                 WHERE rowid = ?`)
-      .run(result.runningTime, result.numYields, bench.rowId);
+      .run(result.runningTime, result.numYields, rowId);
     res.sendStatus(200);
   });
 
