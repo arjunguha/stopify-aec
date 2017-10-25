@@ -1,4 +1,4 @@
-const ITERS = 1000000000;
+const ITERS = 100000000;
 
 function Ctor() {
   while (false) {}
