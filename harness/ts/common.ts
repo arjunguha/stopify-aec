@@ -5,11 +5,13 @@ import  * as csvStringify  from 'csv-stringify';
 import * as Database from 'better-sqlite3';
 import * as glob from 'glob';
 
+export type Platform = 'native' | 'chrome' | 'firefox' | 'MicrosoftEdge' | 'safari';
+
 export interface Benchmark {
   rowId: number,
   lang: string,
   bench: string,
-  platform: 'native' | 'chrome' | 'firefox' | 'MicrosoftEdge' | 'safari',
+  platform: Platform,
   transform?: 'native' | 'original' | 'lazy' | 'eager' | 'retval',
   newMethod?: 'direct' | 'wrapper',
   esMode?: 'sane' | 'es5',
@@ -58,8 +60,7 @@ function parseBenchmarkRow(row: any): Benchmark {
  * Produces all benchmarks that still need to run.
  */
 export function unfinishedBenchmarks(db: Database): Benchmark[] {
-  return db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL AND
-                     platform != 'MicrosoftEdge' and ix < 3`)
+  return db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL AND ix < 3`)
     .all()
     .map(parseBenchmarkRow);
 }
@@ -72,5 +73,42 @@ export function benchmarkSourceFilename(benchmark: Benchmark) {
 export function benchmarkCompiledFilename(benchmark: Benchmark) {
   // These are the compile-time settings
   const { lang, bench, platform, transform, newMethod, esMode } = benchmark;
-  return `./benchmarks/tmp/${lang}-${bench}-${transform}-${newMethod}-${esMode}.js`;
+  return `${lang}-${bench}-${transform}-${newMethod}-${esMode}.js`;
+}
+
+export function benchmarkRunOpts(benchmark: Benchmark): string[] {
+  const { lang, bench, platform, transform, newMethod, esMode, estimator,
+    timePerElapsed, yieldInterval, resampleInterval } = benchmark;
+
+  const args = [ '--env', platform, '-t', transform!];
+  if (estimator) {
+    args.push('--estimator', estimator!);
+  }
+  if (timePerElapsed) {
+    args.push ('--time-per-elapsed', String(timePerElapsed));
+  }
+  if (yieldInterval) {
+    args.push('-y', String(yieldInterval));
+  }
+  if (resampleInterval) {
+    args.push('-r', String(resampleInterval));
+  }
+
+  return args;
+}
+
+export function parseBenchmarkOutput(stdout: string) {
+  const output = String(stdout).split('\n');
+  const lastLine = output[output.length - 2].split(',');
+  const runningTime = Number(lastLine[0]);
+  const numYields = Number(lastLine[1]);
+  if (runningTime >= 0 && numYields >= 0) {
+    return { runningTime, numYields };
+  }
+  else {
+    console.error(`unexpected result from benchmark`);
+    console.error(output.join('\n'));
+    return undefined;
+  }
+
 }

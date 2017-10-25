@@ -28,7 +28,7 @@ export function compileBenchmark(benchmark: common.Benchmark) {
   }
 
   const benchmarkFilename = common.benchmarkSourceFilename(benchmark);
-  const compiledFilename = common.benchmarkCompiledFilename(benchmark);
+  const compiledFilename = './benchmarks/tmp/' + common.benchmarkCompiledFilename(benchmark);
 
   if (fs.existsSync('../../' + compiledFilename)) {
     return;
