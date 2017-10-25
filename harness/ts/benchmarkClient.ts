@@ -81,14 +81,12 @@ function runAllBenchmarks(benchmarks: common.Benchmark[]): Promise<boolean> {
     } 
     return runBenchmark(benchmarks[i])
       .then(() => {
-        console.log('hi');
         completed++;
-        return helper(i + 1);
       })
       .catch(() => {
         failed++;
-        return helper(i + 1);
-      });
+      })
+      .then(() => helper(i + 1));
   }
   return helper(0);
 }

@@ -101,7 +101,7 @@ function timeEstimatorComparisonBenchmarks() {
   }
 }
 
-const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari' ];
+const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' ];
 
 function benchmarksFor(lang: string, bench: string) {
   if (lang === 'python_pyjs') {

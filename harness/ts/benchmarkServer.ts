@@ -7,10 +7,10 @@ import * as common from './common';
 import { Platform, Benchmark } from './common';
 import { parseRuntimeOpts } from '../../../built/src/cli-parse';
 
-
-const platforms: Platform[] = [ 'safari', 'firefox', 'MicrosoftEdge', 'chrome' ];
-
 function getPlatform(ua: string): Platform | undefined {
+  if (ua.includes('CrOS')) {
+    return 'ChromeBook';
+  }
   const browser = detectBrowser.parseUserAgent(ua);
   switch (browser.name) {
     case 'edge':

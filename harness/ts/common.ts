@@ -5,7 +5,7 @@ import  * as csvStringify  from 'csv-stringify';
 import * as Database from 'better-sqlite3';
 import * as glob from 'glob';
 
-export type Platform = 'native' | 'chrome' | 'firefox' | 'MicrosoftEdge' | 'safari';
+export type Platform = 'native' | 'chrome' | 'firefox' | 'MicrosoftEdge' | 'safari' | 'ChromeBook';
 
 export interface Benchmark {
   rowId: number,
