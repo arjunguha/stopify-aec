@@ -22,7 +22,7 @@ function runBenchmarks() {
 
 export function runBenchmark(benchmark: common.Benchmark):
   { runningTime: number, numYields?: number } | undefined {
-  const { lang, bench, platform, transform, newMethod, esMode, estimator,
+  const { lang, bench, platform, transform, newMethod, esMode, jsArgs, estimator,
           timePerElapsed, yieldInterval, resampleInterval } = benchmark;
 
   if (platform === 'native') {

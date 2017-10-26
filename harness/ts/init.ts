@@ -18,6 +18,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS timing
    transform TEXT NOT NULL,
    new_method TEXT NOT NULL,
    es_mode TEXT NOT NULL,
+   js_args TEXT NOT NULL,
    estimator TEXT NOT NULL,
    time_per_elapsed TEXT NOT NULL,
    yield_interval TEXT NOT NULL,
@@ -26,15 +27,15 @@ db.exec(`CREATE TABLE IF NOT EXISTS timing
    num_yields INTEGER);`);
 
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS timing_index ON timing
-  (ix,lang,bench,platform,transform,new_method,es_mode,estimator,
+  (ix,lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
    time_per_elapsed,yield_interval,resample_interval);`);
 
 // 3 more needed: Java, Pyret, JavaScript
 const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js',
-  'scala', 'c++', 'racket_racketscript', 'java' ];
+  'scala', 'c++', 'racket_racketscript', 'java', 'microbenches' ];
 
 function mayNull(x: any) {
-  if (x === undefined) { 
+  if (x === undefined) {
     return `NA`;
   }
   return `${x}`;
@@ -46,18 +47,19 @@ function initTiming(i: number,
   transform?: string,
   newMethod?: 'direct' | 'wrapper',
   esMode?: string,
+  jsArgs?: string,
   estimator?: string,
   timePerElapsed?: number,
   yieldInterval?: number,
   resampleInterval?: number) {
   const r = db.prepare(`INSERT OR IGNORE INTO timing (ix, lang, bench, platform, transform,
-    new_method, es_mode, estimator, time_per_elapsed, yield_interval, resample_interval) VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    new_method, es_mode, js_args, estimator, time_per_elapsed, yield_interval, resample_interval) VALUES
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(i, lang, bench, platform, mayNull(transform), mayNull(newMethod),
-    mayNull(esMode), mayNull(estimator),
+      mayNull(esMode), mayNull(jsArgs), mayNull(estimator),
       mayNull(timePerElapsed), mayNull(yieldInterval), mayNull(resampleInterval));
   if (r.changes > 0) {
-    console.error(`Creating configuration ${i},${lang},${bench},${platform},${transform},${newMethod},${esMode},${estimator},${timePerElapsed},${yieldInterval},${resampleInterval}`);
+    console.error(`Creating configuration ${i},${lang},${bench},${platform},${transform},${newMethod},${esMode},${jsArgs},${estimator},${timePerElapsed},${yieldInterval},${resampleInterval}`);
   }
 }
 
@@ -74,30 +76,64 @@ function pythonBenchmark(name: string) {
 
     // Compare ES5 sane vs. insane mode using Chrome only. The other browsers
     // are just way too slow.
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct',  'es5',  'countdown');
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper',  'es5',  'countdown');
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct',  'sane', 'countdown', undefined,   1000000);
+    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct',  'es5', 'simple', 'countdown');
+    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper',  'es5', 'simple', 'countdown');
+    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct',  'sane', 'simple', 'countdown', undefined,   1000000);
 
     // Compare all Chrome, Firefox, and Edge for new method.
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, edge,     'lazy', 'direct',  'sane', 'countdown', undefined,   1000000);
-    initTiming(i, 'python_pyjs', name, edge,     'lazy', 'wrapper', 'sane', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'direct', 'sane', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'wrapper', 'sane', 'countdown', undefined, 1000000);
+    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
+    initTiming(i, 'python_pyjs', name, edge,     'lazy', 'direct',  'sane', 'simple', 'countdown', undefined,   1000000);
+    initTiming(i, 'python_pyjs', name, edge,     'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
+    initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'countdown', undefined,  1000000);
+    initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined, 1000000);
 
-    initTiming(i, 'python_pyjs', name, 'firefox', 'retval', 'direct', 'sane', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, 'chrome', 'retval', 'wrapper', 'sane', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'reservoir', undefined,  100);
-    initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'direct', 'sane', 'reservoir', undefined,  100);
-    initTiming(i, 'python_pyjs', name, edge, 'lazy', 'direct', 'sane', 'reservoir', undefined,  100);
+    initTiming(i, 'python_pyjs', name, 'firefox', 'retval', 'direct', 'sane', 'simple', 'countdown', undefined,  1000000);
+    initTiming(i, 'python_pyjs', name, 'chrome', 'retval', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
+    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined,  100);
+    initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
+    initTiming(i, 'python_pyjs', name, edge, 'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
+  }
+}
+
+function microbenchmarks(i: number, bench: string): void {
+  switch (bench) {
+    case 'arguments':
+      for (const jsArgs of ['simple', 'faithful']) {
+        initTiming(i, 'microbenches', bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'safari', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'chrome', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'firefox', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, edge, 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
+      }
+      break;
+    case 'arithmetic':
+      for (const esMode of ['sane', 'es5']) {
+        initTiming(i, 'microbenches', bench, 'ChromeBook', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'safari', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'chrome', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'firefox', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, edge, 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
+      }
+      break;
+    case 'constructor':
+      for (const handleNew of <any[]>['wrapper', 'direct']) {
+        initTiming(i, 'microbenches', bench, 'ChromeBook', 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'safari', 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'chrome', 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'firefox', 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, edge, 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
+      }
+      break;
+    default:
+      break;
   }
 }
 
 function timeEstimatorComparisonBenchmarks() {
   for (let i = 0; i < 10; i++) {
-    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'exact', undefined, 100);
-    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'countdown', undefined, 1000000);
-    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'velocity', undefined, 100, 250);
+    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'exact', undefined, 100);
+    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined, 1000000);
+    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined, 100, 250);
   }
 }
 
@@ -111,7 +147,7 @@ function benchmarksFor(lang: string, bench: string) {
   for (let i = 0; i < 10; i++) {
     if (lang === 'scala') {
       for (const resampleInterval of [ 100, 250, 500, 750, 1000 ]) {
-        initTiming(i, lang, bench, 'chrome', 'lazy', 'direct', 'sane', 'velocity',
+        initTiming(i, lang, bench, 'chrome', 'lazy', 'direct', 'sane', 'simple', 'velocity',
           undefined, 100, resampleInterval);
       }
     }
@@ -120,14 +156,19 @@ function benchmarksFor(lang: string, bench: string) {
       initTiming(i, lang, bench, browser, 'original');
     }
 
-    // ChromeBook configuration
-    initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'reservoir', undefined, 100);
+    if (lang === 'microbenches') {
+      microbenchmarks(i, bench);
+      continue;
+    }
 
-    initTiming(i, lang, bench, 'safari', 'lazy', 'direct', 'sane', 'reservoir', undefined, 100);
+    // ChromeBook configuration
+    initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+
+    initTiming(i, lang, bench, 'safari', 'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined, 100);
     for (const transform of [ 'lazy', 'retval' ]) {
-      initTiming(i, lang, bench, 'chrome',  transform, 'wrapper', 'sane', 'reservoir', undefined,  100);
-      initTiming(i, lang, bench, 'firefox', transform, 'direct', 'sane', 'reservoir', undefined,  100);
-      initTiming(i, lang, bench, edge,      transform, 'direct', 'sane', 'reservoir', undefined,  100);
+      initTiming(i, lang, bench, 'chrome',  transform, 'wrapper', 'sane', 'simple', 'reservoir', undefined,  100);
+      initTiming(i, lang, bench, 'firefox', transform, 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
+      initTiming(i, lang, bench, edge,      transform, 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
     }
   }
 

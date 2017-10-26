@@ -15,12 +15,13 @@ export interface Benchmark {
   transform?: 'native' | 'original' | 'lazy' | 'eager' | 'retval',
   newMethod?: 'direct' | 'wrapper',
   esMode?: 'sane' | 'es5',
+  jsArgs?: 'simple' | 'faithful',
   estimator?: 'countdown' | 'reservoir',
   timePerElapsed?: string,
   yieldInterval?: string,
   resampleInterval?: string,
   runningTime?: number,
-  numYields?: number
+  numYields?: number,
 }
 
 function unna<T extends string | number>(x: T): T | undefined {
@@ -47,12 +48,13 @@ export function parseBenchmarkRow(row: any): Benchmark {
     transform: unna(row.transform),
     newMethod: unna(row.new_method),
     esMode: unna(row.es_mode),
+    jsArgs: unna(row.js_args),
     estimator: unna(row.estimator),
     timePerElapsed: unna(row.time_per_elapsed),
     yieldInterval: unna(row.yield_interval),
     resampleInterval: unna(row.resample_interval),
     runningTime: unna(row.running_time),
-    numYields: unna(row.num_yields)
+    numYields: unna(row.num_yields),
   };
 }
 
@@ -72,13 +74,13 @@ export function benchmarkSourceFilename(benchmark: Benchmark) {
 
 export function benchmarkCompiledFilename(benchmark: Benchmark) {
   // These are the compile-time settings
-  const { lang, bench, platform, transform, newMethod, esMode } = benchmark;
-  return `${lang}-${bench}-${transform}-${newMethod}-${esMode}.js`;
+  const { lang, bench, platform, transform, newMethod, esMode, jsArgs } = benchmark;
+  return `${lang}-${bench}-${transform}-${newMethod}-${esMode}-${jsArgs}.js`;
 }
 
 export function benchmarkRunOpts(benchmark: Benchmark): string[] {
   const { lang, bench, platform, transform, newMethod, esMode, estimator,
-    timePerElapsed, yieldInterval, resampleInterval } = benchmark;
+    timePerElapsed, yieldInterval, resampleInterval, jsArgs } = benchmark;
 
   const args = [ '--env', platform, '-t', transform!];
   if (estimator) {

@@ -15,7 +15,7 @@ function compileBenchmarks() {
 
 export function compileBenchmark(benchmark: common.Benchmark) {
   // These are the compile-time settings
-  const { lang, bench, platform, transform, newMethod, esMode } = benchmark;
+  const { lang, bench, platform, transform, newMethod, esMode, jsArgs } = benchmark;
 
   if (platform === 'native') {
     if (lang === 'python_pyjs') {
@@ -38,6 +38,7 @@ export function compileBenchmark(benchmark: common.Benchmark) {
   if (transform! !== 'original') {
     args.push('--new', newMethod!);
     args.push('--es', esMode!);
+    args.push('--js-args', jsArgs!);
   }
   args.push(benchmarkFilename, compiledFilename);
   try {
