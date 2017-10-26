@@ -119,6 +119,10 @@ function benchmarksFor(lang: string, bench: string) {
     for (const browser of browsers) {
       initTiming(i, lang, bench, browser, 'original');
     }
+
+    // ChromeBook configuration
+    initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'reservoir', undefined, 100);
+
     initTiming(i, lang, bench, 'safari', 'lazy', 'direct', 'sane', 'reservoir', undefined, 100);
     for (const transform of [ 'lazy', 'retval' ]) {
       initTiming(i, lang, bench, 'chrome',  transform, 'wrapper', 'sane', 'reservoir', undefined,  100);

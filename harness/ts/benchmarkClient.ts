@@ -1,10 +1,18 @@
 import * as common from './common';
 import { parseRuntimeOpts } from '../../../built/src/cli-parse';
 
-const benchmarkTimeout = 90; //seconds
+const benchmarkTimeout = 600; //seconds
 const checkInterval = 5; // seconds
 
 const label = <HTMLDivElement>document.getElementById('label');
+const skip = document.getElementById('skip')!;
+
+function log(message: string) {
+  const div = <HTMLDivElement>document.getElementById('log');
+  const msg = document.createElement('div');
+  msg.appendChild(document.createTextNode(message));
+  div.insertBefore(msg, div.firstChild);
+}
 
 var headers = new Headers();
 headers.append("Content-Type", "application/json");
@@ -24,22 +32,27 @@ function runBenchmark(b: common.Benchmark): Promise<boolean> {
   iframe.src = url;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
-  label.innerText = `${b.lang}-${b.bench}-${b.transform}-${b.esMode}-${b.newMethod}-${b.estimator}-${b.yieldInterval}`;
+  const bStr = `${b.lang}-${b.bench}-${b.transform}-${b.esMode}-${b.newMethod}-${b.estimator}-${b.yieldInterval}`;
+  label.innerText = bStr;
 
   return new Promise<boolean>((resolve, reject) => {
 
     let elapsedTime = 0;
 
+    function cleanup() {
+      skip.removeEventListener('click', skipListener);
+      window.clearInterval(timer);
+      iframe.remove();
+    }
+
     function checkDone() {
       if (iframe.contentDocument.title === 'done') {
-        const data = <HTMLTextAreaElement>iframe.contentDocument.getElementById('data');
-        window.clearInterval(timer);
-        iframe.remove();
+        const data = (<HTMLTextAreaElement>iframe.contentDocument.getElementById('data')).value;
         fetch(new Request('/done', {
           method: 'post',
           headers: headers,
           body: JSON.stringify({
-            output: data.value,
+            output: data,
             rowId: b.rowId
           })
         })).then(resp => {
@@ -55,12 +68,19 @@ function runBenchmark(b: common.Benchmark): Promise<boolean> {
       elapsedTime += checkInterval;
       if (elapsedTime > benchmarkTimeout) {
         console.log(`Benchmark was taking too long`);
-        window.clearInterval(timer);
-        iframe.remove();
-
+        cleanup();
         reject(`timeout`);
       }
     }
+
+    function skipListener() {
+      log(`Skipped ${bStr}`);
+      cleanup();
+      reject('skipped');
+    }
+
+    skip.addEventListener('click', skipListener);
+
     const timer = window.setInterval(checkDone, checkInterval * 1000);
   });
 }
@@ -101,3 +121,8 @@ fetch(new Request('/list'))
     }
   })
   .then(runAllBenchmarks);
+
+window.onerror = function(message, src, line, col, err) {
+  log(`Error: ${message} ${err}`);
+
+}
