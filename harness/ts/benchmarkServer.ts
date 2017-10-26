@@ -24,12 +24,14 @@ function getPlatform(ua: string): Platform | undefined {
   }
 }
 
-function getBenchmarks(db: Database, platform : common.Platform): Benchmark[] {
-  return db.prepare(`SELECT rowid,* FROM timing WHERE platform = ? AND
-                     running_time IS NULL AND ix < 3`)
-    .all(platform)
-    .map(common.parseBenchmarkRow);
-}
+function getBenchmarks(db: Database, platform : common.Platform,
+  queryParam: string): Benchmark[] {
+    const filter = decodeURIComponent(queryParam);
+    return db.prepare(`SELECT rowid,* FROM timing WHERE platform = ? AND
+                     running_time IS NULL AND ix < 3 ` + (filter === '' ? '' : `AND ${filter}`))
+      .all(platform)
+      .map(common.parseBenchmarkRow);
+  }
 
 function serve(db: Database, port: number) {
 
@@ -44,7 +46,8 @@ function serve(db: Database, port: number) {
   // Serve the benchmark files
   app.use('/benchmarks', express.static(path.join(__dirname, '../../tmp')));
 
-  app.get('/list', (req, res) => {
+  app.post('/list', bodyParser.json(), (req, res) => {
+    const { urlParams } = req.body;
     const ua = req.headers['user-agent'];
     const platform = getPlatform(<string>ua);
     if (typeof platform === 'undefined') {
@@ -52,7 +55,7 @@ function serve(db: Database, port: number) {
       res.sendStatus(404);
       return;
     }
-    res.send(JSON.stringify(getBenchmarks(db, platform)));
+    res.send(JSON.stringify(getBenchmarks(db, platform, urlParams)));
   });
 
   app.post('/done', bodyParser.json(), (req, res) => {

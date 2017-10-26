@@ -111,13 +111,19 @@ function runAllBenchmarks(benchmarks: common.Benchmark[]): Promise<boolean> {
   return helper(0);
 }
 
-fetch(new Request('/list'))
+fetch(new Request('/list', {
+  method: 'post',
+  headers: headers,
+  body: JSON.stringify({
+    urlParams: window.location.search.substring(1),
+  }),
+}))
   .then(resp => {
     if (resp.status === 200) {
       return resp.json();
     }
     else {
-      throw new Error(`GET /list get status ${resp.status}`);
+      throw new Error(`POST /list get status ${resp.status}`);
     }
   })
   .then(runAllBenchmarks);
