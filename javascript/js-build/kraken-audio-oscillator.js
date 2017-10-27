@@ -1916,7 +1916,7 @@ function mixSampleBuffers(sampleBuffer1, sampleBuffer2, negate, volumeCorrection
     
     return outputSamples;
 }   
-var iterations = 500;
+var iterations = 10000;
 
 var bufferSize = 8192;
 var sampleRate = 44100.0;

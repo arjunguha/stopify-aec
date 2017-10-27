@@ -1919,7 +1919,7 @@ function mixSampleBuffers(sampleBuffer1, sampleBuffer2, negate, volumeCorrection
     
     return outputSamples;
 }   
-var iterations = 1000;
+var iterations = 30000;
 
 var fft = new FFT(frameBufferLength / channels, rate);
 

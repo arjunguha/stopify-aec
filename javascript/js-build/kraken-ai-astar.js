@@ -50403,4 +50403,6 @@ function go() {
   path = astar.search(g1, start, end);
 };
 
-go();
+for (var i = 0; i < 10; i++) {
+  go();
+}

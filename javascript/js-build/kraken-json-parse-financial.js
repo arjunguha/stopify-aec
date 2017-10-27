@@ -102,6 +102,6 @@ var data =
 "inceptionDate\":\"2008-04-26 04:44:29.000\",\"withdrawals\":0,\"" +
 "id\":219948,\"deposits\":0}";
 
-for (var i = 0; i < 1000; i++) {
+for (var i = 0; i < 20000; i++) {
   var x = JSON.parse(data);
 }

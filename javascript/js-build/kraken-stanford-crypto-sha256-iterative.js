@@ -256,4 +256,6 @@ new sjcl.test.TestCase("SHA-256 iterative", function (cb) {
   });
 });
 
-sjcl.test.run();
+for (var ix = 0; ix < 25; ix++) {
+  sjcl.test.run();
+}

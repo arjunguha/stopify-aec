@@ -6478,4 +6478,6 @@ new sjcl.test.TestCase("AES official known-answer tests", function (cb) {
   cb && cb();
 });
 
-sjcl.test.run();
+for (var ix = 0; ix < 25; ix++) {
+  sjcl.test.run();
+}

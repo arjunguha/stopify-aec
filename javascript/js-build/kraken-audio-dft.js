@@ -1916,7 +1916,7 @@ function mixSampleBuffers(sampleBuffer1, sampleBuffer2, negate, volumeCorrection
     
     return outputSamples;
 }   
-var iterations = 20;
+var iterations = 150;
 
 var dft = new DFT(frameBufferLength / channels, rate);
 

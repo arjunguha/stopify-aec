@@ -7257,4 +7257,6 @@ new sjcl.test.TestCase("CCM mode tests", function (cb) {
   }, 0, kat.length / 100, true, cb);
 });
 
-sjcl.test.run();
+for (var ix = 0; ix < 15; ix++) {
+  sjcl.test.run();
+}

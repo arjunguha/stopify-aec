@@ -239,4 +239,6 @@ new sjcl.test.TestCase("PBKDF2", function (cb) {
       cb && cb();
   }
 });
-sjcl.test.run();
+for (var ix = 0; ix < 15; ix++) {
+  sjcl.test.run();
+}

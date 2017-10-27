@@ -2579,7 +2579,7 @@ BeatDetektor.modules.vis.VU.prototype.getLevel = function(x)
 {
     return this.vu_levels[x];
 }
-var iterations = 1000;
+var iterations = 20000;
 
 var fft = fft = new FFT(frameBufferLength / channels, rate);
 var bd = new BeatDetektor();
