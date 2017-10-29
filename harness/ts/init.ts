@@ -32,7 +32,7 @@ db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS timing_index ON timing
 
 // 3 more needed: Java, Pyret, JavaScript
 const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js',
-  'scala', 'c++', 'racket_racketscript', 'java', 'microbenches' ];
+  'scala', 'c++', 'scheme', 'java', 'microbenches' ];
 
 function mayNull(x: any) {
   if (x === undefined) {

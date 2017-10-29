@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+set -x
+P=`dirname $0`
+INFILE=$1
+OUTFILE=$2
+java -jar $P/scheme2js-20110717.jar -o $OUTFILE.tmp $INFILE
+cat  $P/misc.js $P/mutable.js $P/immutable.js $P/IO.js $OUTFILE.tmp > $OUTFILE
