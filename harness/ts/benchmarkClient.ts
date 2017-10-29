@@ -56,6 +56,7 @@ function runBenchmark(b: common.Benchmark): Promise<boolean> {
             rowId: b.rowId
           })
         })).then(resp => {
+          cleanup();
           if (resp.status === 200) {
             resolve(true);
           }
@@ -82,6 +83,13 @@ function runBenchmark(b: common.Benchmark): Promise<boolean> {
     skip.addEventListener('click', skipListener);
 
     const timer = window.setInterval(checkDone, checkInterval * 1000);
+
+    iframe.onerror = () => {
+      log(`Error loading ${bStr}`);
+      cleanup();
+      reject('error');
+    }
+
   });
 }
 
