@@ -5626,17 +5626,17 @@ $h_jl_Integer$.prototype = $c_jl_Integer$.prototype;
 $c_jl_Integer$.prototype.init___ = (function() {
   return this
 });
-$c_jl_Integer$.prototype.bitCount__I__I = (function(i) {
-  var t1 = ((i - (1431655765 & (i >> 1))) | 0);
-  var t2 = (((858993459 & t1) + (858993459 & (t1 >> 2))) | 0);
-  return ($imul(16843009, (252645135 & ((t2 + (t2 >> 4)) | 0))) >> 24)
-});
 $c_jl_Integer$.prototype.reverseBytes__I__I = (function(i) {
   var byte3 = ((i >>> 24) | 0);
   var byte2 = (65280 & ((i >>> 8) | 0));
   var byte1 = (16711680 & (i << 8));
   var byte0 = (i << 24);
   return (((byte0 | byte1) | byte2) | byte3)
+});
+$c_jl_Integer$.prototype.bitCount__I__I = (function(i) {
+  var t1 = ((i - (1431655765 & (i >> 1))) | 0);
+  var t2 = (((858993459 & t1) + (858993459 & (t1 >> 2))) | 0);
+  return ($imul(16843009, (252645135 & ((t2 + (t2 >> 4)) | 0))) >> 24)
 });
 var $d_jl_Integer$ = new $TypeData().initClass({
   jl_Integer$: 0

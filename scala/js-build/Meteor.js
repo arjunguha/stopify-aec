@@ -1634,28 +1634,19 @@ $c_Lmeteor$.prototype.init___ = (function() {
 });
 $c_Lmeteor$.prototype.main__AT__V = (function(args) {
   var allSolutions = $m_Lmeteor$Solver$().solve__sc_Seq();
-  if ((args.u.length === 1)) {
-    var x = args.get(0);
-    var this$2 = new $c_sci_StringOps().init___T(x);
-    var this$4 = $m_jl_Integer$();
-    var $$this = this$2.repr$1;
-    var howMany = this$4.parseInt__T__I__I($$this, 10)
-  } else {
-    var howMany = allSolutions.length__I()
-  };
-  var solutions = $as_sc_Seq(allSolutions.take__I__O(howMany));
-  var x$1 = (solutions.length__I() + " solutions found\n");
-  var this$6 = $m_s_Console$();
-  var this$7 = $as_Ljava_io_PrintStream(this$6.outVar$2.v$1);
-  this$7.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$1 + "\n"));
-  var x$2 = solutions.min__s_math_Ordering__O($m_s_math_Ordering$String$());
-  var this$9 = $m_s_Console$();
-  var this$10 = $as_Ljava_io_PrintStream(this$9.outVar$2.v$1);
-  this$10.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$2 + "\n"));
-  var x$3 = solutions.max__s_math_Ordering__O($m_s_math_Ordering$String$());
-  var this$12 = $m_s_Console$();
-  var this$13 = $as_Ljava_io_PrintStream(this$12.outVar$2.v$1);
-  this$13.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$3 + "\n"))
+  var solutions = $as_sc_Seq(allSolutions.take__I__O(2098));
+  var x = (solutions.length__I() + " solutions found\n");
+  var this$2 = $m_s_Console$();
+  var this$3 = $as_Ljava_io_PrintStream(this$2.outVar$2.v$1);
+  this$3.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x + "\n"));
+  var x$1 = solutions.min__s_math_Ordering__O($m_s_math_Ordering$String$());
+  var this$5 = $m_s_Console$();
+  var this$6 = $as_Ljava_io_PrintStream(this$5.outVar$2.v$1);
+  this$6.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$1 + "\n"));
+  var x$2 = solutions.max__s_math_Ordering__O($m_s_math_Ordering$String$());
+  var this$8 = $m_s_Console$();
+  var this$9 = $as_Ljava_io_PrintStream(this$8.outVar$2.v$1);
+  this$9.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$2 + "\n"))
 });
 var $d_Lmeteor$ = new $TypeData().initClass({
   Lmeteor$: 0
@@ -5753,44 +5744,6 @@ var $d_jl_Character = new $TypeData().initClass({
 });
 $c_jl_Character.prototype.$classData = $d_jl_Character;
 /** @constructor */
-function $c_jl_Character$() {
-  $c_O.call(this);
-  this.java$lang$Character$$charTypesFirst256$1 = null;
-  this.charTypeIndices$1 = null;
-  this.charTypes$1 = null;
-  this.isMirroredIndices$1 = null;
-  this.bitmap$0$1 = 0
-}
-$c_jl_Character$.prototype = new $h_O();
-$c_jl_Character$.prototype.constructor = $c_jl_Character$;
-/** @constructor */
-function $h_jl_Character$() {
-  /*<skip>*/
-}
-$h_jl_Character$.prototype = $c_jl_Character$.prototype;
-$c_jl_Character$.prototype.init___ = (function() {
-  return this
-});
-$c_jl_Character$.prototype.digit__C__I__I = (function(c, radix) {
-  return (((radix > 36) || (radix < 2)) ? (-1) : ((((c >= 48) && (c <= 57)) && ((((-48) + c) | 0) < radix)) ? (((-48) + c) | 0) : ((((c >= 65) && (c <= 90)) && ((((-65) + c) | 0) < (((-10) + radix) | 0))) ? (((-55) + c) | 0) : ((((c >= 97) && (c <= 122)) && ((((-97) + c) | 0) < (((-10) + radix) | 0))) ? (((-87) + c) | 0) : ((((c >= 65313) && (c <= 65338)) && ((((-65313) + c) | 0) < (((-10) + radix) | 0))) ? (((-65303) + c) | 0) : ((((c >= 65345) && (c <= 65370)) && ((((-65345) + c) | 0) < (((-10) + radix) | 0))) ? (((-65303) + c) | 0) : (-1)))))))
-});
-var $d_jl_Character$ = new $TypeData().initClass({
-  jl_Character$: 0
-}, false, "java.lang.Character$", {
-  jl_Character$: 1,
-  O: 1,
-  s_Serializable: 1,
-  Ljava_io_Serializable: 1
-});
-$c_jl_Character$.prototype.$classData = $d_jl_Character$;
-var $n_jl_Character$ = (void 0);
-function $m_jl_Character$() {
-  if ((!$n_jl_Character$)) {
-    $n_jl_Character$ = new $c_jl_Character$().init___()
-  };
-  return $n_jl_Character$
-}
-/** @constructor */
 function $c_jl_Double$() {
   $c_O.call(this);
   this.doubleStrPat$1 = null;
@@ -5874,57 +5827,17 @@ $h_jl_Integer$.prototype = $c_jl_Integer$.prototype;
 $c_jl_Integer$.prototype.init___ = (function() {
   return this
 });
-$c_jl_Integer$.prototype.fail$1__p1__T__sr_Nothing$ = (function(s$1) {
-  throw new $c_jl_NumberFormatException().init___T(new $c_s_StringContext().init___sc_Seq(new $c_sjs_js_WrappedArray().init___sjs_js_Array(["For input string: \"", "\""])).s__sc_Seq__T(new $c_sjs_js_WrappedArray().init___sjs_js_Array([s$1])))
-});
-$c_jl_Integer$.prototype.parseInt__T__I__I = (function(s, radix) {
-  if ((s === null)) {
-    var jsx$1 = true
-  } else {
-    var this$2 = new $c_sci_StringOps().init___T(s);
-    var $$this = this$2.repr$1;
-    var jsx$1 = ($uI($$this.length) === 0)
-  };
-  if (((jsx$1 || (radix < 2)) || (radix > 36))) {
-    this.fail$1__p1__T__sr_Nothing$(s)
-  } else {
-    var i = ((((65535 & $uI(s.charCodeAt(0))) === 45) || ((65535 & $uI(s.charCodeAt(0))) === 43)) ? 1 : 0);
-    var this$12 = new $c_sci_StringOps().init___T(s);
-    var $$this$1 = this$12.repr$1;
-    if (($uI($$this$1.length) <= i)) {
-      this.fail$1__p1__T__sr_Nothing$(s)
-    } else {
-      while (true) {
-        var jsx$2 = i;
-        var this$16 = new $c_sci_StringOps().init___T(s);
-        var $$this$2 = this$16.repr$1;
-        if ((jsx$2 < $uI($$this$2.length))) {
-          var jsx$3 = $m_jl_Character$();
-          var index = i;
-          if ((jsx$3.digit__C__I__I((65535 & $uI(s.charCodeAt(index))), radix) < 0)) {
-            this.fail$1__p1__T__sr_Nothing$(s)
-          };
-          i = ((1 + i) | 0)
-        } else {
-          break
-        }
-      };
-      var res = $uD($g.parseInt(s, radix));
-      return (((res !== res) || ((res > 2147483647) || (res < (-2147483648)))) ? this.fail$1__p1__T__sr_Nothing$(s) : $doubleToInt(res))
-    }
-  }
-});
-$c_jl_Integer$.prototype.bitCount__I__I = (function(i) {
-  var t1 = ((i - (1431655765 & (i >> 1))) | 0);
-  var t2 = (((858993459 & t1) + (858993459 & (t1 >> 2))) | 0);
-  return ($imul(16843009, (252645135 & ((t2 + (t2 >> 4)) | 0))) >> 24)
-});
 $c_jl_Integer$.prototype.reverseBytes__I__I = (function(i) {
   var byte3 = ((i >>> 24) | 0);
   var byte2 = (65280 & ((i >>> 8) | 0));
   var byte1 = (16711680 & (i << 8));
   var byte0 = (i << 24);
   return (((byte0 | byte1) | byte2) | byte3)
+});
+$c_jl_Integer$.prototype.bitCount__I__I = (function(i) {
+  var t1 = ((i - (1431655765 & (i >> 1))) | 0);
+  var t2 = (((858993459 & t1) + (858993459 & (t1 >> 2))) | 0);
+  return ($imul(16843009, (252645135 & ((t2 + (t2 >> 4)) | 0))) >> 24)
 });
 var $d_jl_Integer$ = new $TypeData().initClass({
   jl_Integer$: 0
@@ -10370,33 +10283,6 @@ var $d_jl_ArrayIndexOutOfBoundsException = new $TypeData().initClass({
   Ljava_io_Serializable: 1
 });
 $c_jl_ArrayIndexOutOfBoundsException.prototype.$classData = $d_jl_ArrayIndexOutOfBoundsException;
-/** @constructor */
-function $c_jl_NumberFormatException() {
-  $c_jl_IllegalArgumentException.call(this)
-}
-$c_jl_NumberFormatException.prototype = new $h_jl_IllegalArgumentException();
-$c_jl_NumberFormatException.prototype.constructor = $c_jl_NumberFormatException;
-/** @constructor */
-function $h_jl_NumberFormatException() {
-  /*<skip>*/
-}
-$h_jl_NumberFormatException.prototype = $c_jl_NumberFormatException.prototype;
-$c_jl_NumberFormatException.prototype.init___T = (function(s) {
-  $c_jl_Throwable.prototype.init___T__jl_Throwable.call(this, s, null);
-  return this
-});
-var $d_jl_NumberFormatException = new $TypeData().initClass({
-  jl_NumberFormatException: 0
-}, false, "java.lang.NumberFormatException", {
-  jl_NumberFormatException: 1,
-  jl_IllegalArgumentException: 1,
-  jl_RuntimeException: 1,
-  jl_Exception: 1,
-  jl_Throwable: 1,
-  O: 1,
-  Ljava_io_Serializable: 1
-});
-$c_jl_NumberFormatException.prototype.$classData = $d_jl_NumberFormatException;
 /** @constructor */
 function $c_s_Enumeration$Val() {
   $c_s_Enumeration$Value.call(this);

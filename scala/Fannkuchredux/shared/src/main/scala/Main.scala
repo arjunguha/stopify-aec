@@ -17,7 +17,7 @@ object fannkuchredux
       i = 0
       while (r != 1) { count(r-1) = r; r -= 1 }
       while (i < n) { perm(i) = perm1(i); i += 1 }
-      
+
       // Count flips and update max  and checksum
       f = 0
       k = perm(0)
@@ -60,7 +60,7 @@ object fannkuchredux
   }
 
   def main(args: Array[String]) {
-    val n = (if (args.length > 0) args(0).toInt else 10)
+    val n = 12
     println("Pfannkuchen("+n+") = "+fannkuch(n))
   }
 }
