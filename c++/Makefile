@@ -10,6 +10,9 @@ COBJS = $(patsubst $(BDIR)/%.c,js-build/%.js,$(CSRCS))
 CPPOBJS = $(patsubst $(BDIR)/%.cpp,js-build/%.js,$(CPPSRCS))
 
 all: $(COBJS) $(CPPOBJS)
+	cd benchmark-files/zlib && emconfigure ./configure --64
+	emmake make -C benchmark-files/zlib
+	cd benchmark-files/zlib && emcc $(CFLAGS) benchmark.c libz.a -o ../../js-build/zlib.js
 
 js-build/%.js: $(BDIR)/%.cpp | js-build
 	$(CXX) $(CXXFLAGS) $^ -o $@

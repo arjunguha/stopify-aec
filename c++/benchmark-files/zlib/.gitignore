@@ -1,0 +1,11 @@
+*.o
+*.lo
+*.js
+*.so*
+*.a
+minigzip
+minigzip64
+minigzipsh
+example
+example64
+examplesh
