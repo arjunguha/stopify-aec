@@ -220,7 +220,7 @@ struct
              ~selection:!selection
              ?output_file:!output_file
              ()) in
-    !output_file, command
+    command
 
 end
 
@@ -547,9 +547,10 @@ let with_output funct output_file =
      funct output;
    with e -> close_out output; raise e
 
-let run (functions : Micro_bench_types.benchmark list) =
-  match Config.parse () with
-  | output_file, `List raw ->
+let run ?(conf : [`Count | `List of bool | `Run of Config.t] option=Some (Config.parse ()))
+(functions : Micro_bench_types.benchmark list) : unit =
+  match conf with
+  | Some (`List raw) ->
     let f output =
       if raw
       then List.iter (fun (name, _) -> Printf.fprintf output "%s\n" name) functions
@@ -557,8 +558,8 @@ let run (functions : Micro_bench_types.benchmark list) =
         Printf.fprintf output "benchmarks:\n";
         Tester.list output functions
       end
-    in with_output f output_file
-  | output_file, `Count ->
+    in with_output f None
+  | Some (`Count) ->
     let f output =
       let len =
         List.fold_left (fun acc (_, funs) -> match funs with
@@ -569,10 +570,10 @@ let run (functions : Micro_bench_types.benchmark list) =
         ) 0 functions in
       Printf.fprintf output "%i" len
     in
-    with_output f output_file
-  | output_file, `Run config ->
+    with_output f None
+  | Some (`Run config) ->
     let results = run_all {config with maximal_cost= Longer; verbosity=`High}functions in
-    let output = match output_file with
-      | None -> stdout
-      | Some f -> open_out f in
+    let output = stdout in
     List.iter (Measurement.output output) results
+  | None ->
+      failwith "error"

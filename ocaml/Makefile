@@ -5,3 +5,6 @@ OUTPUT = $(SOURCES:benchmark-files/%.ml=js-build/%.js)
 all:
 	bsb
 	$(foreach dir,$(DIRS),$(dir)/webpack $(dir);)
+
+clean:
+	rm -rf lib/ js-build/
