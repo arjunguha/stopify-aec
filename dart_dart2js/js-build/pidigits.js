@@ -1,1 +1,4072 @@
-(function(){var supportsDirectProtoAccess=function(){var cls=function(){};cls.prototype={p:{}};var object=new cls;if(!(object.__proto__&&object.__proto__.p===cls.prototype.p))return false;try{if(typeof navigator!="undefined"&&typeof navigator.userAgent=="string"&&navigator.userAgent.indexOf("Chrome/")>=0)return true;if(typeof version=="function"&&version.length==0){var v=version();if(/^\d+\.\d+\.\d+\.\d+$/.test(v))return true}}catch(_){}return false}();function map(x){x=Object.create(null);x.x=0;delete x.x;return x}var A=map();var B=map();var C=map();var D=map();var E=map();var F=map();var G=map();var H=map();var J=map();var K=map();var L=map();var M=map();var N=map();var O=map();var P=map();var Q=map();var R=map();var S=map();var T=map();var U=map();var V=map();var W=map();var X=map();var Y=map();var Z=map();function Isolate(){}init();function setupProgram(programData,typesOffset){"use strict";function generateAccessor(fieldDescriptor,accessors,cls){var fieldInformation=fieldDescriptor.split("-");var field=fieldInformation[0];var len=field.length;var code=field.charCodeAt(len-1);var reflectable;if(fieldInformation.length>1)reflectable=true;else reflectable=false;code=code>=60&&code<=64?code-59:code>=123&&code<=126?code-117:code>=37&&code<=43?code-27:0;if(code){var getterCode=code&3;var setterCode=code>>2;var accessorName=field=field.substring(0,len-1);var divider=field.indexOf(":");if(divider>0){accessorName=field.substring(0,divider);field=field.substring(divider+1)}if(getterCode){var args=getterCode&2?"receiver":"";var receiver=getterCode&1?"this":"receiver";var body="return "+receiver+"."+field;var property=cls+".prototype.get$"+accessorName+"=";var fn="function("+args+"){"+body+"}";if(reflectable)accessors.push(property+"$reflectable("+fn+");\n");else accessors.push(property+fn+";\n")}if(setterCode){var args=setterCode&2?"receiver, value":"value";var receiver=setterCode&1?"this":"receiver";var body=receiver+"."+field+" = value";var property=cls+".prototype.set$"+accessorName+"=";var fn="function("+args+"){"+body+"}";if(reflectable)accessors.push(property+"$reflectable("+fn+");\n");else accessors.push(property+fn+";\n")}}return field}function defineClass(name,fields){var accessors=[];var str="function "+name+"(";var body="";for(var i=0;i<fields.length;i++){if(i!=0)str+=", ";var field=generateAccessor(fields[i],accessors,name);var parameter="p_"+field;str+=parameter;body+="this."+field+" = "+parameter+";\n"}if(supportsDirectProtoAccess)body+="this."+"$deferredAction"+"();";str+=") {\n"+body+"}\n";str+=name+".builtin$cls=\""+name+"\";\n";str+="$desc=$collectedClasses."+name+"[1];\n";str+=name+".prototype = $desc;\n";if(typeof defineClass.name!="string")str+=name+".name=\""+name+"\";\n";str+=accessors.join("");return str}var inheritFrom=supportsDirectProtoAccess?function(constructor,superConstructor){var prototype=constructor.prototype;prototype.__proto__=superConstructor.prototype;prototype.constructor=constructor;prototype["$is"+constructor.name]=constructor;return convertToFastObject(prototype)}:function(){function tmp(){}return function(constructor,superConstructor){tmp.prototype=superConstructor.prototype;var object=new tmp;convertToSlowObject(object);var properties=constructor.prototype;var members=Object.keys(properties);for(var i=0;i<members.length;i++){var member=members[i];object[member]=properties[member]}object["$is"+constructor.name]=constructor;object.constructor=constructor;constructor.prototype=object;return object}}();function finishClasses(processedClasses){var allClasses=init.allClasses;processedClasses.combinedConstructorFunction+="return [\n"+processedClasses.constructorsList.join(",\n  ")+"\n]";var constructors=new Function("$collectedClasses",processedClasses.combinedConstructorFunction)(processedClasses.collected);processedClasses.combinedConstructorFunction=null;for(var i=0;i<constructors.length;i++){var constructor=constructors[i];var cls=constructor.name;var desc=processedClasses.collected[cls];var globalObject=desc[0];desc=desc[1];allClasses[cls]=constructor;globalObject[cls]=constructor}constructors=null;var finishedClasses=init.finishedClasses;function finishClass(cls){if(finishedClasses[cls])return;finishedClasses[cls]=true;var superclass=processedClasses.pending[cls];if(!superclass||typeof superclass!="string"){var constructor=allClasses[cls];var prototype=constructor.prototype;prototype.constructor=constructor;prototype.$isObject=constructor;prototype.$deferredAction=function(){};return}finishClass(superclass);var superConstructor=allClasses[superclass];if(!superConstructor)superConstructor=existingIsolateProperties[superclass];var constructor=allClasses[cls];var prototype=inheritFrom(constructor,superConstructor);if(prototype.$isInterceptor)prototype.$deferredAction()}var properties=Object.keys(processedClasses.pending);for(var i=0;i<properties.length;i++)finishClass(properties[i])}function finishAddStubsHelper(){var prototype=this;while(!prototype.hasOwnProperty("$deferredAction"))prototype=prototype.__proto__;delete prototype.$deferredAction;var properties=Object.keys(prototype);for(var index=0;index<properties.length;index++){var property=properties[index];var firstChar=property.charCodeAt(0);var elem;if(property!=="^"&&property!=="$reflectable"&&firstChar!==43&&firstChar!==42&&(elem=prototype[property])!=null&&elem.constructor===Array&&property!=="<>")addStubs(prototype,elem,property,false,[])}convertToFastObject(prototype);prototype=prototype.__proto__;prototype.$deferredAction()}function processClassData(cls,descriptor,processedClasses){descriptor=convertToSlowObject(descriptor);var previousProperty;var properties=Object.keys(descriptor);var hasDeferredWork=false;var shouldDeferWork=supportsDirectProtoAccess&&cls!="Object";for(var i=0;i<properties.length;i++){var property=properties[i];var firstChar=property.charCodeAt(0);if(property==="static"){processStatics(init.statics[cls]=descriptor.static,processedClasses);delete descriptor.static}else if(firstChar===43){mangledNames[previousProperty]=property.substring(1);var flag=descriptor[property];if(flag>0)descriptor[previousProperty].$reflectable=flag}else if(firstChar===42){descriptor[previousProperty].$defaultValues=descriptor[property];var optionalMethods=descriptor.$methodsWithOptionalArguments;if(!optionalMethods)descriptor.$methodsWithOptionalArguments=optionalMethods={};optionalMethods[property]=previousProperty}else{var elem=descriptor[property];if(property!=="^"&&elem!=null&&elem.constructor===Array&&property!=="<>"){if(shouldDeferWork)hasDeferredWork=true;else addStubs(descriptor,elem,property,false,[]);}else previousProperty=property}}if(hasDeferredWork)descriptor.$deferredAction=finishAddStubsHelper;var classData=descriptor["^"],split,supr,fields=classData;var s=fields.split(";");fields=s[1]?s[1].split(","):[];supr=s[0];split=supr.split(":");if(split.length==2){supr=split[0];var functionSignature=split[1];if(functionSignature)descriptor.$signature=function(s){return function(){return init.types[s]}}(functionSignature)}if(supr)processedClasses.pending[cls]=supr;processedClasses.combinedConstructorFunction+=defineClass(cls,fields);processedClasses.constructorsList.push(cls);processedClasses.collected[cls]=[globalObject,descriptor];classes.push(cls)}function processStatics(descriptor,processedClasses){var properties=Object.keys(descriptor);for(var i=0;i<properties.length;i++){var property=properties[i];if(property==="^")continue;var element=descriptor[property];var firstChar=property.charCodeAt(0);var previousProperty;if(firstChar===43){mangledGlobalNames[previousProperty]=property.substring(1);var flag=descriptor[property];if(flag>0)descriptor[previousProperty].$reflectable=flag;if(element&&element.length)init.typeInformation[previousProperty]=element}else if(firstChar===42){globalObject[previousProperty].$defaultValues=element;var optionalMethods=descriptor.$methodsWithOptionalArguments;if(!optionalMethods)descriptor.$methodsWithOptionalArguments=optionalMethods={};optionalMethods[property]=previousProperty}else if(typeof element==="function"){globalObject[previousProperty=property]=element;functions.push(property);init.globalFunctions[property]=element}else if(element.constructor===Array)addStubs(globalObject,element,property,true,functions);else{previousProperty=property;processClassData(property,element,processedClasses)}}}function addStubs(prototype,array,name,isStatic,functions){var index=0,alias=array[index],f;if(typeof alias=="string")f=array[++index];else{f=alias;alias=name}var funcs=[prototype[name]=prototype[alias]=f];f.$stubName=name;functions.push(name);for(index++;index<array.length;index++){f=array[index];if(typeof f!="function")break;if(!isStatic)f.$stubName=array[++index];funcs.push(f);if(f.$stubName){prototype[f.$stubName]=f;functions.push(f.$stubName)}}for(var i=0;i<funcs.length;index++,i++)funcs[i].$callName=array[index];var getterStubName=array[index];array=array.slice(++index);var requiredParameterInfo=array[0];var requiredParameterCount=requiredParameterInfo>>1;var isAccessor=(requiredParameterInfo&1)===1;var isSetter=requiredParameterInfo===3;var isGetter=requiredParameterInfo===1;var optionalParameterInfo=array[1];var optionalParameterCount=optionalParameterInfo>>1;var optionalParametersAreNamed=(optionalParameterInfo&1)===1;var isIntercepted=requiredParameterCount+optionalParameterCount!=funcs[0].length;var functionTypeIndex=array[2];if(typeof functionTypeIndex=="number")array[2]=functionTypeIndex+typesOffset;var unmangledNameIndex=2*optionalParameterCount+requiredParameterCount+3;if(getterStubName){f=tearOff(funcs,array,isStatic,name,isIntercepted);prototype[name].$getter=f;f.$getterStub=true;if(isStatic){init.globalFunctions[name]=f;functions.push(getterStubName)}prototype[getterStubName]=f;funcs.push(f);f.$stubName=getterStubName;f.$callName=null}}function tearOffGetter(funcs,reflectionInfo,name,isIntercepted){return isIntercepted?new Function("funcs","reflectionInfo","name","H","c","return function tearOff_"+name+functionCounter++ +"(x) {"+"if (c === null) c = "+"H.closureFromTearOff"+"("+"this, funcs, reflectionInfo, false, [x], name);"+"return new c(this, funcs[0], x, name);"+"}")(funcs,reflectionInfo,name,H,null):new Function("funcs","reflectionInfo","name","H","c","return function tearOff_"+name+functionCounter++ +"() {"+"if (c === null) c = "+"H.closureFromTearOff"+"("+"this, funcs, reflectionInfo, false, [], name);"+"return new c(this, funcs[0], null, name);"+"}")(funcs,reflectionInfo,name,H,null)}function tearOff(funcs,reflectionInfo,isStatic,name,isIntercepted){var cache;return isStatic?function(){if(cache===void 0)cache=H.closureFromTearOff(this,funcs,reflectionInfo,true,[],name).prototype;return cache}:tearOffGetter(funcs,reflectionInfo,name,isIntercepted)}var functionCounter=0;if(!init.libraries)init.libraries=[];if(!init.mangledNames)init.mangledNames=map();if(!init.mangledGlobalNames)init.mangledGlobalNames=map();if(!init.statics)init.statics=map();if(!init.typeInformation)init.typeInformation=map();if(!init.globalFunctions)init.globalFunctions=map();var libraries=init.libraries;var mangledNames=init.mangledNames;var mangledGlobalNames=init.mangledGlobalNames;var hasOwnProperty=Object.prototype.hasOwnProperty;var length=programData.length;var processedClasses=map();processedClasses.collected=map();processedClasses.pending=map();processedClasses.constructorsList=[];processedClasses.combinedConstructorFunction="function $reflectable(fn){fn.$reflectable=1;return fn};\n"+"var $desc;\n";for(var i=0;i<length;i++){var data=programData[i];var name=data[0];var uri=data[1];var metadata=data[2];var globalObject=data[3];var descriptor=data[4];var isRoot=!!data[5];var fields=descriptor&&descriptor["^"];if(fields instanceof Array)fields=fields[0];var classes=[];var functions=[];processStatics(descriptor,processedClasses);libraries.push([name,uri,classes,functions,metadata,fields,isRoot,globalObject])}finishClasses(processedClasses)}Isolate.functionThatReturnsNull=function(){};var dart=[["_foreign_helper","dart:_foreign_helper",,H,{"^":"",JS_CONST:{"^":"Object;code"}}],["_interceptors","dart:_interceptors",,J,{"^":"",getInterceptor:function(object){return void 0},Interceptor:{"^":"Object;",$eq:function(receiver,other){return receiver===other},get$hashCode:function(receiver){return H.Primitives_objectHashCode(receiver)},toString$0:function(receiver){return H.Primitives_objectToHumanReadableString(receiver)}},JSBool:{"^":"Interceptor;",toString$0:function(receiver){return String(receiver)},get$hashCode:function(receiver){return receiver?519018:218159},$isbool:1},JSNull:{"^":"Interceptor;",$eq:function(receiver,other){return null==other},toString$0:function(receiver){return"null"},get$hashCode:function(receiver){return 0}},JSArray0:{"^":"Interceptor;",checkGrowable$1:function(receiver,reason){if(!!receiver.fixed$length)throw H.wrapException(new P.UnsupportedError(reason))},toString$0:function(receiver){return P.IterableBase_iterableToFullString(receiver,"[","]")},get$hashCode:function(receiver){return H.Primitives_objectHashCode(receiver)},get$length:function(receiver){return receiver.length},set$length:function(receiver,newLength){this.checkGrowable$1(receiver,"set length");if(typeof newLength!=="number"||Math.floor(newLength)!==newLength)throw H.wrapException(P.ArgumentError$value(newLength,"newLength",null));if(newLength<0)throw H.wrapException(P.RangeError$range(newLength,0,null,"newLength",null));receiver.length=newLength},$isList:1},JSUnmodifiableArray:{"^":"JSArray0;"},ArrayIterator:{"^":"Object;_iterable,_length,_index,_current",moveNext$0:function(){var t1,$length,t2;t1=this._iterable;$length=t1.length;if(this._length!==$length)throw H.wrapException(H.throwConcurrentModificationError(t1));t2=this._index;if(t2>=$length){this._current=null;return false}this._current=t1[t2];this._index=t2+1;return true}},JSNumber:{"^":"Interceptor;",compareTo$1:function(receiver,b){var bIsNegative;if(typeof b!=="number")throw H.wrapException(H.argumentErrorValue(b));if(receiver<b)return-1;else if(receiver>b)return 1;else if(receiver===b){if(receiver===0){bIsNegative=this.get$isNegative(b);if(this.get$isNegative(receiver)===bIsNegative)return 0;if(this.get$isNegative(receiver))return-1;return 1}return 0}else if(isNaN(receiver)){if(isNaN(b))return 0;return 1}else return-1},get$isNegative:function(receiver){return receiver===0?1/receiver<0:receiver<0},abs$0:function(receiver){return Math.abs(receiver)},toInt$0:function(receiver){var t1;if(receiver>=-2147483648&&receiver<=2147483647)return receiver|0;if(isFinite(receiver)){t1=receiver<0?Math.ceil(receiver):Math.floor(receiver);return t1+0}throw H.wrapException(new P.UnsupportedError(""+receiver+".toInt()"))},floor$0:function(receiver){var truncated,d;if(receiver>=0){if(receiver<=2147483647)return receiver|0}else if(receiver>=-2147483648){truncated=receiver|0;return receiver===truncated?truncated:truncated-1}d=Math.floor(receiver);if(isFinite(d))return d;throw H.wrapException(new P.UnsupportedError(""+receiver+".floor()"))},toRadixString$1:function(receiver,radix){var result,match,t1,exponent;if(radix<2||radix>36)throw H.wrapException(P.RangeError$range(radix,2,36,"radix",null));result=receiver.toString(radix);if(C.JSString_methods.codeUnitAt$1(result,result.length-1)!==41)return result;match=/^([\da-z]+)(?:\.([\da-z]+))?\(e\+(\d+)\)$/.exec(result);if(match==null)H.throwExpression(new P.UnsupportedError("Unexpected toString result: "+result));t1=match.length;if(1>=t1)return H.ioore(match,1);result=match[1];if(3>=t1)return H.ioore(match,3);exponent=+match[3];t1=match[2];if(t1!=null){result+=t1;exponent-=t1.length}return result+C.JSString_methods.$mul("0",exponent)},toString$0:function(receiver){if(receiver===0&&1/receiver<0)return"-0.0";else return""+receiver},get$hashCode:function(receiver){return receiver&536870911},$negate:function(receiver){return-receiver},$add:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));return receiver+other},$sub:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));return receiver-other},$mul:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));return receiver*other},$mod:function(receiver,other){var result;if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));result=receiver%other;if(result===0)return 0;if(result>0)return result;if(other<0)return result-other;else return result+other},$tdiv:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));if((receiver|0)===receiver)if(other>=1||other<-1)return receiver/other|0;return this._tdivSlow$1(receiver,other)},_tdivSlow$1:function(receiver,other){var quotient=receiver/other;if(quotient>=-2147483648&&quotient<=2147483647)return quotient|0;if(quotient>0){if(quotient!==1/0)return Math.floor(quotient)}else if(quotient>-1/0)return Math.ceil(quotient);throw H.wrapException(new P.UnsupportedError("Result of truncating division is "+H.S(quotient)+": "+H.S(receiver)+" ~/ "+H.S(other)))},$shl:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));if(other<0)throw H.wrapException(H.argumentErrorValue(other));return other>31?0:receiver<<other>>>0},_shlPositive$1:function(receiver,other){return other>31?0:receiver<<other>>>0},$shr:function(receiver,other){var t1;if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));if(other<0)throw H.wrapException(H.argumentErrorValue(other));if(receiver>0)t1=other>31?0:receiver>>>other;else{t1=other>31?31:other;t1=receiver>>t1>>>0}return t1},_shrOtherPositive$1:function(receiver,other){var t1;if(receiver>0)t1=other>31?0:receiver>>>other;else{t1=other>31?31:other;t1=receiver>>t1>>>0}return t1},$and:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));return(receiver&other)>>>0},$or:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));return(receiver|other)>>>0},$lt:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));return receiver<other},$gt:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));return receiver>other},$le:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));return receiver<=other},$ge:function(receiver,other){if(typeof other!=="number")throw H.wrapException(H.argumentErrorValue(other));return receiver>=other},$isnum:1},JSInt:{"^":"JSNumber;",$not:function(receiver){return~receiver>>>0},$isnum:1,$isint:1},JSDouble:{"^":"JSNumber;",$isnum:1},JSString:{"^":"Interceptor;",codeUnitAt$1:function(receiver,index){if(index<0)throw H.wrapException(H.diagnoseIndexError(receiver,index));if(index>=receiver.length)H.throwExpression(H.diagnoseIndexError(receiver,index));return receiver.charCodeAt(index)},_codeUnitAt$1:function(receiver,index){if(index>=receiver.length)throw H.wrapException(H.diagnoseIndexError(receiver,index));return receiver.charCodeAt(index)},$add:function(receiver,other){if(typeof other!=="string")throw H.wrapException(P.ArgumentError$value(other,null,null));return receiver+other},substring$2:function(receiver,startIndex,endIndex){if(endIndex==null)endIndex=receiver.length;if(startIndex>endIndex)throw H.wrapException(P.RangeError$value(startIndex,null,null));if(endIndex>receiver.length)throw H.wrapException(P.RangeError$value(endIndex,null,null));return receiver.substring(startIndex,endIndex)},substring$1:function($receiver,startIndex){return this.substring$2($receiver,startIndex,null)},$mul:function(receiver,times){var s,result;if(typeof times!=="number")return H.iae(times);if(0>=times)return"";if(times===1||receiver.length===0)return receiver;if(times!==times>>>0)throw H.wrapException(C.C_OutOfMemoryError);for(s=receiver,result="";true;){if((times&1)===1)result=s+result;times=times>>>1;if(times===0)break;s+=s}return result},compareTo$1:function(receiver,other){var t1;if(typeof other!=="string")throw H.wrapException(H.argumentErrorValue(other));if(receiver===other)t1=0;else t1=receiver<other?-1:1;return t1},toString$0:function(receiver){return receiver},get$hashCode:function(receiver){var t1,hash,i;for(t1=receiver.length,hash=0,i=0;i<t1;++i){hash=536870911&hash+receiver.charCodeAt(i);hash=536870911&hash+((524287&hash)<<10);hash^=hash>>6}hash=536870911&hash+((67108863&hash)<<3);hash^=hash>>11;return 536870911&hash+((16383&hash)<<15)},get$length:function(receiver){return receiver.length},$isString:1}}],["_js_helper","dart:_js_helper",,H,{"^":"",getType:function(index){return init.types[index]},S:function(value){var res;if(typeof value==="string")return value;if(typeof value==="number"){if(value!==0)return""+value}else if(true===value)return"true";else if(false===value)return"false";else if(value==null)return"null";res=J.toString$0$(value);if(typeof res!=="string")throw H.wrapException(H.argumentErrorValue(value));return res},Primitives_objectHashCode:function(object){var hash=object.$identityHash;if(hash==null){hash=Math.random()*1073741823|0;object.$identityHash=hash}return hash},Primitives__parseIntError:function(source,handleError){return handleError.call$1(source)},Primitives_parseInt:function(source,radix,handleError){var match,decimalMatch;if(typeof source!=="string")H.throwExpression(H.argumentErrorValue(source));match=/^\s*[+-]?((0x[a-f0-9]+)|(\d+)|([a-z0-9]+))\s*$/i.exec(source);if(match==null)return H.Primitives__parseIntError(source,handleError);if(3>=match.length)return H.ioore(match,3);decimalMatch=match[3];if(decimalMatch!=null)return parseInt(source,10);if(match[2]!=null)return parseInt(source,16);return H.Primitives__parseIntError(source,handleError)},Primitives_objectTypeName:function(object){var interceptor,interceptorConstructor,interceptorConstructorName,$name,dispatchName,objectConstructor,match,decompiledName;interceptor=J.getInterceptor(object);interceptorConstructor=interceptor.constructor;if(typeof interceptorConstructor=="function"){interceptorConstructorName=interceptorConstructor.name;$name=typeof interceptorConstructorName==="string"?interceptorConstructorName:null}else $name=null;if($name==null||interceptor===C.Interceptor_methods||!!J.getInterceptor(object).$isUnknownJavaScriptObject){dispatchName=C.JS_CONST_u2C(object);if(dispatchName==="Object"){objectConstructor=object.constructor;if(typeof objectConstructor=="function"){match=String(objectConstructor).match(/^\s*function\s*([\w$]*)\s*\(/);decompiledName=match==null?null:match[1];if(typeof decompiledName==="string"&&/^\w+$/.test(decompiledName))$name=decompiledName}if($name==null)$name=dispatchName}else $name=dispatchName}$name=$name;if($name.length>1&&C.JSString_methods._codeUnitAt$1($name,0)===36)$name=C.JSString_methods.substring$1($name,1);return function(str,names){return str.replace(/[^<,> ]+/g,function(m){return names[m]||m})}($name+H.joinArguments(H.getRuntimeTypeInfo(object),0,null),init.mangledGlobalNames)},Primitives_objectToHumanReadableString:function(object){return"Instance of '"+H.Primitives_objectTypeName(object)+"'"},Primitives_dateNow:[function(){return Date.now()},"call$0","_js_helper_Primitives_dateNow$closure",0,0,2],Primitives_initTicker:function(){var $window,performance;if($.Primitives_timerFrequency!=null)return;$.Primitives_timerFrequency=1000;$.Primitives_timerTicks=H._js_helper_Primitives_dateNow$closure();if(typeof window=="undefined")return;$window=window;if($window==null)return;performance=$window.performance;if(performance==null)return;if(typeof performance.now!="function")return;$.Primitives_timerFrequency=1000000;$.Primitives_timerTicks=new H.Primitives_initTicker_closure(performance)},iae:function(argument){throw H.wrapException(H.argumentErrorValue(argument))},ioore:function(receiver,index){if(receiver==null)J.get$length$as(receiver);throw H.wrapException(H.diagnoseIndexError(receiver,index))},diagnoseIndexError:function(indexable,index){var $length;if(typeof index!=="number"||Math.floor(index)!==index)return new P.ArgumentError(true,index,"index",null);$length=J.get$length$as(indexable);if(index<0||index>=$length)return P.IndexError$(index,indexable,"index",null,$length);return P.RangeError$value(index,"index",null)},argumentErrorValue:function(object){return new P.ArgumentError(true,object,null,null)},checkNum:function(value){if(typeof value!=="number")throw H.wrapException(H.argumentErrorValue(value));return value},wrapException:function(ex){var wrapper;if(ex==null)ex=new P.NullThrownError;wrapper=new Error;wrapper.dartException=ex;if("defineProperty"in Object){Object.defineProperty(wrapper,"message",{get:H.toStringWrapper});wrapper.name=""}else wrapper.toString=H.toStringWrapper;return wrapper},toStringWrapper:function(){return J.toString$0$(this.dartException)},throwExpression:function(ex){throw H.wrapException(ex)},throwConcurrentModificationError:function(collection){throw H.wrapException(new P.ConcurrentModificationError(collection))},Closure_fromTearOff:function(receiver,functions,reflectionInfo,isStatic,jsArguments,propertyName){var $function,callName,functionType,$prototype,$constructor,t1,isIntercepted,trampoline,signatureFunction,getReceiver,i,stub,stubCallName,t2;$function=functions[0];callName=$function.$callName;if(!!J.getInterceptor(reflectionInfo).$isList){$function.$reflectionInfo=reflectionInfo;functionType=H.ReflectionInfo_ReflectionInfo($function).functionType}else functionType=reflectionInfo;$prototype=isStatic?Object.create(new H.StaticClosure().constructor.prototype):Object.create(new H.BoundClosure(null,null,null,null).constructor.prototype);$prototype.$initialize=$prototype.constructor;if(isStatic)$constructor=function(){this.$initialize()};else{t1=$.Closure_functionCounter;$.Closure_functionCounter=J.$add$ns(t1,1);$constructor=new Function("a,b,c,d"+t1,"this.$initialize(a,b,c,d"+t1+")")}$prototype.constructor=$constructor;$constructor.prototype=$prototype;if(!isStatic){isIntercepted=jsArguments.length==1&&true;trampoline=H.Closure_forwardCallTo(receiver,$function,isIntercepted);trampoline.$reflectionInfo=reflectionInfo}else{$prototype.$static_name=propertyName;trampoline=$function;isIntercepted=false}if(typeof functionType=="number")signatureFunction=function(getType,t){return function(){return getType(t)}}(H.getType,functionType);else if(typeof functionType=="function"){if(isStatic)signatureFunction=functionType;else{getReceiver=isIntercepted?H.BoundClosure_receiverOf:H.BoundClosure_selfOf;signatureFunction=function(f,r){return function(){return f.apply({$receiver:r(this)},arguments)}}(functionType,getReceiver)}}else throw H.wrapException("Error in reflectionInfo.");$prototype.$signature=signatureFunction;$prototype[callName]=trampoline;for(t1=functions.length,i=1;i<t1;++i){stub=functions[i];stubCallName=stub.$callName;if(stubCallName!=null){t2=isStatic?stub:H.Closure_forwardCallTo(receiver,stub,isIntercepted);$prototype[stubCallName]=t2}}$prototype["call*"]=trampoline;$prototype.$requiredArgCount=$function.$requiredArgCount;$prototype.$defaultValues=$function.$defaultValues;return $constructor},Closure_cspForwardCall:function(arity,isSuperCall,stubName,$function){var getSelf=H.BoundClosure_selfOf;switch(isSuperCall?-1:arity){case 0:return function(n,S){return function(){return S(this)[n]()}}(stubName,getSelf);case 1:return function(n,S){return function(a){return S(this)[n](a)}}(stubName,getSelf);case 2:return function(n,S){return function(a,b){return S(this)[n](a,b)}}(stubName,getSelf);case 3:return function(n,S){return function(a,b,c){return S(this)[n](a,b,c)}}(stubName,getSelf);case 4:return function(n,S){return function(a,b,c,d){return S(this)[n](a,b,c,d)}}(stubName,getSelf);case 5:return function(n,S){return function(a,b,c,d,e){return S(this)[n](a,b,c,d,e)}}(stubName,getSelf);default:return function(f,s){return function(){return f.apply(s(this),arguments)}}($function,getSelf);}},Closure_forwardCallTo:function(receiver,$function,isIntercepted){var stubName,arity,lookedUpFunction,t1,t2,selfName,$arguments;if(isIntercepted)return H.Closure_forwardInterceptedCallTo(receiver,$function);stubName=$function.$stubName;arity=$function.length;lookedUpFunction=receiver[stubName];t1=$function==null?lookedUpFunction==null:$function===lookedUpFunction;t2=!t1||arity>=27;if(t2)return H.Closure_cspForwardCall(arity,!t1,stubName,$function);if(arity===0){t1=$.Closure_functionCounter;$.Closure_functionCounter=J.$add$ns(t1,1);selfName="self"+H.S(t1);t1="return function(){var "+selfName+" = this.";t2=$.BoundClosure_selfFieldNameCache;if(t2==null){t2=H.BoundClosure_computeFieldNamed("self");$.BoundClosure_selfFieldNameCache=t2}return new Function(t1+H.S(t2)+";return "+selfName+"."+H.S(stubName)+"();}")()}$arguments="abcdefghijklmnopqrstuvwxyz".split("").splice(0,arity).join(",");t1=$.Closure_functionCounter;$.Closure_functionCounter=J.$add$ns(t1,1);$arguments+=H.S(t1);t1="return function("+$arguments+"){return this.";t2=$.BoundClosure_selfFieldNameCache;if(t2==null){t2=H.BoundClosure_computeFieldNamed("self");$.BoundClosure_selfFieldNameCache=t2}return new Function(t1+H.S(t2)+"."+H.S(stubName)+"("+$arguments+");}")()},Closure_cspForwardInterceptedCall:function(arity,isSuperCall,$name,$function){var getSelf,getReceiver;getSelf=H.BoundClosure_selfOf;getReceiver=H.BoundClosure_receiverOf;switch(isSuperCall?-1:arity){case 0:throw H.wrapException(new H.RuntimeError("Intercepted function with no arguments."));case 1:return function(n,s,r){return function(){return s(this)[n](r(this))}}($name,getSelf,getReceiver);case 2:return function(n,s,r){return function(a){return s(this)[n](r(this),a)}}($name,getSelf,getReceiver);case 3:return function(n,s,r){return function(a,b){return s(this)[n](r(this),a,b)}}($name,getSelf,getReceiver);case 4:return function(n,s,r){return function(a,b,c){return s(this)[n](r(this),a,b,c)}}($name,getSelf,getReceiver);case 5:return function(n,s,r){return function(a,b,c,d){return s(this)[n](r(this),a,b,c,d)}}($name,getSelf,getReceiver);case 6:return function(n,s,r){return function(a,b,c,d,e){return s(this)[n](r(this),a,b,c,d,e)}}($name,getSelf,getReceiver);default:return function(f,s,r,a){return function(){a=[r(this)];Array.prototype.push.apply(a,arguments);return f.apply(s(this),a)}}($function,getSelf,getReceiver);}},Closure_forwardInterceptedCallTo:function(receiver,$function){var selfField,t1,stubName,arity,lookedUpFunction,t2,t3,$arguments;selfField=H.BoundClosure_selfFieldName();t1=$.BoundClosure_receiverFieldNameCache;if(t1==null){t1=H.BoundClosure_computeFieldNamed("receiver");$.BoundClosure_receiverFieldNameCache=t1}stubName=$function.$stubName;arity=$function.length;lookedUpFunction=receiver[stubName];t2=$function==null?lookedUpFunction==null:$function===lookedUpFunction;t3=!t2||arity>=28;if(t3)return H.Closure_cspForwardInterceptedCall(arity,!t2,stubName,$function);if(arity===1){t1="return function(){return this."+H.S(selfField)+"."+H.S(stubName)+"(this."+H.S(t1)+");";t2=$.Closure_functionCounter;$.Closure_functionCounter=J.$add$ns(t2,1);return new Function(t1+H.S(t2)+"}")()}$arguments="abcdefghijklmnopqrstuvwxyz".split("").splice(0,arity-1).join(",");t1="return function("+$arguments+"){return this."+H.S(selfField)+"."+H.S(stubName)+"(this."+H.S(t1)+", "+$arguments+");";t2=$.Closure_functionCounter;$.Closure_functionCounter=J.$add$ns(t2,1);return new Function(t1+H.S(t2)+"}")()},closureFromTearOff:function(receiver,functions,reflectionInfo,isStatic,jsArguments,$name){var t1;functions.fixed$length=Array;if(!!J.getInterceptor(reflectionInfo).$isList){reflectionInfo.fixed$length=Array;t1=reflectionInfo}else t1=reflectionInfo;return H.Closure_fromTearOff(receiver,functions,t1,!!isStatic,jsArguments,$name)},throwCyclicInit:function(staticName){throw H.wrapException(new P.CyclicInitializationError(staticName))},getRuntimeTypeInfo:function(target){if(target==null)return;return target.$ti},runtimeTypeToString:function(rti,onTypeVariable){var typedefInfo;if(rti==null)return"dynamic";if(typeof rti==="object"&&rti!==null&&rti.constructor===Array)return rti[0].builtin$cls+H.joinArguments(rti,1,onTypeVariable);if(typeof rti=="function")return rti.builtin$cls;if(typeof rti==="number"&&Math.floor(rti)===rti)return H.S(rti);if(typeof rti.func!="undefined"){typedefInfo=rti.typedef;if(typedefInfo!=null)return H.runtimeTypeToString(typedefInfo,onTypeVariable);return H._functionRtiToString(rti,onTypeVariable)}return"unknown-reified-type"},_functionRtiToString:function(rti,onTypeVariable){var returnTypeText,$arguments,t1,argumentsText,sep,_i,argument,optionalArguments,namedArguments,t2,$name;returnTypeText=!!rti.v?"void":H.runtimeTypeToString(rti.ret,onTypeVariable);if("args"in rti){$arguments=rti.args;for(t1=$arguments.length,argumentsText="",sep="",_i=0;_i<t1;++_i,sep=", "){argument=$arguments[_i];argumentsText=argumentsText+sep+H.runtimeTypeToString(argument,onTypeVariable)}}else{argumentsText="";sep=""}if("opt"in rti){optionalArguments=rti.opt;argumentsText+=sep+"[";for(t1=optionalArguments.length,sep="",_i=0;_i<t1;++_i,sep=", "){argument=optionalArguments[_i];argumentsText=argumentsText+sep+H.runtimeTypeToString(argument,onTypeVariable)}argumentsText+="]"}if("named"in rti){namedArguments=rti.named;argumentsText+=sep+"{";for(t1=H.extractKeys(namedArguments),t2=t1.length,sep="",_i=0;_i<t2;++_i,sep=", "){$name=t1[_i];argumentsText=argumentsText+sep+H.runtimeTypeToString(namedArguments[$name],onTypeVariable)+(" "+H.S($name))}argumentsText+="}"}return"("+argumentsText+") => "+returnTypeText},joinArguments:function(types,startIndex,onTypeVariable){var buffer,index,firstArgument,allDynamic,t1,argument;if(types==null)return"";buffer=new P.StringBuffer("");for(index=startIndex,firstArgument=true,allDynamic=true,t1="";index<types.length;++index){if(firstArgument)firstArgument=false;else buffer._contents=t1+", ";argument=types[index];if(argument!=null)allDynamic=false;t1=buffer._contents+=H.runtimeTypeToString(argument,onTypeVariable)}return allDynamic?"":"<"+buffer.toString$0(0)+">"},ReflectionInfo:{"^":"Object;jsFunction,data<,isAccessor,requiredParameterCount,optionalParameterCount,areOptionalParametersNamed,functionType,cachedSortedIndices",static:{ReflectionInfo_ReflectionInfo:function(jsFunction){var data,requiredParametersInfo,optionalParametersInfo;data=jsFunction.$reflectionInfo;if(data==null)return;data.fixed$length=Array;data=data;requiredParametersInfo=data[0];optionalParametersInfo=data[1];return new H.ReflectionInfo(jsFunction,data,(requiredParametersInfo&1)===1,requiredParametersInfo>>1,optionalParametersInfo>>1,(optionalParametersInfo&1)===1,data[2],null)}}},Primitives_initTicker_closure:{"^":"Closure;performance",call$0:function(){return C.JSNumber_methods.floor$0(1000*this.performance.now())}},Closure:{"^":"Object;",toString$0:function(_){return"Closure '"+H.Primitives_objectTypeName(this).trim()+"'"},get$$call:function(){return this},get$$call:function(){return this}},TearOffClosure:{"^":"Closure;"},StaticClosure:{"^":"TearOffClosure;",toString$0:function(_){var $name=this.$static_name;if($name==null)return"Closure of unknown static method";return"Closure '"+$name+"'"}},BoundClosure:{"^":"TearOffClosure;_self,_target,_receiver,_name",$eq:function(_,other){if(other==null)return false;if(this===other)return true;if(!(other instanceof H.BoundClosure))return false;return this._self===other._self&&this._target===other._target&&this._receiver===other._receiver},get$hashCode:function(_){var t1,receiverHashCode;t1=this._receiver;if(t1==null)receiverHashCode=H.Primitives_objectHashCode(this._self);else receiverHashCode=typeof t1!=="object"?J.get$hashCode$(t1):H.Primitives_objectHashCode(t1);return(receiverHashCode^H.Primitives_objectHashCode(this._target))>>>0},toString$0:function(_){var receiver=this._receiver;if(receiver==null)receiver=this._self;return"Closure '"+H.S(this._name)+"' of "+H.Primitives_objectToHumanReadableString(receiver)},static:{BoundClosure_selfOf:function(closure){return closure._self},BoundClosure_receiverOf:function(closure){return closure._receiver},BoundClosure_selfFieldName:function(){var t1=$.BoundClosure_selfFieldNameCache;if(t1==null){t1=H.BoundClosure_computeFieldNamed("self");$.BoundClosure_selfFieldNameCache=t1}return t1},BoundClosure_computeFieldNamed:function(fieldName){var template,t1,names,i,$name;template=new H.BoundClosure("self","target","receiver","name");t1=Object.getOwnPropertyNames(template);t1.fixed$length=Array;names=t1;for(t1=names.length,i=0;i<t1;++i){$name=names[i];if(template[$name]===fieldName)return $name}}}},RuntimeError:{"^":"Error;message",toString$0:function(_){return"RuntimeError: "+this.message}},JsLinkedHashMap:{"^":"Object;__js_helper$_length,_strings,_nums,_rest,_first,_last,_modifications",get$length:function(_){return this.__js_helper$_length},$index:function(_,key){var nums,cell;if((key&67108863)===key){nums=this._nums;if(nums==null)return;cell=this._getTableCell$2(nums,key);return cell==null?null:cell.get$hashMapCellValue()}else return this.internalGet$1(key)},internalGet$1:function(key){var rest,bucket,index;rest=this._rest;if(rest==null)return;bucket=this._getTableBucket$2(rest,C.JSInt_methods.get$hashCode(key)&67108863);index=this.internalFindBucketIndex$2(bucket,key);if(index<0)return;return bucket[index].get$hashMapCellValue()},$indexSet:function(_,key,value){var strings,nums,rest,hash,bucket,index;if(typeof key==="string"){strings=this._strings;if(strings==null){strings=this._newHashTable$0();this._strings=strings}this._addHashTableEntry$3(strings,key,value)}else if(typeof key==="number"&&(key&67108863)===key){nums=this._nums;if(nums==null){nums=this._newHashTable$0();this._nums=nums}this._addHashTableEntry$3(nums,key,value)}else{rest=this._rest;if(rest==null){rest=this._newHashTable$0();this._rest=rest}hash=J.get$hashCode$(key)&67108863;bucket=this._getTableBucket$2(rest,hash);if(bucket==null)this._setTableEntry$3(rest,hash,[this._newLinkedCell$2(key,value)]);else{index=this.internalFindBucketIndex$2(bucket,key);if(index>=0)bucket[index].set$hashMapCellValue(value);else bucket.push(this._newLinkedCell$2(key,value))}}},forEach$1:function(_,action){var cell,modifications;cell=this._first;modifications=this._modifications;for(;cell!=null;){action.call$2(cell.hashMapCellKey,cell.hashMapCellValue);if(modifications!==this._modifications)throw H.wrapException(new P.ConcurrentModificationError(this));cell=cell._next}},_addHashTableEntry$3:function(table,key,value){var cell=this._getTableCell$2(table,key);if(cell==null)this._setTableEntry$3(table,key,this._newLinkedCell$2(key,value));else cell.set$hashMapCellValue(value)},_newLinkedCell$2:function(key,value){var cell,last;cell=new H.LinkedHashMapCell(key,value,null,null);if(this._first==null){this._last=cell;this._first=cell}else{last=this._last;cell._previous=last;last._next=cell;this._last=cell}++this.__js_helper$_length;this._modifications=this._modifications+1&67108863;return cell},internalFindBucketIndex$2:function(bucket,key){var $length,i;if(bucket==null)return-1;$length=bucket.length;for(i=0;i<$length;++i)if(J.$eq$(bucket[i].get$hashMapCellKey(),key))return i;return-1},toString$0:function(_){return P.Maps_mapToString(this)},_getTableCell$2:function(table,key){return table[key]},_getTableBucket$2:function(table,key){return table[key]},_setTableEntry$3:function(table,key,value){table[key]=value},_deleteTableEntry$2:function(table,key){delete table[key]},_newHashTable$0:function(){var table=Object.create(null);this._setTableEntry$3(table,"<non-identifier-key>",table);this._deleteTableEntry$2(table,"<non-identifier-key>");return table}},LinkedHashMapCell:{"^":"Object;hashMapCellKey<,hashMapCellValue@,_next,_previous"}}],["dart._js_names","dart:_js_names",,H,{"^":"",extractKeys:function(victim){var t1=victim?Object.keys(victim):[];t1.fixed$length=Array;return t1}}],["dart2js._js_primitives","dart:_js_primitives",,H,{"^":"",printString:function(string){if(typeof dartPrint=="function"){dartPrint(string);return}if(typeof console=="object"&&typeof console.log!="undefined"){console.log(string);return}if(typeof window=="object")return;if(typeof print=="function"){print(string);return}throw"Unable to print message: "+String(string)}}],["dart.collection","dart:collection",,P,{"^":"",IterableBase_iterableToFullString:function(iterable,leftDelimiter,rightDelimiter){var buffer,t1,t2;if(P._isToStringVisiting(iterable))return leftDelimiter+"..."+rightDelimiter;buffer=new P.StringBuffer(leftDelimiter);t1=$.$get$_toStringVisiting();t1.push(iterable);try{t2=buffer;t2._contents=P.StringBuffer__writeAll(t2.get$_contents(),iterable,", ")}finally{if(0>=t1.length)return H.ioore(t1,-1);t1.pop()}t1=buffer;t1._contents=t1.get$_contents()+rightDelimiter;t1=buffer.get$_contents();return t1.charCodeAt(0)==0?t1:t1},_isToStringVisiting:function(o){var i,t1;for(i=0;t1=$.$get$_toStringVisiting(),i<t1.length;++i)if(o===t1[i])return true;return false},Maps_mapToString:function(m){var t1,result,t2;t1={};if(P._isToStringVisiting(m))return"{...}";result=new P.StringBuffer("");try{$.$get$_toStringVisiting().push(m);t2=result;t2._contents=t2.get$_contents()+"{";t1.first=true;m.forEach$1(0,new P.Maps_mapToString_closure(t1,result));t1=result;t1._contents=t1.get$_contents()+"}"}finally{t1=$.$get$_toStringVisiting();if(0>=t1.length)return H.ioore(t1,-1);t1.pop()}t1=result.get$_contents();return t1.charCodeAt(0)==0?t1:t1},Maps_mapToString_closure:{"^":"Closure;_box_0,result",call$2:function(k,v){var t1,t2;t1=this._box_0;if(!t1.first)this.result._contents+=", ";t1.first=false;t1=this.result;t2=t1._contents+=H.S(k);t1._contents=t2+": ";t1._contents+=H.S(v)}}}],["dart.core","dart:core",,P,{"^":"",Error_safeToString:function(object){if(typeof object==="number"||typeof object==="boolean"||null==object)return J.toString$0$(object);if(typeof object==="string")return JSON.stringify(object);return P.Error__objectToString(object)},Error__objectToString:function(object){var t1=J.getInterceptor(object);if(!!t1.$isClosure)return t1.toString$0(object);return H.Primitives_objectToHumanReadableString(object)},bool:{"^":"Object;",get$hashCode:function(_){return P.Object.prototype.get$hashCode.call(this,this)},toString$0:function(_){return this?"true":"false"}},"+bool":0,double:{"^":"num;"},"+double":0,Error:{"^":"Object;"},NullThrownError:{"^":"Error;",toString$0:function(_){return"Throw of null."}},ArgumentError:{"^":"Error;_hasValue,invalidValue,name,message",get$_errorName:function(){return"Invalid argument"+(!this._hasValue?"(s)":"")},get$_errorExplanation:function(){return""},toString$0:function(_){var t1,nameString,message,prefix,explanation,errorValue;t1=this.name;nameString=t1!=null?" ("+t1+")":"";t1=this.message;message=t1==null?"":": "+t1;prefix=this.get$_errorName()+nameString+message;if(!this._hasValue)return prefix;explanation=this.get$_errorExplanation();errorValue=P.Error_safeToString(this.invalidValue);return prefix+explanation+": "+H.S(errorValue)},static:{ArgumentError$value:function(value,$name,message){return new P.ArgumentError(true,value,$name,message)}}},RangeError:{"^":"ArgumentError;start,end,_hasValue,invalidValue,name,message",get$_errorName:function(){return"RangeError"},get$_errorExplanation:function(){var t1,explanation,t2;t1=this.start;if(t1==null){t1=this.end;explanation=t1!=null?": Not less than or equal to "+H.S(t1):""}else{t2=this.end;if(t2==null)explanation=": Not greater than or equal to "+H.S(t1);else if(t2>t1)explanation=": Not in range "+H.S(t1)+".."+H.S(t2)+", inclusive";else explanation=t2<t1?": Valid value range is empty":": Only valid value is "+H.S(t1)}return explanation},static:{RangeError$value:function(value,$name,message){return new P.RangeError(null,null,true,value,$name,"Value not in range")},RangeError$range:function(invalidValue,minValue,maxValue,$name,message){return new P.RangeError(minValue,maxValue,true,invalidValue,$name,"Invalid value")}}},IndexError:{"^":"ArgumentError;indexable,length>,_hasValue,invalidValue,name,message",get$_errorName:function(){return"RangeError"},get$_errorExplanation:function(){if(J.$lt$n(this.invalidValue,0))return": index must not be negative";var t1=this.length;if(t1===0)return": no indices are valid";return": index should be less than "+t1},static:{IndexError$:function(invalidValue,indexable,$name,message,$length){return new P.IndexError(indexable,$length,true,invalidValue,$name,"Index out of range")}}},UnsupportedError:{"^":"Error;message",toString$0:function(_){return"Unsupported operation: "+this.message}},ConcurrentModificationError:{"^":"Error;modifiedObject",toString$0:function(_){var t1=this.modifiedObject;if(t1==null)return"Concurrent modification during iteration.";return"Concurrent modification during iteration: "+H.S(P.Error_safeToString(t1))+"."}},OutOfMemoryError:{"^":"Object;",toString$0:function(_){return"Out of Memory"}},CyclicInitializationError:{"^":"Error;variableName",toString$0:function(_){var t1=this.variableName;return t1==null?"Reading static variable during its initialization":"Reading static variable '"+H.S(t1)+"' during its initialization"}},int:{"^":"num;"},"+int":0,List:{"^":"Object;"},"+List":0,Null:{"^":"Object;",get$hashCode:function(_){return P.Object.prototype.get$hashCode.call(this,this)},toString$0:function(_){return"null"}},"+Null":0,num:{"^":"Object;"},"+num":0,Object:{"^":";",$eq:function(_,other){return this===other},get$hashCode:function(_){return H.Primitives_objectHashCode(this)},toString$0:function(_){return H.Primitives_objectToHumanReadableString(this)},toString:function(){return this.toString$0(this)}},Stopwatch:{"^":"Object;_start,_stop"},String:{"^":"Object;"},"+String":0,StringBuffer:{"^":"Object;_contents<",get$length:function(_){return this._contents.length},toString$0:function(_){var t1=this._contents;return t1.charCodeAt(0)==0?t1:t1},static:{StringBuffer__writeAll:function(string,objects,separator){var iterator=new J.ArrayIterator(objects,objects.length,0,null);if(!iterator.moveNext$0())return string;if(separator.length===0){do string+=H.S(iterator._current);while(iterator.moveNext$0())}else{string+=H.S(iterator._current);for(;iterator.moveNext$0();)string=string+separator+H.S(iterator._current)}return string}}}}],["bignum","package:bignum/bignum.dart",,Z,{"^":"",BigInteger_ZERO:function(){if($.$get$BigInteger__useJsBigint()===true){var r=B.BigIntegerV8$(null,null,null);r.fromInt$1(0);return r}else return N.BigIntegerDartvm$(0,null,null)},BigInteger_ONE:function(){if($.$get$BigInteger__useJsBigint()===true){var r=B.BigIntegerV8$(null,null,null);r.fromInt$1(1);return r}else return N.BigIntegerDartvm$(1,null,null)},BigInteger_TWO:function(){if($.$get$BigInteger__useJsBigint()===true){var r=B.BigIntegerV8$(null,null,null);r.fromInt$1(2);return r}else return N.BigIntegerDartvm$(2,null,null)},BigInteger_THREE:function(){if($.$get$BigInteger__useJsBigint()===true){var r=B.BigIntegerV8$(null,null,null);r.fromInt$1(3);return r}else return N.BigIntegerDartvm$(3,null,null)},BigInteger_BigInteger:function(a,b,c){if($.$get$BigInteger__useJsBigint()===true)return B.BigIntegerV8$(a,b,c);else return N.BigIntegerDartvm$(a,b,c)},closure:{"^":"Closure;",call$0:function(){return true}}}],["bignum.dartvm","package:bignum/src/big_integer_dartvm.dart",,N,{"^":"",BigIntegerDartvm:{"^":"Object;data<",fromString$2:function(s,b){this.data=H.Primitives_parseInt(s,b,new N.BigIntegerDartvm_fromString_closure)},fromByteArray$2:function(s,fixsign){var t1,v,_i,t2;t1=s.length;if(t1===0){this.data=0;return}if(0>=t1)return H.ioore(s,0);t1=J.$gt$n(J.$and$n(s[0],255),127);if(t1&&true){for(t1=s.length,v=0,_i=0;_i<s.length;s.length===t1||(0,H.throwConcurrentModificationError)(s),++_i){t2=J.$not$i(J.$sub$n(J.$and$n(s[_i],255),256));if(typeof t2!=="number")return H.iae(t2);v=v<<8|t2}this.data=~v>>>0}else{for(t1=s.length,v=0,_i=0;_i<s.length;s.length===t1||(0,H.throwConcurrentModificationError)(s),++_i){t2=J.$and$n(s[_i],255);if(typeof t2!=="number")return H.iae(t2);v=(v<<8|t2)>>>0}this.data=v}},fromByteArray$1:function(s){return this.fromByteArray$2(s,false)},toString$1:function(_,b){return J.toRadixString$1$n(this.data,b)},toString$0:function($receiver){return this.toString$1($receiver,10)},abs$0:function(_){var t1,t2;t1=J.$lt$n(this.data,0);t2=this.data;return t1?N.BigIntegerDartvm$(J.$negate$n(t2),null,null):N.BigIntegerDartvm$(t2,null,null)},compareTo$1:function(_,a){if(typeof a==="number")return J.compareTo$1$ns(this.data,a);if(a instanceof N.BigIntegerDartvm)return J.compareTo$1$ns(this.data,a.data);return 0},subTo$2:function(a,r){r.set$data(J.$sub$n(this.data,a.get$data()))},mod$1:function(a){return N.BigIntegerDartvm$(J.$mod$n(this.data,a.get$data()),null,null)},intValue$0:function(){return this.data},shiftLeft$1:function(n){return N.BigIntegerDartvm$(J.$shl$n(this.data,n),null,null)},add$1:function(_,a){return N.BigIntegerDartvm$(J.$add$ns(this.data,a.get$data()),null,null)},subtract$1:function(a){return N.BigIntegerDartvm$(J.$sub$n(this.data,a.get$data()),null,null)},multiply$1:function(a){return N.BigIntegerDartvm$(J.$mul$ns(this.data,a.get$data()),null,null)},divide$1:function(a){return N.BigIntegerDartvm$(J.$tdiv$n(this.data,a.get$data()),null,null)},$add:function(_,other){return N.BigIntegerDartvm$(J.$add$ns(this.data,other.get$data()),null,null)},$sub:function(_,other){return N.BigIntegerDartvm$(J.$sub$n(this.data,other.get$data()),null,null)},$mul:function(_,other){return N.BigIntegerDartvm$(J.$mul$ns(this.data,other.get$data()),null,null)},$mod:function(_,other){return N.BigIntegerDartvm$(J.$mod$n(this.data,other.get$data()),null,null)},$tdiv:function(_,other){return N.BigIntegerDartvm$(J.$tdiv$n(this.data,other.get$data()),null,null)},$negate:function(_){return N.BigIntegerDartvm$(J.$negate$n(this.data),null,null)},$lt:function(_,other){return J.$lt$n(this.compareTo$1(0,other),0)&&true},$le:function(_,other){return J.$le$n(this.compareTo$1(0,other),0)&&true},$gt:function(_,other){return J.$gt$n(this.compareTo$1(0,other),0)&&true},$ge:function(_,other){return J.$ge$n(this.compareTo$1(0,other),0)&&true},$eq:function(_,other){if(other==null)return false;return J.$eq$(this.compareTo$1(0,other),0)&&true},$and:function(_,other){return N.BigIntegerDartvm$(J.$and$n(this.data,other.get$data()),null,null)},$or:function(_,other){return N.BigIntegerDartvm$(J.$or$n(this.data,other.get$data()),null,null)},$not:function(_){return N.BigIntegerDartvm$(J.$not$i(this.data),null,null)},$shl:function(_,shiftAmount){return N.BigIntegerDartvm$(J.$shl$n(this.data,shiftAmount),null,null)},$shr:function(_,shiftAmount){return N.BigIntegerDartvm$(J.$shr$n(this.data,shiftAmount),null,null)},BigIntegerDartvm$3:function(a,b,c){if(a!=null)if(typeof a==="number"&&Math.floor(a)===a)this.data=a;else if(typeof a==="number")this.data=C.JSNumber_methods.toInt$0(a);else if(!!J.getInterceptor(a).$isList)this.fromByteArray$1(a);else this.fromString$2(a,b)},static:{BigIntegerDartvm$:function(a,b,c){var t1=new N.BigIntegerDartvm(null);t1.BigIntegerDartvm$3(a,b,c);return t1}}},BigIntegerDartvm_fromString_closure:{"^":"Closure;",call$1:function(str){return 0}}}],["bignum.v8","package:bignum/src/big_integer_v8.dart",,B,{"^":"",JSArray:{"^":"Object;data<",$indexSet:function(_,index,value){var t1=J.getInterceptor$n(index);if(t1.$gt(index,this.data.length-1))C.JSArray_methods.set$length(this.data,t1.$add(index,1));t1=this.data;if(index>>>0!==index||index>=t1.length)return H.ioore(t1,index);t1[index]=value;return value}},BigIntegerV8:{"^":"Object;array<,am,t<,s<,_debugging",_am3$6:[function(i,x,w,j,c,n){var this_array,w_array,xl,xh,t1,l,i0,h,m,t2,t3,t4,j0;this_array=this.array;w_array=w.get$array();xl=J.getInterceptor$n(x).toInt$0(x)&16383;xh=C.JSInt_methods._shrOtherPositive$1(C.JSNumber_methods.toInt$0(x),14);for(;n=J.$sub$n(n,1),J.$ge$n(n,0);j=j0,i=i0){t1=this_array.data;if(i>>>0!==i||i>=t1.length)return H.ioore(t1,i);l=J.$and$n(t1[i],16383);i0=i+1;t1=this_array.data;if(i>=t1.length)return H.ioore(t1,i);h=J.$shr$n(t1[i],14);if(typeof l!=="number")return H.iae(l);t1=J.$mul$ns(h,xl);if(typeof t1!=="number")return H.iae(t1);m=xh*l+t1;t1=w_array.data;t2=t1.length;if(j>>>0!==j||j>=t2)return H.ioore(t1,j);t3=t1[j];if(typeof t3!=="number")return H.iae(t3);if(typeof c!=="number")return H.iae(c);l=xl*l+((m&16383)<<14)+t3+c;t3=C.JSNumber_methods._shrOtherPositive$1(l,28);t4=C.JSNumber_methods._shrOtherPositive$1(m,14);if(typeof h!=="number")return H.iae(h);c=t3+t4+xh*h;j0=j+1;if(j>t2-1)C.JSArray_methods.set$length(t1,j0);t1=w_array.data;if(j>=t1.length)return H.ioore(t1,j);t1[j]=l&268435455}return c},"call$6","get$_am3",12,0,1],copyTo$1:function(r){var this_array,r_array,t1,i,t2;this_array=this.array;r_array=r.array;t1=this.t;if(typeof t1!=="number")return t1.$sub();i=t1-1;for(;i>=0;--i){t1=this_array.data;if(i>>>0!==i||i>=t1.length)return H.ioore(t1,i);t1=t1[i];t2=r_array.data;if(i>t2.length-1)C.JSArray_methods.set$length(t2,i+1);t2=r_array.data;if(i>=t2.length)return H.ioore(t2,i);t2[i]=t1}r.t=this.t;r.s=this.s},fromInt$1:function(x){var this_array,t1;this_array=this.array;this.t=1;this.s=x<0?-1:0;if(x>0)this_array.$indexSet(0,0,x);else if(x<-1){t1=$.BigIntegerV8_BI_DV;if(typeof t1!=="number")return H.iae(t1);this_array.$indexSet(0,0,x+t1)}else this.t=0},fromString$2:function(s,b){var this_array,k,i,t1,t2,mi,sh,x,c,t3,t4,t5,t6,r;this_array=this.array;if(b===16)k=4;else if(b===8)k=3;else if(b===256)k=8;else if(b===2)k=1;else if(b===32)k=5;else{if(!(b===4)){this.fromRadix$2(s,b);return}k=2}this.t=0;this.s=0;i=J.get$length$as(s);for(t1=k===8,t2=s.length,mi=false,sh=0;--i,i>=0;){if(t1){if(i>=t2)return H.ioore(s,i);x=C.JSString_methods.$and(s[i],255)}else{c=$.BigIntegerV8_BI_RC.$index(0,C.JSString_methods.codeUnitAt$1(s,i));x=c==null?-1:c}t3=J.getInterceptor$n(x);if(t3.$lt(x,0)){if(i>=t2)return H.ioore(s,i);if(s[i]==="-")mi=true;continue}if(sh===0){t3=this.t;if(typeof t3!=="number")return t3.$add();t4=t3+1;this.t=t4;t5=this_array.data;if(t3>t5.length-1)C.JSArray_methods.set$length(t5,t4);t4=this_array.data;if(t3>>>0!==t3||t3>=t4.length)return H.ioore(t4,t3);t4[t3]=x}else{t4=$.BigIntegerV8_BI_DB;if(typeof t4!=="number")return H.iae(t4);t5=this.t;if(sh+k>t4){if(typeof t5!=="number")return t5.$sub();--t5;t6=this_array.data;if(t5>>>0!==t5||t5>=t6.length)return H.ioore(t6,t5);t4=J.$or$n(t6[t5],J.$shl$n(t3.$and(x,C.JSInt_methods.$shl(1,t4-sh)-1),sh));t6=this_array.data;if(t5>t6.length-1)C.JSArray_methods.set$length(t6,t5+1);t6=this_array.data;if(t5>=t6.length)return H.ioore(t6,t5);t6[t5]=t4;t4=this.t;if(typeof t4!=="number")return t4.$add();t5=t4+1;this.t=t5;t6=$.BigIntegerV8_BI_DB;if(typeof t6!=="number")return t6.$sub();t6=t3.$shr(x,t6-sh);t3=this_array.data;if(t4>t3.length-1)C.JSArray_methods.set$length(t3,t5);t3=this_array.data;if(t4>>>0!==t4||t4>=t3.length)return H.ioore(t3,t4);t3[t4]=t6}else{if(typeof t5!=="number")return t5.$sub();t4=t5-1;t5=this_array.data;if(t4>>>0!==t4||t4>=t5.length)return H.ioore(t5,t4);t3=J.$or$n(t5[t4],t3.$shl(x,sh));t5=this_array.data;if(t4>t5.length-1)C.JSArray_methods.set$length(t5,t4+1);t5=this_array.data;if(t4>=t5.length)return H.ioore(t5,t4);t5[t4]=t3}}sh+=k;t3=$.BigIntegerV8_BI_DB;if(typeof t3!=="number")return H.iae(t3);if(sh>=t3)sh-=t3;mi=false}if(t1){if(0>=t2)return H.ioore(s,0);C.JSString_methods.$and(s[0],128);t1=true}else t1=false;if(t1){this.s=-1;if(sh>0){t1=this.t;if(typeof t1!=="number")return t1.$sub();--t1;t2=this_array.data;if(t1>>>0!==t1||t1>=t2.length)return H.ioore(t2,t1);t2=t2[t1];t3=$.BigIntegerV8_BI_DB;if(typeof t3!=="number")return t3.$sub();this_array.$indexSet(0,t1,J.$or$n(t2,C.JSInt_methods.$shl(C.JSInt_methods.$shl(1,t3-sh)-1,sh)))}}this.clamp$0(0);if(mi){r=B.BigIntegerV8$(null,null,null);r.fromInt$1(0);r.subTo$2(this,this)}},toString$1:function(_,b){var t1;if(J.$lt$n(this.s,0))return"-"+this.negate_op$0().toString$1(0,b);t1=this.toRadix$1(b);return t1},toString$0:function($receiver){return this.toString$1($receiver,null)},negate_op$0:function(){var r,r0;r=B.BigIntegerV8$(null,null,null);r0=B.BigIntegerV8$(null,null,null);r0.fromInt$1(0);r0.subTo$2(this,r);return r},abs$0:function(_){return J.$lt$n(this.s,0)?this.negate_op$0():this},compareTo$1:function(_,a){var this_array,a_array,r,i,t1,t2;if(typeof a==="number")a=B.BigIntegerV8$(a,null,null);this_array=this.array;a_array=a.get$array();r=J.$sub$n(this.s,a.s);if(!J.$eq$(r,0))return r;i=this.t;t1=a.t;if(typeof i!=="number")return i.$sub();if(typeof t1!=="number")return H.iae(t1);r=i-t1;if(r!==0)return r;for(;--i,i>=0;){t1=this_array.data;if(i>>>0!==i||i>=t1.length)return H.ioore(t1,i);t1=t1[i];t2=a_array.data;if(i>=t2.length)return H.ioore(t2,i);r=J.$sub$n(t1,t2[i]);if(!J.$eq$(r,0))return r}return 0},dlShiftTo$2:function(n,r){var this_array,r_array,t1,i,t2,t3;this_array=this.array;r_array=r.array;t1=this.t;if(typeof t1!=="number")return t1.$sub();i=t1-1;for(;i>=0;--i){t1=i+n;t2=this_array.data;if(i>>>0!==i||i>=t2.length)return H.ioore(t2,i);t2=t2[i];t3=r_array.data;if(t1>t3.length-1)C.JSArray_methods.set$length(t3,t1+1);t3=r_array.data;if(t1>>>0!==t1||t1>=t3.length)return H.ioore(t3,t1);t3[t1]=t2}for(i=n-1;i>=0;--i){t1=r_array.data;if(i>t1.length-1)C.JSArray_methods.set$length(t1,i+1);t1=r_array.data;if(i>>>0!==i||i>=t1.length)return H.ioore(t1,i);t1[i]=0}t1=this.t;if(typeof t1!=="number")return t1.$add();r.t=t1+n;r.s=this.s},drShiftTo$2:function(n,r){var this_array,r_array,i,t1,t2,t3;this_array=this.array;r_array=r.array;i=n;while(true){t1=this.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=i-n;t2=this_array.data;if(i>>>0!==i||i>=t2.length)return H.ioore(t2,i);t2=t2[i];t3=r_array.data;if(t1>t3.length-1)C.JSArray_methods.set$length(t3,t1+1);t3=r_array.data;if(t1>>>0!==t1||t1>=t3.length)return H.ioore(t3,t1);t3[t1]=t2;++i}r.t=Math.max(t1-n,0);r.s=this.s},lShiftTo$2:function(n,r){var this_array,r_array,t1,bs,t2,cbs,bm,ds,c,i,t3;this_array=this.array;r_array=r.array;t1=J.getInterceptor$n(n);bs=t1.$mod(n,$.BigIntegerV8_BI_DB);t2=$.BigIntegerV8_BI_DB;if(typeof t2!=="number")return t2.$sub();if(typeof bs!=="number")return H.iae(bs);cbs=t2-bs;bm=C.JSInt_methods.$shl(1,cbs)-1;ds=t1.$tdiv(n,t2);c=J.$and$n(J.$shl$n(this.s,bs),$.BigIntegerV8_BI_DM);t1=this.t;if(typeof t1!=="number")return t1.$sub();i=t1-1;for(;i>=0;--i){if(typeof ds!=="number")return H.iae(ds);t1=i+ds+1;t2=this_array.data;if(i>>>0!==i||i>=t2.length)return H.ioore(t2,i);t2=J.$or$n(J.$shr$n(t2[i],cbs),c);t3=r_array.data;if(t1>t3.length-1)C.JSArray_methods.set$length(t3,t1+1);t3=r_array.data;if(t1>>>0!==t1||t1>=t3.length)return H.ioore(t3,t1);t3[t1]=t2;t2=this_array.data;if(i>=t2.length)return H.ioore(t2,i);c=J.$shl$n(J.$and$n(t2[i],bm),bs)}for(i=J.$sub$n(ds,1);t1=J.getInterceptor$n(i),t1.$ge(i,0);--i){if(t1.$gt(i,r_array.data.length-1))C.JSArray_methods.set$length(r_array.data,t1.$add(i,1));t1=r_array.data;if(i>>>0!==i||i>=t1.length)return H.ioore(t1,i);t1[i]=0}r_array.$indexSet(0,ds,c);t1=this.t;if(typeof t1!=="number")return t1.$add();if(typeof ds!=="number")return H.iae(ds);r.t=t1+ds+1;r.s=this.s;r.clamp$0(0)},rShiftTo$2:function(n,r){var this_array,r_array,t1,ds,bs,cbs,bm,i,t2,t3;this_array=this.array;r_array=r.array;r.s=this.s;t1=J.getInterceptor$n(n);ds=t1.$tdiv(n,$.BigIntegerV8_BI_DB);if(J.$ge$n(ds,this.t)){r.t=0;return}bs=t1.$mod(n,$.BigIntegerV8_BI_DB);t1=$.BigIntegerV8_BI_DB;if(typeof t1!=="number")return t1.$sub();if(typeof bs!=="number")return H.iae(bs);cbs=t1-bs;bm=C.JSInt_methods.$shl(1,bs)-1;t1=this_array.data;if(ds>>>0!==ds||ds>=t1.length)return H.ioore(t1,ds);r_array.$indexSet(0,0,J.$shr$n(t1[ds],bs));i=ds+1;while(true){t1=this.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=i-ds-1;t2=r_array.data;if(t1<0||t1>=t2.length)return H.ioore(t2,t1);t2=t2[t1];t3=this_array.data;if(i>=t3.length)return H.ioore(t3,i);t3=J.$or$n(t2,J.$shl$n(J.$and$n(t3[i],bm),cbs));t2=r_array.data;if(t1>t2.length-1)C.JSArray_methods.set$length(t2,t1+1);t2=r_array.data;if(t1>=t2.length)return H.ioore(t2,t1);t2[t1]=t3;t3=i-ds;t1=this_array.data;if(i>=t1.length)return H.ioore(t1,i);t1=J.$shr$n(t1[i],bs);t2=r_array.data;if(t3>t2.length-1)C.JSArray_methods.set$length(t2,t3+1);t2=r_array.data;if(t3<0||t3>=t2.length)return H.ioore(t2,t3);t2[t3]=t1;++i}if(bs>0){t1=this.t;if(typeof t1!=="number")return t1.$sub();t1=t1-ds-1;t2=r_array.data;if(t1>>>0!==t1||t1>=t2.length)return H.ioore(t2,t1);r_array.$indexSet(0,t1,J.$or$n(t2[t1],J.$shl$n(J.$and$n(this.s,bm),cbs)))}t1=this.t;if(typeof t1!=="number")return t1.$sub();r.t=t1-ds;r.clamp$0(0)},clamp$0:function(_){var this_array,c,t1,t2;this_array=this.array;c=J.$and$n(this.s,$.BigIntegerV8_BI_DM);while(true){t1=this.t;if(typeof t1!=="number")return t1.$gt();if(t1>0){--t1;t2=this_array.data;if(t1>>>0!==t1||t1>=t2.length)return H.ioore(t2,t1);t1=J.$eq$(t2[t1],c)}else t1=false;if(!t1)break;t1=this.t;if(typeof t1!=="number")return t1.$sub();this.t=t1-1}},subTo$2:function(a,r){var this_array,r_array,a_array,t1,t2,m,i,c,i0;this_array=this.array;r_array=r.array;a_array=a.get$array();t1=a.t;t2=this.t;m=Math.min(H.checkNum(t1),H.checkNum(t2));for(i=0,c=0;i<m;i=i0){t1=this_array.data;if(i>=t1.length)return H.ioore(t1,i);t1=J.toInt$0$n(t1[i]);t2=a_array.data;if(i>=t2.length)return H.ioore(t2,i);c+=C.JSInt_methods.toInt$0(t1-J.toInt$0$n(t2[i]));i0=i+1;t2=$.BigIntegerV8_BI_DM;if(typeof t2!=="number")return H.iae(t2);t1=r_array.data;if(i>t1.length-1)C.JSArray_methods.set$length(t1,i0);t1=r_array.data;if(i>=t1.length)return H.ioore(t1,i);t1[i]=(c&t2)>>>0;t2=$.BigIntegerV8_BI_DB;if(typeof t2!=="number")return H.iae(t2);c=C.JSInt_methods._shrOtherPositive$1(c,t2);if(c===4294967295)c=-1}t1=a.t;t2=this.t;if(typeof t1!=="number")return t1.$lt();if(typeof t2!=="number")return H.iae(t2);if(t1<t2){t1=a.s;if(typeof t1!=="number")return H.iae(t1);c-=t1;while(true){t1=this.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=this_array.data;if(i>=t1.length)return H.ioore(t1,i);t1=t1[i];if(typeof t1!=="number")return H.iae(t1);c+=t1;i0=i+1;t1=$.BigIntegerV8_BI_DM;if(typeof t1!=="number")return H.iae(t1);t2=r_array.data;if(i>t2.length-1)C.JSArray_methods.set$length(t2,i0);t2=r_array.data;if(i>=t2.length)return H.ioore(t2,i);t2[i]=(c&t1)>>>0;t1=$.BigIntegerV8_BI_DB;if(typeof t1!=="number")return H.iae(t1);c=C.JSNumber_methods._shrOtherPositive$1(c,t1);if(c===4294967295)c=-1;i=i0}t1=this.s;if(typeof t1!=="number")return H.iae(t1);c+=t1}else{t1=this.s;if(typeof t1!=="number")return H.iae(t1);c+=t1;while(true){t1=a.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=a_array.data;if(i>=t1.length)return H.ioore(t1,i);t1=t1[i];if(typeof t1!=="number")return H.iae(t1);c-=t1;i0=i+1;t1=$.BigIntegerV8_BI_DM;if(typeof t1!=="number")return H.iae(t1);t2=r_array.data;if(i>t2.length-1)C.JSArray_methods.set$length(t2,i0);t2=r_array.data;if(i>=t2.length)return H.ioore(t2,i);t2[i]=(c&t1)>>>0;t1=$.BigIntegerV8_BI_DB;if(typeof t1!=="number")return H.iae(t1);c=C.JSNumber_methods._shrOtherPositive$1(c,t1);if(c===4294967295)c=-1;i=i0}t1=a.s;if(typeof t1!=="number")return H.iae(t1);c-=t1}r.s=c<0?-1:0;if(c<-1){i0=i+1;t1=$.BigIntegerV8_BI_DV;if(typeof t1!=="number")return t1.$add();r_array.$indexSet(0,i,t1+c);i=i0}else if(c>0){i0=i+1;r_array.$indexSet(0,i,c);i=i0}r.t=i;r.clamp$0(0)},multiplyTo$2:function(a,r){var r_array,x,y,y_array,i,t1,t2,t3,r0;r_array=r.array;x=J.$lt$n(this.s,0)?this.negate_op$0():this;y=J.abs$0$n(a);y_array=y.get$array();i=x.t;t1=y.t;if(typeof i!=="number")return i.$add();if(typeof t1!=="number")return H.iae(t1);r.t=i+t1;for(;--i,i>=0;){t1=r_array.data;if(i>t1.length-1)C.JSArray_methods.set$length(t1,i+1);t1=r_array.data;if(i>>>0!==i||i>=t1.length)return H.ioore(t1,i);t1[i]=0}i=0;while(true){t1=y.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=x.t;if(typeof t1!=="number")return H.iae(t1);t2=i+t1;t3=y_array.data;if(i>=t3.length)return H.ioore(t3,i);t3=t3[i];t1=x.am.call$6(0,t3,r,i,0,t1);t3=r_array.data;if(t2>t3.length-1)C.JSArray_methods.set$length(t3,t2+1);t3=r_array.data;if(t2>>>0!==t2||t2>=t3.length)return H.ioore(t3,t2);t3[t2]=t1;++i}r.s=0;r.clamp$0(0);if(!J.$eq$(this.s,a.get$s())){r0=B.BigIntegerV8$(null,null,null);r0.fromInt$1(0);r0.subTo$2(r,r)}},divRemTo$3:function(m,q,r){var pm,t1,pt,t2,y,ts,ms,pm_array,t3,x,t,r0,nsh,ys,y_array,y0,t4,yt,d1,d2,e,i,j,r_array,t5,qd;pm=J.abs$0$n(m);t1=pm.get$t();if(typeof t1!=="number")return t1.$le();if(t1<=0)return;pt=J.$lt$n(this.s,0)?this.negate_op$0():this;t1=pt.t;t2=pm.t;if(typeof t1!=="number")return t1.$lt();if(typeof t2!=="number")return H.iae(t2);if(t1<t2){if(q!=null)q.fromInt$1(0);if(r!=null)this.copyTo$1(r);return}if(r==null)r=B.BigIntegerV8$(null,null,null);y=B.BigIntegerV8$(null,null,null);ts=this.s;ms=m.get$s();pm_array=pm.array;t1=$.BigIntegerV8_BI_DB;t2=pm.t;if(typeof t2!=="number")return t2.$sub();--t2;t3=pm_array.data;if(t2>>>0!==t2||t2>=t3.length)return H.ioore(t3,t2);x=t3[t2];if(typeof x==="number")x=C.JSNumber_methods.toInt$0(x);t=J.$shr$n(x,16);if(!J.$eq$(t,0)){x=t;r0=17}else r0=1;t=J.$shr$n(x,8);if(!J.$eq$(t,0)){r0+=8;x=t}t=J.$shr$n(x,4);if(!J.$eq$(t,0)){r0+=4;x=t}t=J.$shr$n(x,2);if(!J.$eq$(t,0)){r0+=2;x=t}if(!J.$eq$(J.$shr$n(x,1),0))++r0;if(typeof t1!=="number")return t1.$sub();nsh=t1-r0;t1=nsh>0;if(t1){pm.lShiftTo$2(nsh,y);pt.lShiftTo$2(nsh,r)}else{pm.copyTo$1(y);pt.copyTo$1(r)}ys=y.t;y_array=y.array;if(typeof ys!=="number")return ys.$sub();t2=ys-1;t3=y_array.data;if(t2>>>0!==t2||t2>=t3.length)return H.ioore(t3,t2);y0=t3[t2];t2=J.getInterceptor(y0);if(t2.$eq(y0,0))return;t3=$.BigIntegerV8_BI_F1;if(typeof t3!=="number")return H.iae(t3);t3=t2.$mul(y0,C.JSInt_methods.$shl(1,t3));if(ys>1){t2=ys-2;t4=y_array.data;if(t2>>>0!==t2||t2>=t4.length)return H.ioore(t4,t2);t2=J.$shr$n(t4[t2],$.BigIntegerV8_BI_F2)}else t2=0;yt=J.$add$ns(t3,t2);t2=$.BigIntegerV8_BI_FV;if(typeof t2!=="number")return t2.$div();if(typeof yt!=="number")return H.iae(yt);d1=t2/yt;t2=$.BigIntegerV8_BI_F1;if(typeof t2!=="number")return H.iae(t2);d2=C.JSInt_methods.$shl(1,t2)/yt;t2=$.BigIntegerV8_BI_F2;if(typeof t2!=="number")return H.iae(t2);e=C.JSInt_methods.$shl(1,t2);i=r.t;if(typeof i!=="number")return i.$sub();j=i-ys;t2=q==null;t=t2?B.BigIntegerV8$(null,null,null):q;y.dlShiftTo$2(j,t);r_array=r.array;if(J.$ge$n(r.compareTo$1(0,t),0)){t3=r.t;if(typeof t3!=="number")return t3.$add();r.t=t3+1;r_array.$indexSet(0,t3,1);r.subTo$2(t,r)}r0=B.BigIntegerV8$(null,null,null);r0.fromInt$1(1);r0.dlShiftTo$2(ys,t);t.subTo$2(y,y);while(true){t3=y.t;if(typeof t3!=="number")return t3.$lt();if(!(t3<ys))break;t4=t3+1;y.t=t4;t5=y_array.data;if(t3>t5.length-1)C.JSArray_methods.set$length(t5,t4);t4=y_array.data;if(t3>>>0!==t3||t3>=t4.length)return H.ioore(t4,t3);t4[t3]=0}for(;--j,j>=0;){--i;t3=r_array.data;if(i>>>0!==i||i>=t3.length)return H.ioore(t3,i);if(J.$eq$(t3[i],y0))qd=$.BigIntegerV8_BI_DM;else{t3=r_array.data;if(i>=t3.length)return H.ioore(t3,i);t3=J.$mul$ns(t3[i],d1);t4=i-1;t5=r_array.data;if(t4<0||t4>=t5.length)return H.ioore(t5,t4);qd=J.floor$0$n(J.$add$ns(t3,J.$mul$ns(J.$add$ns(t5[t4],e),d2)))}t3=r_array.data;if(i>=t3.length)return H.ioore(t3,i);t3=J.$add$ns(t3[i],y.am.call$6(0,qd,r,j,0,ys));t4=r_array.data;if(i>t4.length-1)C.JSArray_methods.set$length(t4,i+1);t4=r_array.data;if(i>=t4.length)return H.ioore(t4,i);t4[i]=t3;if(J.$lt$n(t3,qd)){y.dlShiftTo$2(j,t);r.subTo$2(t,r);while(true){t3=r_array.data;if(i>=t3.length)return H.ioore(t3,i);t3=t3[i];if(typeof qd!=="number")return qd.$sub();--qd;if(!J.$lt$n(t3,qd))break;r.subTo$2(t,r)}}}if(!t2){r.drShiftTo$2(ys,q);if(!J.$eq$(ts,ms)){r0=B.BigIntegerV8$(null,null,null);r0.fromInt$1(0);r0.subTo$2(q,q)}}r.t=ys;r.clamp$0(0);if(t1)r.rShiftTo$2(nsh,r);if(J.$lt$n(ts,0)){r0=B.BigIntegerV8$(null,null,null);r0.fromInt$1(0);r0.subTo$2(r,r)}},mod$1:function(a){var r,r0,t1;r=B.BigIntegerV8$(null,null,null);(J.$lt$n(this.s,0)?this.negate_op$0():this).divRemTo$3(a,null,r);if(J.$lt$n(this.s,0)){r0=B.BigIntegerV8$(null,null,null);r0.fromInt$1(0);t1=J.$gt$n(r.compareTo$1(0,r0),0)}else t1=false;if(t1)a.subTo$2(r,r);return r},intValue$0:function(){var this_array,t1,t2;this_array=this.array;if(J.$lt$n(this.s,0)){t1=this.t;if(t1===1){t1=this_array.data;if(0>=t1.length)return H.ioore(t1,0);return J.$sub$n(t1[0],$.BigIntegerV8_BI_DV)}else if(t1===0)return-1}else{t1=this.t;if(t1===1){t1=this_array.data;if(0>=t1.length)return H.ioore(t1,0);return t1[0]}else if(t1===0)return 0}t1=this_array.data;if(1>=t1.length)return H.ioore(t1,1);t1=t1[1];t2=$.BigIntegerV8_BI_DB;if(typeof t2!=="number")return H.iae(t2);t2=J.$shl$n(J.$and$n(t1,C.JSInt_methods.$shl(1,32-t2)-1),$.BigIntegerV8_BI_DB);t1=this_array.data;if(0>=t1.length)return H.ioore(t1,0);return J.$or$n(t2,t1[0])},chunkSize$1:function(r){var t1=$.BigIntegerV8_BI_DB;if(typeof t1!=="number")return H.iae(t1);return C.JSInt_methods.toInt$0(C.JSDouble_methods.floor$0(0.6931471805599453*t1/Math.log(r)))},signum$0:function(){var this_array,t1;this_array=this.array;if(J.$lt$n(this.s,0))return-1;else{t1=this.t;if(typeof t1!=="number")return t1.$le();if(!(t1<=0)){if(t1===1){t1=this_array.data;if(0>=t1.length)return H.ioore(t1,0);t1=J.$le$n(t1[0],0)}else t1=false;}else t1=true;if(t1)return 0;else return 1}},toRadix$1:function(b){var t1,a,r,y,z,r0;if(this.signum$0()!==0)t1=false;else t1=true;if(t1)return"0";a=Math.pow(10,this.chunkSize$1(10));r=B.BigIntegerV8$(null,null,null);r.fromInt$1(a);y=B.BigIntegerV8$(null,null,null);z=B.BigIntegerV8$(null,null,null);this.divRemTo$3(r,y,z);for(r0="";y.signum$0()>0;){t1=z.intValue$0();if(typeof t1!=="number")return H.iae(t1);r0=C.JSString_methods.substring$1(C.JSInt_methods.toRadixString$1(C.JSNumber_methods.toInt$0(a+t1),10),1)+r0;y.divRemTo$3(r,y,z)}return J.toRadixString$1$n(z.intValue$0(),10)+r0},fromRadix$2:function(s,b){var cs,d,t1,mi,j,w,i,c,x,r;this.fromInt$1(0);if(b==null)b=10;cs=this.chunkSize$1(b);d=Math.pow(b,cs);for(t1=J.getInterceptor$as(s),mi=false,j=0,w=0,i=0;i<t1.get$length(s);++i){c=$.BigIntegerV8_BI_RC.$index(0,C.JSString_methods._codeUnitAt$1(s,i));x=c==null?-1:c;if(J.$lt$n(x,0)){if(0>=s.length)return H.ioore(s,0);if(s[0]==="-"&&this.signum$0()===0)mi=true;continue}if(typeof x!=="number")return H.iae(x);w=b*w+x;++j;if(j>=cs){this.dMultiply$1(d);this.dAddOffset$2(w,0);j=0;w=0}}if(j>0){this.dMultiply$1(Math.pow(b,j));if(w!==0)this.dAddOffset$2(w,0)}if(mi){r=B.BigIntegerV8$(null,null,null);r.fromInt$1(0);r.subTo$2(this,this)}},bitwiseTo$3:function(a,op,r){var this_array,a_array,r_array,t1,t2,m,i,t3,f;this_array=this.array;a_array=a.get$array();r_array=r.array;t1=a.t;t2=this.t;m=Math.min(H.checkNum(t1),H.checkNum(t2));for(i=0;i<m;++i){t1=this_array.data;if(i>=t1.length)return H.ioore(t1,i);t1=t1[i];t2=a_array.data;if(i>=t2.length)return H.ioore(t2,i);t2=op.call$2(t1,t2[i]);t1=r_array.data;if(i>t1.length-1)C.JSArray_methods.set$length(t1,i+1);t1=r_array.data;if(i>=t1.length)return H.ioore(t1,i);t1[i]=t2}t1=a.t;t2=this.t;if(typeof t1!=="number")return t1.$lt();if(typeof t2!=="number")return H.iae(t2);t3=$.BigIntegerV8_BI_DM;if(t1<t2){f=J.$and$n(a.s,t3);i=m;while(true){t1=this.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=this_array.data;if(i>>>0!==i||i>=t1.length)return H.ioore(t1,i);t1=op.call$2(t1[i],f);t2=r_array.data;if(i>t2.length-1)C.JSArray_methods.set$length(t2,i+1);t2=r_array.data;if(i>=t2.length)return H.ioore(t2,i);t2[i]=t1;++i}r.t=t1}else{f=J.$and$n(this.s,t3);i=m;while(true){t1=a.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=a_array.data;if(i>>>0!==i||i>=t1.length)return H.ioore(t1,i);t1=op.call$2(f,t1[i]);t2=r_array.data;if(i>t2.length-1)C.JSArray_methods.set$length(t2,i+1);t2=r_array.data;if(i>=t2.length)return H.ioore(t2,i);t2[i]=t1;++i}r.t=t1}r.s=op.call$2(this.s,a.s);r.clamp$0(0)},op_and$2:[function(x,y){return J.$and$n(x,y)},"call$2","get$op_and",4,0,0],op_or$2:[function(x,y){return J.$or$n(x,y)},"call$2","get$op_or",4,0,0],not$0:function(){var this_array,r,r_array,i,t1,t2,t3;this_array=this.array;r=B.BigIntegerV8$(null,null,null);r_array=r.array;i=0;while(true){t1=this.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=$.BigIntegerV8_BI_DM;t2=this_array.data;if(i>=t2.length)return H.ioore(t2,i);t2=J.$not$i(t2[i]);if(typeof t1!=="number")return t1.$and();if(typeof t2!=="number")return H.iae(t2);t3=r_array.data;if(i>t3.length-1)C.JSArray_methods.set$length(t3,i+1);t3=r_array.data;if(i>=t3.length)return H.ioore(t3,i);t3[i]=(t1&t2)>>>0;++i}r.t=t1;r.s=J.$not$i(this.s);return r},shiftLeft$1:function(n){var r,t1;r=B.BigIntegerV8$(null,null,null);t1=J.getInterceptor$n(n);if(t1.$lt(n,0))this.rShiftTo$2(t1.$negate(n),r);else this.lShiftTo$2(n,r);return r},addTo$2:function(a,r){var this_array,a_array,r_array,t1,t2,m,i,c,i0;this_array=this.array;a_array=a.get$array();r_array=r.array;t1=a.t;t2=this.t;m=Math.min(H.checkNum(t1),H.checkNum(t2));for(i=0,c=0;i<m;i=i0){t1=this_array.data;if(i>=t1.length)return H.ioore(t1,i);t1=t1[i];t2=a_array.data;if(i>=t2.length)return H.ioore(t2,i);t2=J.$add$ns(t1,t2[i]);if(typeof t2!=="number")return H.iae(t2);c+=t2;i0=i+1;t2=$.BigIntegerV8_BI_DM;if(typeof t2!=="number")return H.iae(t2);t1=r_array.data;if(i>t1.length-1)C.JSArray_methods.set$length(t1,i0);t1=r_array.data;if(i>=t1.length)return H.ioore(t1,i);t1[i]=(c&t2)>>>0;t2=$.BigIntegerV8_BI_DB;if(typeof t2!=="number")return H.iae(t2);c=C.JSNumber_methods._shrOtherPositive$1(c,t2)}t1=a.t;t2=this.t;if(typeof t1!=="number")return t1.$lt();if(typeof t2!=="number")return H.iae(t2);if(t1<t2){t1=a.s;if(typeof t1!=="number")return H.iae(t1);c+=t1;while(true){t1=this.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=this_array.data;if(i>=t1.length)return H.ioore(t1,i);t1=t1[i];if(typeof t1!=="number")return H.iae(t1);c+=t1;i0=i+1;t1=$.BigIntegerV8_BI_DM;if(typeof t1!=="number")return H.iae(t1);t2=r_array.data;if(i>t2.length-1)C.JSArray_methods.set$length(t2,i0);t2=r_array.data;if(i>=t2.length)return H.ioore(t2,i);t2[i]=(c&t1)>>>0;t1=$.BigIntegerV8_BI_DB;if(typeof t1!=="number")return H.iae(t1);c=C.JSNumber_methods._shrOtherPositive$1(c,t1);i=i0}t1=this.s;if(typeof t1!=="number")return H.iae(t1);c+=t1}else{t1=this.s;if(typeof t1!=="number")return H.iae(t1);c+=t1;while(true){t1=a.t;if(typeof t1!=="number")return H.iae(t1);if(!(i<t1))break;t1=a_array.data;if(i>=t1.length)return H.ioore(t1,i);t1=t1[i];if(typeof t1!=="number")return H.iae(t1);c+=t1;i0=i+1;t1=$.BigIntegerV8_BI_DM;if(typeof t1!=="number")return H.iae(t1);t2=r_array.data;if(i>t2.length-1)C.JSArray_methods.set$length(t2,i0);t2=r_array.data;if(i>=t2.length)return H.ioore(t2,i);t2[i]=(c&t1)>>>0;t1=$.BigIntegerV8_BI_DB;if(typeof t1!=="number")return H.iae(t1);c=C.JSNumber_methods._shrOtherPositive$1(c,t1);i=i0}t1=a.s;if(typeof t1!=="number")return H.iae(t1);c+=t1}r.s=c<0?-1:0;if(c>0){i0=i+1;r_array.$indexSet(0,i,c);i=i0}else if(c<-1){i0=i+1;t1=$.BigIntegerV8_BI_DV;if(typeof t1!=="number")return t1.$add();r_array.$indexSet(0,i,t1+c);i=i0}r.t=i;r.clamp$0(0)},add$1:function(_,a){var r=B.BigIntegerV8$(null,null,null);this.addTo$2(a,r);return r},subtract$1:function(a){var r=B.BigIntegerV8$(null,null,null);this.subTo$2(a,r);return r},multiply$1:function(a){var r=B.BigIntegerV8$(null,null,null);this.multiplyTo$2(a,r);return r},divide$1:function(a){var r=B.BigIntegerV8$(null,null,null);this.divRemTo$3(a,r,null);return r},remainder$1:function(_,a){var r=B.BigIntegerV8$(null,null,null);this.divRemTo$3(a,null,r);return r.signum$0()>=0?r:r.add$1(0,a)},dMultiply$1:function(n){var this_array,t1,t2,t3,t4;this_array=this.array;t1=this.t;t2=this.am.call$6(0,n-1,this,0,0,t1);t3=this_array.data;t4=t3.length;if(typeof t1!=="number")return t1.$gt();if(t1>t4-1)C.JSArray_methods.set$length(t3,t1+1);t3=this_array.data;if(t1>>>0!==t1||t1>=t3.length)return H.ioore(t3,t1);t3[t1]=t2;t2=this.t;if(typeof t2!=="number")return t2.$add();this.t=t2+1;this.clamp$0(0)},dAddOffset$2:function(n,w){var this_array,t1,t2,t3,t4;this_array=this.array;while(true){t1=this.t;if(typeof t1!=="number")return t1.$le();if(!(t1<=w))break;t2=t1+1;this.t=t2;t3=this_array.data;if(t1>t3.length-1)C.JSArray_methods.set$length(t3,t2);t2=this_array.data;if(t1>>>0!==t1||t1>=t2.length)return H.ioore(t2,t1);t2[t1]=0}t1=this_array.data;if(w>=t1.length)return H.ioore(t1,w);t1=J.$add$ns(t1[w],n);t2=this_array.data;if(w>t2.length-1)C.JSArray_methods.set$length(t2,w+1);t2=this_array.data;if(w>=t2.length)return H.ioore(t2,w);t2[w]=t1;t1=t2;while(true){if(w>=t1.length)return H.ioore(t1,w);if(!J.$ge$n(t1[w],$.BigIntegerV8_BI_DV))break;t1=this_array.data;if(w>=t1.length)return H.ioore(t1,w);t1=J.$sub$n(t1[w],$.BigIntegerV8_BI_DV);t2=this_array.data;if(w>t2.length-1)C.JSArray_methods.set$length(t2,w+1);t2=this_array.data;t3=t2.length;if(w>=t3)return H.ioore(t2,w);t2[w]=t1;++w;t1=this.t;if(typeof t1!=="number")return H.iae(t1);if(w>=t1){t4=t1+1;this.t=t4;if(t1>t3-1)C.JSArray_methods.set$length(t2,t4);t2=this_array.data;if(t1>>>0!==t1||t1>=t2.length)return H.ioore(t2,t1);t2[t1]=0;t1=t2}else t1=t2;if(w>=t1.length)return H.ioore(t1,w);t1=J.$add$ns(t1[w],1);t2=this_array.data;if(w>t2.length-1)C.JSArray_methods.set$length(t2,w+1);t2=this_array.data;if(w>=t2.length)return H.ioore(t2,w);t2[w]=t1;t1=t2}},$add:function(_,other){return this.add$1(0,other)},$sub:function(_,other){return this.subtract$1(other)},$mul:function(_,other){return this.multiply$1(other)},$mod:function(_,other){return this.remainder$1(0,other)},$tdiv:function(_,other){return this.divide$1(other)},$negate:function(_){return this.negate_op$0()},$lt:function(_,other){return J.$lt$n(this.compareTo$1(0,other),0)&&true},$le:function(_,other){return J.$le$n(this.compareTo$1(0,other),0)&&true},$gt:function(_,other){return J.$gt$n(this.compareTo$1(0,other),0)&&true},$ge:function(_,other){return J.$ge$n(this.compareTo$1(0,other),0)&&true},$eq:function(_,other){if(other==null)return false;return J.$eq$(this.compareTo$1(0,other),0)&&true},$and:function(_,other){var r=B.BigIntegerV8$(null,null,null);this.bitwiseTo$3(other,this.get$op_and(),r);return r},$or:function(_,other){var r=B.BigIntegerV8$(null,null,null);this.bitwiseTo$3(other,this.get$op_or(),r);return r},$not:function(_){return this.not$0()},$shl:function(_,shiftAmount){return this.shiftLeft$1(shiftAmount)},$shr:function(_,shiftAmount){var r,t1;r=B.BigIntegerV8$(null,null,null);t1=J.getInterceptor$n(shiftAmount);if(t1.$lt(shiftAmount,0))this.lShiftTo$2(t1.$negate(shiftAmount),r);else this.rShiftTo$2(shiftAmount,r);return r},BigIntegerV8$3:function(a,b,c){B.BigIntegerV8__init(28);this.am=this.get$_am3();this.array=new B.JSArray([]);if(a!=null)if(typeof a==="number"&&Math.floor(a)===a)this.fromString$2(C.JSInt_methods.toString$0(a),10);else this.fromString$2(C.JSInt_methods.toString$0(C.JSNumber_methods.toInt$0(a)),10)},static:{BigIntegerV8$:function(a,b,c){var t1=new B.BigIntegerV8(null,null,null,null,true);t1.BigIntegerV8$3(a,b,c);return t1},BigIntegerV8__init:function(bits){var t1,t2;if($.BigIntegerV8_BI_RC!=null)return;$.BigIntegerV8_BI_RC=new H.JsLinkedHashMap(0,null,null,null,null,null,0);$.BigIntegerV8__j_lm=($.BigIntegerV8_canary&16777215)===15715070;B.BigIntegerV8__setupDigitConversions();$.BigIntegerV8__lplim=131844;$.BigIntegerV8_dbits=bits;$.BigIntegerV8_BI_DB=bits;t1=C.JSInt_methods._shlPositive$1(1,bits);$.BigIntegerV8_BI_DM=t1-1;$.BigIntegerV8_BI_DV=t1;$.BigIntegerV8_BI_FP=52;$.BigIntegerV8_BI_FV=Math.pow(2,52);t1=$.BigIntegerV8_BI_FP;t2=$.BigIntegerV8_dbits;if(typeof t1!=="number")return t1.$sub();if(typeof t2!=="number")return H.iae(t2);$.BigIntegerV8_BI_F1=t1-t2;$.BigIntegerV8_BI_F2=2*t2-t1},BigIntegerV8__setupDigitConversions:function(){var rr,vv,rr0;$.BigIntegerV8_BI_RM="0123456789abcdefghijklmnopqrstuvwxyz";$.BigIntegerV8_BI_RC=new H.JsLinkedHashMap(0,null,null,null,null,null,0);for(rr=48,vv=0;vv<=9;++vv,rr=rr0){rr0=rr+1;$.BigIntegerV8_BI_RC.$indexSet(0,rr,vv)}for(rr=97,vv=10;vv<36;++vv,rr=rr0){rr0=rr+1;$.BigIntegerV8_BI_RC.$indexSet(0,rr,vv)}for(rr=65,vv=10;vv<36;++vv,rr=rr0){rr0=rr+1;$.BigIntegerV8_BI_RC.$indexSet(0,rr,vv)}}}}}],["benchmark_base","../benchmark-files/BenchmarkBase.dart",,V,{"^":"",BenchmarkBase_measureFor:function(f,timeMinimum){var t1,iter,elapsed,t2;if($.Stopwatch__frequency==null){H.Primitives_initTicker();$.Stopwatch__frequency=$.Primitives_timerFrequency}t1=J.$sub$n($.Primitives_timerTicks.call$0(),0);if(typeof t1!=="number")return H.iae(t1);t1=0+t1;for(iter=0,elapsed=0;J.$lt$n(elapsed,timeMinimum);){f.call$0();t2=$.Primitives_timerTicks.call$0();elapsed=J.$tdiv$n(J.$mul$ns(J.$sub$n(t2,t1),1000),$.Stopwatch__frequency);++iter}if(typeof elapsed!=="number")return H.iae(elapsed);return 1000*elapsed/iter},BenchmarkBase:{"^":"Object;",measure$0:function(){V.BenchmarkBase_measureFor(new V.BenchmarkBase_measure_closure(this),100);return V.BenchmarkBase_measureFor(new V.BenchmarkBase_measure_closure0(this),2000)}},BenchmarkBase_measure_closure:{"^":"Closure;$this",call$0:function(){G.calculatePi(3000)}},BenchmarkBase_measure_closure0:{"^":"Closure;$this",call$0:function(){G.calculatePi(3000)}}}],["","../benchmark-files/pidigits.dart",,G,{"^":"",pad:function(i,last){var res,count;res=C.JSNumber_methods.toString$0(i);count=10-res.length;for(;count>0;){res=last?res+" ":"0"+res;--count}return res},calculatePi:function($N){var bigint_TEN,k,k1,a,d,m,n,u,i,ns,t,t1,last;bigint_TEN=Z.BigInteger_BigInteger(10,null,null);k=Z.BigInteger_ZERO();k1=Z.BigInteger_ONE();a=Z.BigInteger_ZERO();d=Z.BigInteger_ONE();m=Z.BigInteger_ZERO();n=Z.BigInteger_ONE();Z.BigInteger_ZERO();u=Z.BigInteger_ZERO();for(i=0,ns=0;true;){k=k.add$1(0,Z.BigInteger_ONE());k1=k1.add$1(0,Z.BigInteger_TWO());t=n.shiftLeft$1(1);n=n.multiply$1(k);a=a.add$1(0,t).multiply$1(k1);d=d.multiply$1(k1);if(J.$ge$n(a.compareTo$1(0,n),0)){m=n.multiply$1(Z.BigInteger_THREE()).add$1(0,a);t=m.divide$1(d);u=m.mod$1(d).add$1(0,n);if(J.$gt$n(d.compareTo$1(0,u),0)){t1=t.intValue$0();if(typeof t1!=="number")return H.iae(t1);ns=ns*10+t1;++i;last=i>=$N;if(i%10===0||last){G.pad(ns,last);ns=0}if(last)break;a=a.subtract$1(d.multiply$1(t)).multiply$1(bigint_TEN);n=n.multiply$1(bigint_TEN)}}}},main:function(){H.printString("PiDigits(RunTime): "+H.S(new G.PiDigits("PiDigits").measure$0())+" us.")},PiDigits:{"^":"BenchmarkBase;name"}},1]];setupProgram(dart,0);J.getInterceptor=function(receiver){if(typeof receiver=="number"){if(Math.floor(receiver)==receiver)return J.JSInt.prototype;return J.JSDouble.prototype}if(typeof receiver=="string")return J.JSString.prototype;if(receiver==null)return J.JSNull.prototype;if(typeof receiver=="boolean")return J.JSBool.prototype;if(receiver.constructor==Array)return J.JSArray0.prototype;return receiver};J.getInterceptor$as=function(receiver){if(typeof receiver=="string")return J.JSString.prototype;if(receiver==null)return receiver;if(receiver.constructor==Array)return J.JSArray0.prototype;return receiver};J.getInterceptor$i=function(receiver){if(typeof receiver=="number"){if(Math.floor(receiver)==receiver)return J.JSInt.prototype;return J.JSNumber.prototype}if(receiver==null)return receiver;return receiver};J.getInterceptor$n=function(receiver){if(typeof receiver=="number")return J.JSNumber.prototype;if(receiver==null)return receiver;return receiver};J.getInterceptor$ns=function(receiver){if(typeof receiver=="number")return J.JSNumber.prototype;if(typeof receiver=="string")return J.JSString.prototype;if(receiver==null)return receiver;return receiver};J.get$length$as=function(receiver){return J.getInterceptor$as(receiver).get$length(receiver)};J.$add$ns=function(receiver,a0){if(typeof receiver=="number"&&typeof a0=="number")return receiver+a0;return J.getInterceptor$ns(receiver).$add(receiver,a0)};J.$and$n=function(receiver,a0){if(typeof receiver=="number"&&typeof a0=="number")return(receiver&a0)>>>0;return J.getInterceptor$n(receiver).$and(receiver,a0)};J.$ge$n=function(receiver,a0){if(typeof receiver=="number"&&typeof a0=="number")return receiver>=a0;return J.getInterceptor$n(receiver).$ge(receiver,a0)};J.$gt$n=function(receiver,a0){if(typeof receiver=="number"&&typeof a0=="number")return receiver>a0;return J.getInterceptor$n(receiver).$gt(receiver,a0)};J.$le$n=function(receiver,a0){if(typeof receiver=="number"&&typeof a0=="number")return receiver<=a0;return J.getInterceptor$n(receiver).$le(receiver,a0)};J.$lt$n=function(receiver,a0){if(typeof receiver=="number"&&typeof a0=="number")return receiver<a0;return J.getInterceptor$n(receiver).$lt(receiver,a0)};J.$mod$n=function(receiver,a0){return J.getInterceptor$n(receiver).$mod(receiver,a0)};J.$mul$ns=function(receiver,a0){if(typeof receiver=="number"&&typeof a0=="number")return receiver*a0;return J.getInterceptor$ns(receiver).$mul(receiver,a0)};J.$negate$n=function(receiver){if(typeof receiver=="number")return-receiver;return J.getInterceptor$n(receiver).$negate(receiver)};J.$not$i=function(receiver){if(typeof receiver=="number"&&Math.floor(receiver)==receiver)return~receiver>>>0;return J.getInterceptor$i(receiver).$not(receiver)};J.$or$n=function(receiver,a0){if(typeof receiver=="number"&&typeof a0=="number")return(receiver|a0)>>>0;return J.getInterceptor$n(receiver).$or(receiver,a0)};J.$shl$n=function(receiver,a0){return J.getInterceptor$n(receiver).$shl(receiver,a0)};J.$shr$n=function(receiver,a0){return J.getInterceptor$n(receiver).$shr(receiver,a0)};J.$sub$n=function(receiver,a0){if(typeof receiver=="number"&&typeof a0=="number")return receiver-a0;return J.getInterceptor$n(receiver).$sub(receiver,a0)};J.$tdiv$n=function(receiver,a0){return J.getInterceptor$n(receiver).$tdiv(receiver,a0)};J.abs$0$n=function(receiver){return J.getInterceptor$n(receiver).abs$0(receiver)};J.compareTo$1$ns=function(receiver,a0){return J.getInterceptor$ns(receiver).compareTo$1(receiver,a0)};J.floor$0$n=function(receiver){return J.getInterceptor$n(receiver).floor$0(receiver)};J.toInt$0$n=function(receiver){return J.getInterceptor$n(receiver).toInt$0(receiver)};J.toRadixString$1$n=function(receiver,a0){return J.getInterceptor$n(receiver).toRadixString$1(receiver,a0)};J.get$hashCode$=function(receiver){return J.getInterceptor(receiver).get$hashCode(receiver)};J.$eq$=function(receiver,a0){if(receiver==null)return a0==null;if(typeof receiver!="object")return a0!=null&&receiver===a0;return J.getInterceptor(receiver).$eq(receiver,a0)};J.toString$0$=function(receiver){return J.getInterceptor(receiver).toString$0(receiver)};var $=Isolate.$isolateProperties;C.Interceptor_methods=J.Interceptor.prototype;C.JSArray_methods=J.JSArray0.prototype;C.JSDouble_methods=J.JSDouble.prototype;C.JSInt_methods=J.JSInt.prototype;C.JSNumber_methods=J.JSNumber.prototype;C.JSString_methods=J.JSString.prototype;C.C_OutOfMemoryError=new P.OutOfMemoryError;C.JS_CONST_u2C=function getTagFallback(o){var s=Object.prototype.toString.call(o);return s.substring(8,s.length-1)};$.Primitives_timerFrequency=null;$.Primitives_timerTicks=null;$.Closure_functionCounter=0;$.BoundClosure_selfFieldNameCache=null;$.BoundClosure_receiverFieldNameCache=null;$.Stopwatch__frequency=null;$.BigIntegerV8_dbits=null;$.BigIntegerV8_BI_DB=null;$.BigIntegerV8_BI_DM=null;$.BigIntegerV8_BI_DV=null;$.BigIntegerV8_BI_FP=null;$.BigIntegerV8_BI_FV=null;$.BigIntegerV8_BI_F1=null;$.BigIntegerV8_BI_F2=null;$.BigIntegerV8__lplim=null;$.BigIntegerV8_canary=244837814094590;$.BigIntegerV8__j_lm=null;$.BigIntegerV8_BI_RM="0123456789abcdefghijklmnopqrstuvwxyz";$.BigIntegerV8_BI_RC=null;$=null;init.isHunkLoaded=function(hunkHash){return!!$dart_deferred_initializers$[hunkHash]};init.deferredInitialized=new Object(null);init.isHunkInitialized=function(hunkHash){return init.deferredInitialized[hunkHash]};init.initializeLoadedHunk=function(hunkHash){$dart_deferred_initializers$[hunkHash]($globals$,$);init.deferredInitialized[hunkHash]=true};init.deferredLibraryUris={};init.deferredLibraryHashes={};(function(lazies){for(var i=0;i<lazies.length;){var fieldName=lazies[i++];var getterName=lazies[i++];var lazyValue=lazies[i++];var staticName=lazies[i++];Isolate.$lazy(fieldName,getterName,lazyValue,staticName)}})(["_toStringVisiting","$get$_toStringVisiting",function(){return[]},"_toStringVisiting","BigInteger__useJsBigint","$get$BigInteger__useJsBigint",function(){return new Z.closure().call$0()},"BigInteger__useJsBigint"]);Isolate=Isolate.$finishIsolateConstructor(Isolate);$=new Isolate;init.metadata=[];init.types=[{func:1,args:[,,]},{func:1,args:[,,,,,,]},{func:1,ret:P.num}];function convertToFastObject(properties){function MyClass(){}MyClass.prototype=properties;new MyClass;return properties}function convertToSlowObject(properties){properties.__MAGIC_SLOW_PROPERTY=1;delete properties.__MAGIC_SLOW_PROPERTY;return properties}A=convertToFastObject(A);B=convertToFastObject(B);C=convertToFastObject(C);D=convertToFastObject(D);E=convertToFastObject(E);F=convertToFastObject(F);G=convertToFastObject(G);H=convertToFastObject(H);J=convertToFastObject(J);K=convertToFastObject(K);L=convertToFastObject(L);M=convertToFastObject(M);N=convertToFastObject(N);O=convertToFastObject(O);P=convertToFastObject(P);Q=convertToFastObject(Q);R=convertToFastObject(R);S=convertToFastObject(S);T=convertToFastObject(T);U=convertToFastObject(U);V=convertToFastObject(V);W=convertToFastObject(W);X=convertToFastObject(X);Y=convertToFastObject(Y);Z=convertToFastObject(Z);function init(){Isolate.$isolateProperties=Object.create(null);init.allClasses=map();init.getTypeFromName=function(name){return init.allClasses[name]};init.interceptorsByTag=map();init.leafTags=map();init.finishedClasses=map();Isolate.$lazy=function(fieldName,getterName,lazyValue,staticName,prototype){if(!init.lazies)init.lazies=Object.create(null);init.lazies[fieldName]=getterName;prototype=prototype||Isolate.$isolateProperties;var sentinelUndefined={};var sentinelInProgress={};prototype[fieldName]=sentinelUndefined;prototype[getterName]=function(){var result=this[fieldName];if(result==sentinelInProgress)H.throwCyclicInit(staticName||fieldName);try{if(result===sentinelUndefined){this[fieldName]=sentinelInProgress;try{result=this[fieldName]=lazyValue()}finally{if(result===sentinelUndefined)this[fieldName]=null}}return result}finally{this[getterName]=function(){return this[fieldName]}}}};Isolate.$finishIsolateConstructor=function(oldIsolate){var isolateProperties=oldIsolate.$isolateProperties;function Isolate(){var staticNames=Object.keys(isolateProperties);for(var i=0;i<staticNames.length;i++){var staticName=staticNames[i];this[staticName]=isolateProperties[staticName]}var lazies=init.lazies;var lazyInitializers=lazies?Object.keys(lazies):[];for(var i=0;i<lazyInitializers.length;i++)this[lazies[lazyInitializers[i]]]=null;function ForceEfficientMap(){}ForceEfficientMap.prototype=this;new ForceEfficientMap;for(var i=0;i<lazyInitializers.length;i++){var lazyInitName=lazies[lazyInitializers[i]];this[lazyInitName]=isolateProperties[lazyInitName]}}Isolate.prototype=oldIsolate.prototype;Isolate.prototype.constructor=Isolate;Isolate.$isolateProperties=isolateProperties;Isolate.functionThatReturnsNull=oldIsolate.functionThatReturnsNull;return Isolate}}(function(callback){if(typeof document==="undefined"){callback(null);return}if(typeof document.currentScript!="undefined"){callback(document.currentScript);return}var scripts=document.scripts;function onLoad(event){for(var i=0;i<scripts.length;++i)scripts[i].removeEventListener("load",onLoad,false);callback(event.target)}for(var i=0;i<scripts.length;++i)scripts[i].addEventListener("load",onLoad,false)})(function(currentScript){init.currentScript=currentScript;if(typeof dartMainRunner==="function")dartMainRunner(G.main,[]);else G.main([])})})();
+// Generated by dart2js, the Dart to JavaScript compiler version: 1.24.2.
+// The code supports the following hooks:
+// dartPrint(message):
+//    if this function is defined it is called instead of the Dart [print]
+//    method.
+//
+// dartMainRunner(main, args):
+//    if this function is defined, the Dart [main] method will not be invoked
+//    directly. Instead, a closure that will invoke [main], and its arguments
+//    [args] is passed to [dartMainRunner].
+//
+// dartDeferredLibraryLoader(uri, successCallback, errorCallback):
+//    if this function is defined, it will be called when a deferred library
+//    is loaded. It should load and eval the javascript of `uri`, and call
+//    successCallback. If it fails to do so, it should call errorCallback with
+//    an error.
+//
+// defaultPackagesBase:
+//    Override the location where `package:` uris are resolved from. By default
+//    they are resolved under "packages/" from the current window location.
+(function() {
+  // /* ::norenaming:: */
+  var supportsDirectProtoAccess = function() {
+    var cls = function() {
+    };
+    cls.prototype = {p: {}};
+    var object = new cls();
+    if (!(object.__proto__ && object.__proto__.p === cls.prototype.p))
+      return false;
+    try {
+      if (typeof navigator != "undefined" && typeof navigator.userAgent == "string" && navigator.userAgent.indexOf("Chrome/") >= 0)
+        return true;
+      if (typeof version == "function" && version.length == 0) {
+        var v = version();
+        if (/^\d+\.\d+\.\d+\.\d+$/.test(v))
+          return true;
+      }
+    } catch (_) {
+    }
+    return false;
+  }();
+  function map(x) {
+    x = Object.create(null);
+    x.x = 0;
+    delete x.x;
+    return x;
+  }
+  // The global objects start as so-called "slow objects". For V8, this
+  // means that it won't try to make map transitions as we add properties
+  // to these objects. Later on, we attempt to turn these objects into
+  // fast objects by calling "convertToFastObject" (see
+  // [emitConvertToFastObjectFunction]).
+  var A = map();
+  var B = map();
+  var C = map();
+  var D = map();
+  var E = map();
+  var F = map();
+  var G = map();
+  var H = map();
+  var J = map();
+  var K = map();
+  var L = map();
+  var M = map();
+  var N = map();
+  var O = map();
+  var P = map();
+  var Q = map();
+  var R = map();
+  var S = map();
+  var T = map();
+  var U = map();
+  var V = map();
+  var W = map();
+  var X = map();
+  var Y = map();
+  var Z = map();
+  function Isolate() {
+  }
+  init();
+  // Constructors are generated at runtime.
+  function setupProgram(programData, typesOffset) {
+    "use strict";
+    function generateAccessor(fieldDescriptor, accessors, cls) {
+      var fieldInformation = fieldDescriptor.split("-");
+      var field = fieldInformation[0];
+      var len = field.length;
+      var code = field.charCodeAt(len - 1);
+      var reflectable;
+      if (fieldInformation.length > 1)
+        reflectable = true;
+      else
+        reflectable = false;
+      code = code >= 60 && code <= 64 ? code - 59 : code >= 123 && code <= 126 ? code - 117 : code >= 37 && code <= 43 ? code - 27 : 0;
+      if (code) {
+        var getterCode = code & 3;
+        var setterCode = code >> 2;
+        var accessorName = field = field.substring(0, len - 1);
+        var divider = field.indexOf(":");
+        if (divider > 0) {
+          accessorName = field.substring(0, divider);
+          field = field.substring(divider + 1);
+        }
+        if (getterCode) {
+          var args = getterCode & 2 ? "receiver" : "";
+          var receiver = getterCode & 1 ? "this" : "receiver";
+          var body = "return " + receiver + "." + field;
+          var property = cls + ".prototype.get$" + accessorName + "=";
+          var fn = "function(" + args + "){" + body + "}";
+          if (reflectable)
+            accessors.push(property + "$reflectable(" + fn + ");\n");
+          else
+            accessors.push(property + fn + ";\n");
+        }
+        if (setterCode) {
+          var args = setterCode & 2 ? "receiver, value" : "value";
+          var receiver = setterCode & 1 ? "this" : "receiver";
+          var body = receiver + "." + field + " = value";
+          var property = cls + ".prototype.set$" + accessorName + "=";
+          var fn = "function(" + args + "){" + body + "}";
+          if (reflectable)
+            accessors.push(property + "$reflectable(" + fn + ");\n");
+          else
+            accessors.push(property + fn + ";\n");
+        }
+      }
+      return field;
+    }
+    function defineClass(name, fields) {
+      var accessors = [];
+      var str = "function " + name + "(";
+      var body = "";
+      for (var i = 0; i < fields.length; i++) {
+        if (i != 0)
+          str += ", ";
+        var field = generateAccessor(fields[i], accessors, name);
+        var parameter = "p_" + field;
+        str += parameter;
+        body += "this." + field + " = " + parameter + ";\n";
+      }
+      if (supportsDirectProtoAccess)
+        body += "this." + "$deferredAction" + "();";
+      str += ") {\n" + body + "}\n";
+      str += name + ".builtin$cls=\"" + name + "\";\n";
+      str += "$desc=$collectedClasses." + name + "[1];\n";
+      str += name + ".prototype = $desc;\n";
+      if (typeof defineClass.name != "string")
+        str += name + ".name=\"" + name + "\";\n";
+      str += accessors.join("");
+      return str;
+    }
+    var inheritFrom = supportsDirectProtoAccess ? function(constructor, superConstructor) {
+      var prototype = constructor.prototype;
+      prototype.__proto__ = superConstructor.prototype;
+      prototype.constructor = constructor;
+      prototype["$is" + constructor.name] = constructor;
+      return convertToFastObject(prototype);
+    } : function() {
+      function tmp() {
+      }
+      return function(constructor, superConstructor) {
+        tmp.prototype = superConstructor.prototype;
+        var object = new tmp();
+        convertToSlowObject(object);
+        var properties = constructor.prototype;
+        var members = Object.keys(properties);
+        for (var i = 0; i < members.length; i++) {
+          var member = members[i];
+          object[member] = properties[member];
+        }
+        object["$is" + constructor.name] = constructor;
+        object.constructor = constructor;
+        constructor.prototype = object;
+        return object;
+      };
+    }();
+    function finishClasses(processedClasses) {
+      var allClasses = init.allClasses;
+      processedClasses.combinedConstructorFunction += "return [\n" + processedClasses.constructorsList.join(",\n  ") + "\n]";
+      var constructors = new Function("$collectedClasses", processedClasses.combinedConstructorFunction)(processedClasses.collected);
+      processedClasses.combinedConstructorFunction = null;
+      for (var i = 0; i < constructors.length; i++) {
+        var constructor = constructors[i];
+        var cls = constructor.name;
+        var desc = processedClasses.collected[cls];
+        var globalObject = desc[0];
+        desc = desc[1];
+        allClasses[cls] = constructor;
+        globalObject[cls] = constructor;
+      }
+      constructors = null;
+      var finishedClasses = init.finishedClasses;
+      function finishClass(cls) {
+        if (finishedClasses[cls])
+          return;
+        finishedClasses[cls] = true;
+        var superclass = processedClasses.pending[cls];
+        if (!superclass || typeof superclass != "string") {
+          var constructor = allClasses[cls];
+          var prototype = constructor.prototype;
+          prototype.constructor = constructor;
+          prototype.$isObject = constructor;
+          prototype.$deferredAction = function() {
+          };
+          return;
+        }
+        finishClass(superclass);
+        var superConstructor = allClasses[superclass];
+        if (!superConstructor)
+          superConstructor = existingIsolateProperties[superclass];
+        var constructor = allClasses[cls];
+        var prototype = inheritFrom(constructor, superConstructor);
+        if (prototype.$isInterceptor)
+          prototype.$deferredAction();
+      }
+      var properties = Object.keys(processedClasses.pending);
+      for (var i = 0; i < properties.length; i++)
+        finishClass(properties[i]);
+    }
+    function finishAddStubsHelper() {
+      var prototype = this;
+      while (!prototype.hasOwnProperty("$deferredAction"))
+        prototype = prototype.__proto__;
+      delete prototype.$deferredAction;
+      var properties = Object.keys(prototype);
+      for (var index = 0; index < properties.length; index++) {
+        var property = properties[index];
+        var firstChar = property.charCodeAt(0);
+        var elem;
+        if (property !== "^" && property !== "$reflectable" && firstChar !== 43 && firstChar !== 42 && (elem = prototype[property]) != null && elem.constructor === Array && property !== "<>")
+          addStubs(prototype, elem, property, false, []);
+      }
+      convertToFastObject(prototype);
+      prototype = prototype.__proto__;
+      prototype.$deferredAction();
+    }
+    function processClassData(cls, descriptor, processedClasses) {
+      descriptor = convertToSlowObject(descriptor);
+      var previousProperty;
+      var properties = Object.keys(descriptor);
+      var hasDeferredWork = false;
+      var shouldDeferWork = supportsDirectProtoAccess && cls != "Object";
+      for (var i = 0; i < properties.length; i++) {
+        var property = properties[i];
+        var firstChar = property.charCodeAt(0);
+        if (property === "static") {
+          processStatics(init.statics[cls] = descriptor.static, processedClasses);
+          delete descriptor.static;
+        } else if (firstChar === 43) {
+          mangledNames[previousProperty] = property.substring(1);
+          var flag = descriptor[property];
+          if (flag > 0)
+            descriptor[previousProperty].$reflectable = flag;
+        } else if (firstChar === 42) {
+          descriptor[previousProperty].$defaultValues = descriptor[property];
+          var optionalMethods = descriptor.$methodsWithOptionalArguments;
+          if (!optionalMethods)
+            descriptor.$methodsWithOptionalArguments = optionalMethods = {};
+          optionalMethods[property] = previousProperty;
+        } else {
+          var elem = descriptor[property];
+          if (property !== "^" && elem != null && elem.constructor === Array && property !== "<>")
+            if (shouldDeferWork)
+              hasDeferredWork = true;
+            else
+              addStubs(descriptor, elem, property, false, []);
+          else
+            previousProperty = property;
+        }
+      }
+      if (hasDeferredWork)
+        descriptor.$deferredAction = finishAddStubsHelper;
+      var classData = descriptor["^"], split, supr, fields = classData;
+      var s = fields.split(";");
+      fields = s[1] ? s[1].split(",") : [];
+      supr = s[0];
+      split = supr.split(":");
+      if (split.length == 2) {
+        supr = split[0];
+        var functionSignature = split[1];
+        if (functionSignature)
+          descriptor.$signature = function(s) {
+            return function() {
+              return init.types[s];
+            };
+          }(functionSignature);
+      }
+      if (supr)
+        processedClasses.pending[cls] = supr;
+      processedClasses.combinedConstructorFunction += defineClass(cls, fields);
+      processedClasses.constructorsList.push(cls);
+      processedClasses.collected[cls] = [globalObject, descriptor];
+      classes.push(cls);
+    }
+    function processStatics(descriptor, processedClasses) {
+      var properties = Object.keys(descriptor);
+      for (var i = 0; i < properties.length; i++) {
+        var property = properties[i];
+        if (property === "^")
+          continue;
+        var element = descriptor[property];
+        var firstChar = property.charCodeAt(0);
+        var previousProperty;
+        if (firstChar === 43) {
+          mangledGlobalNames[previousProperty] = property.substring(1);
+          var flag = descriptor[property];
+          if (flag > 0)
+            descriptor[previousProperty].$reflectable = flag;
+          if (element && element.length)
+            init.typeInformation[previousProperty] = element;
+        } else if (firstChar === 42) {
+          globalObject[previousProperty].$defaultValues = element;
+          var optionalMethods = descriptor.$methodsWithOptionalArguments;
+          if (!optionalMethods)
+            descriptor.$methodsWithOptionalArguments = optionalMethods = {};
+          optionalMethods[property] = previousProperty;
+        } else if (typeof element === "function") {
+          globalObject[previousProperty = property] = element;
+          functions.push(property);
+          init.globalFunctions[property] = element;
+        } else if (element.constructor === Array)
+          addStubs(globalObject, element, property, true, functions);
+        else {
+          previousProperty = property;
+          processClassData(property, element, processedClasses);
+        }
+      }
+    }
+    function addStubs(prototype, array, name, isStatic, functions) {
+      var index = 0, alias = array[index], f;
+      if (typeof alias == "string")
+        f = array[++index];
+      else {
+        f = alias;
+        alias = name;
+      }
+      var funcs = [prototype[name] = prototype[alias] = f];
+      f.$stubName = name;
+      functions.push(name);
+      for (index++; index < array.length; index++) {
+        f = array[index];
+        if (typeof f != "function")
+          break;
+        if (!isStatic)
+          f.$stubName = array[++index];
+        funcs.push(f);
+        if (f.$stubName) {
+          prototype[f.$stubName] = f;
+          functions.push(f.$stubName);
+        }
+      }
+      for (var i = 0; i < funcs.length; index++, i++)
+        funcs[i].$callName = array[index];
+      var getterStubName = array[index];
+      array = array.slice(++index);
+      var requiredParameterInfo = array[0];
+      var requiredParameterCount = requiredParameterInfo >> 1;
+      var isAccessor = (requiredParameterInfo & 1) === 1;
+      var isSetter = requiredParameterInfo === 3;
+      var isGetter = requiredParameterInfo === 1;
+      var optionalParameterInfo = array[1];
+      var optionalParameterCount = optionalParameterInfo >> 1;
+      var optionalParametersAreNamed = (optionalParameterInfo & 1) === 1;
+      var isIntercepted = requiredParameterCount + optionalParameterCount != funcs[0].length;
+      var functionTypeIndex = array[2];
+      if (typeof functionTypeIndex == "number")
+        array[2] = functionTypeIndex + typesOffset;
+      var unmangledNameIndex = 2 * optionalParameterCount + requiredParameterCount + 3;
+      if (getterStubName) {
+        f = tearOff(funcs, array, isStatic, name, isIntercepted);
+        prototype[name].$getter = f;
+        f.$getterStub = true;
+        if (isStatic) {
+          init.globalFunctions[name] = f;
+          functions.push(getterStubName);
+        }
+        prototype[getterStubName] = f;
+        funcs.push(f);
+        f.$stubName = getterStubName;
+        f.$callName = null;
+      }
+    }
+    function tearOffGetter(funcs, reflectionInfo, name, isIntercepted) {
+      return isIntercepted ? new Function("funcs", "reflectionInfo", "name", "H", "c", "return function tearOff_" + name + functionCounter++ + "(x) {" + "if (c === null) c = " + "H.closureFromTearOff" + "(" + "this, funcs, reflectionInfo, false, [x], name);" + "return new c(this, funcs[0], x, name);" + "}")(funcs, reflectionInfo, name, H, null) : new Function("funcs", "reflectionInfo", "name", "H", "c", "return function tearOff_" + name + functionCounter++ + "() {" + "if (c === null) c = " + "H.closureFromTearOff" + "(" + "this, funcs, reflectionInfo, false, [], name);" + "return new c(this, funcs[0], null, name);" + "}")(funcs, reflectionInfo, name, H, null);
+    }
+    function tearOff(funcs, reflectionInfo, isStatic, name, isIntercepted) {
+      var cache;
+      return isStatic ? function() {
+        if (cache === void 0)
+          cache = H.closureFromTearOff(this, funcs, reflectionInfo, true, [], name).prototype;
+        return cache;
+      } : tearOffGetter(funcs, reflectionInfo, name, isIntercepted);
+    }
+    var functionCounter = 0;
+    if (!init.libraries)
+      init.libraries = [];
+    if (!init.mangledNames)
+      init.mangledNames = map();
+    if (!init.mangledGlobalNames)
+      init.mangledGlobalNames = map();
+    if (!init.statics)
+      init.statics = map();
+    if (!init.typeInformation)
+      init.typeInformation = map();
+    if (!init.globalFunctions)
+      init.globalFunctions = map();
+    var libraries = init.libraries;
+    var mangledNames = init.mangledNames;
+    var mangledGlobalNames = init.mangledGlobalNames;
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var length = programData.length;
+    var processedClasses = map();
+    processedClasses.collected = map();
+    processedClasses.pending = map();
+    processedClasses.constructorsList = [];
+    processedClasses.combinedConstructorFunction = "function $reflectable(fn){fn.$reflectable=1;return fn};\n" + "var $desc;\n";
+    for (var i = 0; i < length; i++) {
+      var data = programData[i];
+      var name = data[0];
+      var uri = data[1];
+      var metadata = data[2];
+      var globalObject = data[3];
+      var descriptor = data[4];
+      var isRoot = !!data[5];
+      var fields = descriptor && descriptor["^"];
+      if (fields instanceof Array)
+        fields = fields[0];
+      var classes = [];
+      var functions = [];
+      processStatics(descriptor, processedClasses);
+      libraries.push([name, uri, classes, functions, metadata, fields, isRoot, globalObject]);
+    }
+    finishClasses(processedClasses);
+  }
+  Isolate.functionThatReturnsNull = function() {
+  };
+  var dart = [["_foreign_helper", "dart:_foreign_helper",, H, {
+    "^": "",
+    JS_CONST: {
+      "^": "Object;code"
+    }
+  }], ["_interceptors", "dart:_interceptors",, J, {
+    "^": "",
+    getInterceptor: function(object) {
+      return void 0;
+    },
+    Interceptor: {
+      "^": "Object;",
+      $eq: function(receiver, other) {
+        return receiver === other;
+      },
+      get$hashCode: function(receiver) {
+        return H.Primitives_objectHashCode(receiver);
+      },
+      toString$0: function(receiver) {
+        return H.Primitives_objectToHumanReadableString(receiver);
+      }
+    },
+    JSBool: {
+      "^": "Interceptor;",
+      toString$0: function(receiver) {
+        return String(receiver);
+      },
+      get$hashCode: function(receiver) {
+        return receiver ? 519018 : 218159;
+      },
+      $isbool: 1
+    },
+    JSNull: {
+      "^": "Interceptor;",
+      $eq: function(receiver, other) {
+        return null == other;
+      },
+      toString$0: function(receiver) {
+        return "null";
+      },
+      get$hashCode: function(receiver) {
+        return 0;
+      }
+    },
+    JSArray0: {
+      "^": "Interceptor;",
+      checkGrowable$1: function(receiver, reason) {
+        if (!!receiver.fixed$length)
+          throw H.wrapException(new P.UnsupportedError(reason));
+      },
+      toString$0: function(receiver) {
+        return P.IterableBase_iterableToFullString(receiver, "[", "]");
+      },
+      get$hashCode: function(receiver) {
+        return H.Primitives_objectHashCode(receiver);
+      },
+      get$length: function(receiver) {
+        return receiver.length;
+      },
+      set$length: function(receiver, newLength) {
+        this.checkGrowable$1(receiver, "set length");
+        if (typeof newLength !== "number" || Math.floor(newLength) !== newLength)
+          throw H.wrapException(P.ArgumentError$value(newLength, "newLength", null));
+        if (newLength < 0)
+          throw H.wrapException(P.RangeError$range(newLength, 0, null, "newLength", null));
+        receiver.length = newLength;
+      },
+      $isList: 1
+    },
+    JSUnmodifiableArray: {
+      "^": "JSArray0;"
+    },
+    ArrayIterator: {
+      "^": "Object;_iterable,_length,_index,_current",
+      moveNext$0: function() {
+        var t1, $length, t2;
+        t1 = this._iterable;
+        $length = t1.length;
+        if (this._length !== $length)
+          throw H.wrapException(H.throwConcurrentModificationError(t1));
+        t2 = this._index;
+        if (t2 >= $length) {
+          this._current = null;
+          return false;
+        }
+        this._current = t1[t2];
+        this._index = t2 + 1;
+        return true;
+      }
+    },
+    JSNumber: {
+      "^": "Interceptor;",
+      compareTo$1: function(receiver, b) {
+        var bIsNegative;
+        if (typeof b !== "number")
+          throw H.wrapException(H.argumentErrorValue(b));
+        if (receiver < b)
+          return -1;
+        else if (receiver > b)
+          return 1;
+        else if (receiver === b) {
+          if (receiver === 0) {
+            bIsNegative = this.get$isNegative(b);
+            if (this.get$isNegative(receiver) === bIsNegative)
+              return 0;
+            if (this.get$isNegative(receiver))
+              return -1;
+            return 1;
+          }
+          return 0;
+        } else if (isNaN(receiver)) {
+          if (isNaN(b))
+            return 0;
+          return 1;
+        } else
+          return -1;
+      },
+      get$isNegative: function(receiver) {
+        return receiver === 0 ? 1 / receiver < 0 : receiver < 0;
+      },
+      abs$0: function(receiver) {
+        return Math.abs(receiver);
+      },
+      toInt$0: function(receiver) {
+        var t1;
+        if (receiver >= -2147483648 && receiver <= 2147483647)
+          return receiver | 0;
+        if (isFinite(receiver)) {
+          t1 = receiver < 0 ? Math.ceil(receiver) : Math.floor(receiver);
+          return t1 + 0;
+        }
+        throw H.wrapException(new P.UnsupportedError("" + receiver + ".toInt()"));
+      },
+      floor$0: function(receiver) {
+        var truncated, d;
+        if (receiver >= 0) {
+          if (receiver <= 2147483647)
+            return receiver | 0;
+        } else if (receiver >= -2147483648) {
+          truncated = receiver | 0;
+          return receiver === truncated ? truncated : truncated - 1;
+        }
+        d = Math.floor(receiver);
+        if (isFinite(d))
+          return d;
+        throw H.wrapException(new P.UnsupportedError("" + receiver + ".floor()"));
+      },
+      toRadixString$1: function(receiver, radix) {
+        var result, match, t1, exponent;
+        if (radix < 2 || radix > 36)
+          throw H.wrapException(P.RangeError$range(radix, 2, 36, "radix", null));
+        result = receiver.toString(radix);
+        if (C.JSString_methods.codeUnitAt$1(result, result.length - 1) !== 41)
+          return result;
+        match = /^([\da-z]+)(?:\.([\da-z]+))?\(e\+(\d+)\)$/.exec(result);
+        if (match == null)
+          H.throwExpression(new P.UnsupportedError("Unexpected toString result: " + result));
+        t1 = match.length;
+        if (1 >= t1)
+          return H.ioore(match, 1);
+        result = match[1];
+        if (3 >= t1)
+          return H.ioore(match, 3);
+        exponent = +match[3];
+        t1 = match[2];
+        if (t1 != null) {
+          result += t1;
+          exponent -= t1.length;
+        }
+        return result + C.JSString_methods.$mul("0", exponent);
+      },
+      toString$0: function(receiver) {
+        if (receiver === 0 && 1 / receiver < 0)
+          return "-0.0";
+        else
+          return "" + receiver;
+      },
+      get$hashCode: function(receiver) {
+        return receiver & 0x1FFFFFFF;
+      },
+      $negate: function(receiver) {
+        return -receiver;
+      },
+      $add: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return receiver + other;
+      },
+      $sub: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return receiver - other;
+      },
+      $mul: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return receiver * other;
+      },
+      $mod: function(receiver, other) {
+        var result;
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        result = receiver % other;
+        if (result === 0)
+          return 0;
+        if (result > 0)
+          return result;
+        if (other < 0)
+          return result - other;
+        else
+          return result + other;
+      },
+      $tdiv: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        if ((receiver | 0) === receiver)
+          if (other >= 1 || other < -1)
+            return receiver / other | 0;
+        return this._tdivSlow$1(receiver, other);
+      },
+      _tdivSlow$1: function(receiver, other) {
+        var quotient = receiver / other;
+        if (quotient >= -2147483648 && quotient <= 2147483647)
+          return quotient | 0;
+        if (quotient > 0) {
+          if (quotient !== 1 / 0)
+            return Math.floor(quotient);
+        } else if (quotient > -1 / 0)
+          return Math.ceil(quotient);
+        throw H.wrapException(new P.UnsupportedError("Result of truncating division is " + H.S(quotient) + ": " + H.S(receiver) + " ~/ " + H.S(other)));
+      },
+      $shl: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        if (other < 0)
+          throw H.wrapException(H.argumentErrorValue(other));
+        return other > 31 ? 0 : receiver << other >>> 0;
+      },
+      _shlPositive$1: function(receiver, other) {
+        return other > 31 ? 0 : receiver << other >>> 0;
+      },
+      $shr: function(receiver, other) {
+        var t1;
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        if (other < 0)
+          throw H.wrapException(H.argumentErrorValue(other));
+        if (receiver > 0)
+          t1 = other > 31 ? 0 : receiver >>> other;
+        else {
+          t1 = other > 31 ? 31 : other;
+          t1 = receiver >> t1 >>> 0;
+        }
+        return t1;
+      },
+      _shrOtherPositive$1: function(receiver, other) {
+        var t1;
+        if (receiver > 0)
+          t1 = other > 31 ? 0 : receiver >>> other;
+        else {
+          t1 = other > 31 ? 31 : other;
+          t1 = receiver >> t1 >>> 0;
+        }
+        return t1;
+      },
+      $and: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return (receiver & other) >>> 0;
+      },
+      $or: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return (receiver | other) >>> 0;
+      },
+      $lt: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return receiver < other;
+      },
+      $gt: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return receiver > other;
+      },
+      $le: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return receiver <= other;
+      },
+      $ge: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return receiver >= other;
+      },
+      $isnum: 1
+    },
+    JSInt: {
+      "^": "JSNumber;",
+      $not: function(receiver) {
+        return ~receiver >>> 0;
+      },
+      $isnum: 1,
+      $isint: 1
+    },
+    JSDouble: {
+      "^": "JSNumber;",
+      $isnum: 1
+    },
+    JSString: {
+      "^": "Interceptor;",
+      codeUnitAt$1: function(receiver, index) {
+        if (index < 0)
+          throw H.wrapException(H.diagnoseIndexError(receiver, index));
+        if (index >= receiver.length)
+          H.throwExpression(H.diagnoseIndexError(receiver, index));
+        return receiver.charCodeAt(index);
+      },
+      _codeUnitAt$1: function(receiver, index) {
+        if (index >= receiver.length)
+          throw H.wrapException(H.diagnoseIndexError(receiver, index));
+        return receiver.charCodeAt(index);
+      },
+      $add: function(receiver, other) {
+        if (typeof other !== "string")
+          throw H.wrapException(P.ArgumentError$value(other, null, null));
+        return receiver + other;
+      },
+      substring$2: function(receiver, startIndex, endIndex) {
+        if (endIndex == null)
+          endIndex = receiver.length;
+        if (startIndex > endIndex)
+          throw H.wrapException(P.RangeError$value(startIndex, null, null));
+        if (endIndex > receiver.length)
+          throw H.wrapException(P.RangeError$value(endIndex, null, null));
+        return receiver.substring(startIndex, endIndex);
+      },
+      substring$1: function($receiver, startIndex) {
+        return this.substring$2($receiver, startIndex, null);
+      },
+      $mul: function(receiver, times) {
+        var s, result;
+        if (typeof times !== "number")
+          return H.iae(times);
+        if (0 >= times)
+          return "";
+        if (times === 1 || receiver.length === 0)
+          return receiver;
+        if (times !== times >>> 0)
+          throw H.wrapException(C.C_OutOfMemoryError);
+        for (s = receiver, result = ""; true;) {
+          if ((times & 1) === 1)
+            result = s + result;
+          times = times >>> 1;
+          if (times === 0)
+            break;
+          s += s;
+        }
+        return result;
+      },
+      compareTo$1: function(receiver, other) {
+        var t1;
+        if (typeof other !== "string")
+          throw H.wrapException(H.argumentErrorValue(other));
+        if (receiver === other)
+          t1 = 0;
+        else
+          t1 = receiver < other ? -1 : 1;
+        return t1;
+      },
+      toString$0: function(receiver) {
+        return receiver;
+      },
+      get$hashCode: function(receiver) {
+        var t1, hash, i;
+        for (t1 = receiver.length, hash = 0, i = 0; i < t1; ++i) {
+          hash = 536870911 & hash + receiver.charCodeAt(i);
+          hash = 536870911 & hash + ((524287 & hash) << 10);
+          hash ^= hash >> 6;
+        }
+        hash = 536870911 & hash + ((67108863 & hash) << 3);
+        hash ^= hash >> 11;
+        return 536870911 & hash + ((16383 & hash) << 15);
+      },
+      get$length: function(receiver) {
+        return receiver.length;
+      },
+      $isString: 1
+    }
+  }], ["_js_helper", "dart:_js_helper",, H, {
+    "^": "",
+    getType: function(index) {
+      return init.types[index];
+    },
+    S: function(value) {
+      var res;
+      if (typeof value === "string")
+        return value;
+      if (typeof value === "number") {
+        if (value !== 0)
+          return "" + value;
+      } else if (true === value)
+        return "true";
+      else if (false === value)
+        return "false";
+      else if (value == null)
+        return "null";
+      res = J.toString$0$(value);
+      if (typeof res !== "string")
+        throw H.wrapException(H.argumentErrorValue(value));
+      return res;
+    },
+    Primitives_objectHashCode: function(object) {
+      var hash = object.$identityHash;
+      if (hash == null) {
+        hash = Math.random() * 0x3fffffff | 0;
+        object.$identityHash = hash;
+      }
+      return hash;
+    },
+    Primitives__parseIntError: function(source, handleError) {
+      return handleError.call$1(source);
+    },
+    Primitives_parseInt: function(source, radix, handleError) {
+      var match, decimalMatch;
+      if (typeof source !== "string")
+        H.throwExpression(H.argumentErrorValue(source));
+      match = /^\s*[+-]?((0x[a-f0-9]+)|(\d+)|([a-z0-9]+))\s*$/i.exec(source);
+      if (match == null)
+        return H.Primitives__parseIntError(source, handleError);
+      if (3 >= match.length)
+        return H.ioore(match, 3);
+      decimalMatch = match[3];
+      if (decimalMatch != null)
+        return parseInt(source, 10);
+      if (match[2] != null)
+        return parseInt(source, 16);
+      return H.Primitives__parseIntError(source, handleError);
+    },
+    Primitives_objectTypeName: function(object) {
+      var interceptor, interceptorConstructor, interceptorConstructorName, $name, dispatchName, objectConstructor, match, decompiledName;
+      interceptor = J.getInterceptor(object);
+      interceptorConstructor = interceptor.constructor;
+      if (typeof interceptorConstructor == "function") {
+        interceptorConstructorName = interceptorConstructor.name;
+        $name = typeof interceptorConstructorName === "string" ? interceptorConstructorName : null;
+      } else
+        $name = null;
+      if ($name == null || interceptor === C.Interceptor_methods || !!J.getInterceptor(object).$isUnknownJavaScriptObject) {
+        dispatchName = C.JS_CONST_u2C(object);
+        if (dispatchName === "Object") {
+          objectConstructor = object.constructor;
+          if (typeof objectConstructor == "function") {
+            match = String(objectConstructor).match(/^\s*function\s*([\w$]*)\s*\(/);
+            decompiledName = match == null ? null : match[1];
+            if (typeof decompiledName === "string" && /^\w+$/.test(decompiledName))
+              $name = decompiledName;
+          }
+          if ($name == null)
+            $name = dispatchName;
+        } else
+          $name = dispatchName;
+      }
+      $name = $name;
+      if ($name.length > 1 && C.JSString_methods._codeUnitAt$1($name, 0) === 36)
+        $name = C.JSString_methods.substring$1($name, 1);
+      return function(str, names) {
+        return str.replace(/[^<,> ]+/g, function(m) {
+          return names[m] || m;
+        });
+      }($name + H.joinArguments(H.getRuntimeTypeInfo(object), 0, null), init.mangledGlobalNames);
+    },
+    Primitives_objectToHumanReadableString: function(object) {
+      return "Instance of '" + H.Primitives_objectTypeName(object) + "'";
+    },
+    Primitives_dateNow: [function() {
+      return Date.now();
+    }, "call$0", "_js_helper_Primitives_dateNow$closure", 0, 0, 2],
+    Primitives_initTicker: function() {
+      var $window, performance;
+      if ($.Primitives_timerFrequency != null)
+        return;
+      $.Primitives_timerFrequency = 1000;
+      $.Primitives_timerTicks = H._js_helper_Primitives_dateNow$closure();
+      if (typeof window == "undefined")
+        return;
+      $window = window;
+      if ($window == null)
+        return;
+      performance = $window.performance;
+      if (performance == null)
+        return;
+      if (typeof performance.now != "function")
+        return;
+      $.Primitives_timerFrequency = 1000000;
+      $.Primitives_timerTicks = new H.Primitives_initTicker_closure(performance);
+    },
+    iae: function(argument) {
+      throw H.wrapException(H.argumentErrorValue(argument));
+    },
+    ioore: function(receiver, index) {
+      if (receiver == null)
+        J.get$length$as(receiver);
+      throw H.wrapException(H.diagnoseIndexError(receiver, index));
+    },
+    diagnoseIndexError: function(indexable, index) {
+      var $length;
+      if (typeof index !== "number" || Math.floor(index) !== index)
+        return new P.ArgumentError(true, index, "index", null);
+      $length = J.get$length$as(indexable);
+      if (index < 0 || index >= $length)
+        return P.IndexError$(index, indexable, "index", null, $length);
+      return P.RangeError$value(index, "index", null);
+    },
+    argumentErrorValue: function(object) {
+      return new P.ArgumentError(true, object, null, null);
+    },
+    checkNum: function(value) {
+      if (typeof value !== "number")
+        throw H.wrapException(H.argumentErrorValue(value));
+      return value;
+    },
+    wrapException: function(ex) {
+      var wrapper;
+      if (ex == null)
+        ex = new P.NullThrownError();
+      wrapper = new Error();
+      wrapper.dartException = ex;
+      if ("defineProperty" in Object) {
+        Object.defineProperty(wrapper, "message", {get: H.toStringWrapper});
+        wrapper.name = "";
+      } else
+        wrapper.toString = H.toStringWrapper;
+      return wrapper;
+    },
+    toStringWrapper: function() {
+      return J.toString$0$(this.dartException);
+    },
+    throwExpression: function(ex) {
+      throw H.wrapException(ex);
+    },
+    throwConcurrentModificationError: function(collection) {
+      throw H.wrapException(new P.ConcurrentModificationError(collection));
+    },
+    Closure_fromTearOff: function(receiver, functions, reflectionInfo, isStatic, jsArguments, propertyName) {
+      var $function, callName, functionType, $prototype, $constructor, t1, isIntercepted, trampoline, signatureFunction, getReceiver, i, stub, stubCallName, t2;
+      $function = functions[0];
+      callName = $function.$callName;
+      if (!!J.getInterceptor(reflectionInfo).$isList) {
+        $function.$reflectionInfo = reflectionInfo;
+        functionType = H.ReflectionInfo_ReflectionInfo($function).functionType;
+      } else
+        functionType = reflectionInfo;
+      $prototype = isStatic ? Object.create(new H.StaticClosure().constructor.prototype) : Object.create(new H.BoundClosure(null, null, null, null).constructor.prototype);
+      $prototype.$initialize = $prototype.constructor;
+      if (isStatic)
+        $constructor = function() {
+          this.$initialize();
+        };
+      else {
+        t1 = $.Closure_functionCounter;
+        $.Closure_functionCounter = J.$add$ns(t1, 1);
+        $constructor = new Function("a,b,c,d" + t1, "this.$initialize(a,b,c,d" + t1 + ")");
+      }
+      $prototype.constructor = $constructor;
+      $constructor.prototype = $prototype;
+      if (!isStatic) {
+        isIntercepted = jsArguments.length == 1 && true;
+        trampoline = H.Closure_forwardCallTo(receiver, $function, isIntercepted);
+        trampoline.$reflectionInfo = reflectionInfo;
+      } else {
+        $prototype.$static_name = propertyName;
+        trampoline = $function;
+        isIntercepted = false;
+      }
+      if (typeof functionType == "number")
+        signatureFunction = function(getType, t) {
+          return function() {
+            return getType(t);
+          };
+        }(H.getType, functionType);
+      else if (typeof functionType == "function")
+        if (isStatic)
+          signatureFunction = functionType;
+        else {
+          getReceiver = isIntercepted ? H.BoundClosure_receiverOf : H.BoundClosure_selfOf;
+          signatureFunction = function(f, r) {
+            return function() {
+              return f.apply({$receiver: r(this)}, arguments);
+            };
+          }(functionType, getReceiver);
+        }
+      else
+        throw H.wrapException("Error in reflectionInfo.");
+      $prototype.$signature = signatureFunction;
+      $prototype[callName] = trampoline;
+      for (t1 = functions.length, i = 1; i < t1; ++i) {
+        stub = functions[i];
+        stubCallName = stub.$callName;
+        if (stubCallName != null) {
+          t2 = isStatic ? stub : H.Closure_forwardCallTo(receiver, stub, isIntercepted);
+          $prototype[stubCallName] = t2;
+        }
+      }
+      $prototype["call*"] = trampoline;
+      $prototype.$requiredArgCount = $function.$requiredArgCount;
+      $prototype.$defaultValues = $function.$defaultValues;
+      return $constructor;
+    },
+    Closure_cspForwardCall: function(arity, isSuperCall, stubName, $function) {
+      var getSelf = H.BoundClosure_selfOf;
+      switch (isSuperCall ? -1 : arity) {
+        case 0:
+          return function(n, S) {
+            return function() {
+              return S(this)[n]();
+            };
+          }(stubName, getSelf);
+        case 1:
+          return function(n, S) {
+            return function(a) {
+              return S(this)[n](a);
+            };
+          }(stubName, getSelf);
+        case 2:
+          return function(n, S) {
+            return function(a, b) {
+              return S(this)[n](a, b);
+            };
+          }(stubName, getSelf);
+        case 3:
+          return function(n, S) {
+            return function(a, b, c) {
+              return S(this)[n](a, b, c);
+            };
+          }(stubName, getSelf);
+        case 4:
+          return function(n, S) {
+            return function(a, b, c, d) {
+              return S(this)[n](a, b, c, d);
+            };
+          }(stubName, getSelf);
+        case 5:
+          return function(n, S) {
+            return function(a, b, c, d, e) {
+              return S(this)[n](a, b, c, d, e);
+            };
+          }(stubName, getSelf);
+        default:
+          return function(f, s) {
+            return function() {
+              return f.apply(s(this), arguments);
+            };
+          }($function, getSelf);
+      }
+    },
+    Closure_forwardCallTo: function(receiver, $function, isIntercepted) {
+      var stubName, arity, lookedUpFunction, t1, t2, selfName, $arguments;
+      if (isIntercepted)
+        return H.Closure_forwardInterceptedCallTo(receiver, $function);
+      stubName = $function.$stubName;
+      arity = $function.length;
+      lookedUpFunction = receiver[stubName];
+      t1 = $function == null ? lookedUpFunction == null : $function === lookedUpFunction;
+      t2 = !t1 || arity >= 27;
+      if (t2)
+        return H.Closure_cspForwardCall(arity, !t1, stubName, $function);
+      if (arity === 0) {
+        t1 = $.Closure_functionCounter;
+        $.Closure_functionCounter = J.$add$ns(t1, 1);
+        selfName = "self" + H.S(t1);
+        t1 = "return function(){var " + selfName + " = this.";
+        t2 = $.BoundClosure_selfFieldNameCache;
+        if (t2 == null) {
+          t2 = H.BoundClosure_computeFieldNamed("self");
+          $.BoundClosure_selfFieldNameCache = t2;
+        }
+        return new Function(t1 + H.S(t2) + ";return " + selfName + "." + H.S(stubName) + "();}")();
+      }
+      $arguments = "abcdefghijklmnopqrstuvwxyz".split("").splice(0, arity).join(",");
+      t1 = $.Closure_functionCounter;
+      $.Closure_functionCounter = J.$add$ns(t1, 1);
+      $arguments += H.S(t1);
+      t1 = "return function(" + $arguments + "){return this.";
+      t2 = $.BoundClosure_selfFieldNameCache;
+      if (t2 == null) {
+        t2 = H.BoundClosure_computeFieldNamed("self");
+        $.BoundClosure_selfFieldNameCache = t2;
+      }
+      return new Function(t1 + H.S(t2) + "." + H.S(stubName) + "(" + $arguments + ");}")();
+    },
+    Closure_cspForwardInterceptedCall: function(arity, isSuperCall, $name, $function) {
+      var getSelf, getReceiver;
+      getSelf = H.BoundClosure_selfOf;
+      getReceiver = H.BoundClosure_receiverOf;
+      switch (isSuperCall ? -1 : arity) {
+        case 0:
+          throw H.wrapException(new H.RuntimeError("Intercepted function with no arguments."));
+        case 1:
+          return function(n, s, r) {
+            return function() {
+              return s(this)[n](r(this));
+            };
+          }($name, getSelf, getReceiver);
+        case 2:
+          return function(n, s, r) {
+            return function(a) {
+              return s(this)[n](r(this), a);
+            };
+          }($name, getSelf, getReceiver);
+        case 3:
+          return function(n, s, r) {
+            return function(a, b) {
+              return s(this)[n](r(this), a, b);
+            };
+          }($name, getSelf, getReceiver);
+        case 4:
+          return function(n, s, r) {
+            return function(a, b, c) {
+              return s(this)[n](r(this), a, b, c);
+            };
+          }($name, getSelf, getReceiver);
+        case 5:
+          return function(n, s, r) {
+            return function(a, b, c, d) {
+              return s(this)[n](r(this), a, b, c, d);
+            };
+          }($name, getSelf, getReceiver);
+        case 6:
+          return function(n, s, r) {
+            return function(a, b, c, d, e) {
+              return s(this)[n](r(this), a, b, c, d, e);
+            };
+          }($name, getSelf, getReceiver);
+        default:
+          return function(f, s, r, a) {
+            return function() {
+              a = [r(this)];
+              Array.prototype.push.apply(a, arguments);
+              return f.apply(s(this), a);
+            };
+          }($function, getSelf, getReceiver);
+      }
+    },
+    Closure_forwardInterceptedCallTo: function(receiver, $function) {
+      var selfField, t1, stubName, arity, lookedUpFunction, t2, t3, $arguments;
+      selfField = H.BoundClosure_selfFieldName();
+      t1 = $.BoundClosure_receiverFieldNameCache;
+      if (t1 == null) {
+        t1 = H.BoundClosure_computeFieldNamed("receiver");
+        $.BoundClosure_receiverFieldNameCache = t1;
+      }
+      stubName = $function.$stubName;
+      arity = $function.length;
+      lookedUpFunction = receiver[stubName];
+      t2 = $function == null ? lookedUpFunction == null : $function === lookedUpFunction;
+      t3 = !t2 || arity >= 28;
+      if (t3)
+        return H.Closure_cspForwardInterceptedCall(arity, !t2, stubName, $function);
+      if (arity === 1) {
+        t1 = "return function(){return this." + H.S(selfField) + "." + H.S(stubName) + "(this." + H.S(t1) + ");";
+        t2 = $.Closure_functionCounter;
+        $.Closure_functionCounter = J.$add$ns(t2, 1);
+        return new Function(t1 + H.S(t2) + "}")();
+      }
+      $arguments = "abcdefghijklmnopqrstuvwxyz".split("").splice(0, arity - 1).join(",");
+      t1 = "return function(" + $arguments + "){return this." + H.S(selfField) + "." + H.S(stubName) + "(this." + H.S(t1) + ", " + $arguments + ");";
+      t2 = $.Closure_functionCounter;
+      $.Closure_functionCounter = J.$add$ns(t2, 1);
+      return new Function(t1 + H.S(t2) + "}")();
+    },
+    closureFromTearOff: function(receiver, functions, reflectionInfo, isStatic, jsArguments, $name) {
+      var t1;
+      functions.fixed$length = Array;
+      if (!!J.getInterceptor(reflectionInfo).$isList) {
+        reflectionInfo.fixed$length = Array;
+        t1 = reflectionInfo;
+      } else
+        t1 = reflectionInfo;
+      return H.Closure_fromTearOff(receiver, functions, t1, !!isStatic, jsArguments, $name);
+    },
+    throwCyclicInit: function(staticName) {
+      throw H.wrapException(new P.CyclicInitializationError(staticName));
+    },
+    getRuntimeTypeInfo: function(target) {
+      if (target == null)
+        return;
+      return target.$ti;
+    },
+    runtimeTypeToString: function(rti, onTypeVariable) {
+      var typedefInfo;
+      if (rti == null)
+        return "dynamic";
+      if (typeof rti === "object" && rti !== null && rti.constructor === Array)
+        return rti[0].builtin$cls + H.joinArguments(rti, 1, onTypeVariable);
+      if (typeof rti == "function")
+        return rti.builtin$cls;
+      if (typeof rti === "number" && Math.floor(rti) === rti)
+        return H.S(rti);
+      if (typeof rti.func != "undefined") {
+        typedefInfo = rti.typedef;
+        if (typedefInfo != null)
+          return H.runtimeTypeToString(typedefInfo, onTypeVariable);
+        return H._functionRtiToString(rti, onTypeVariable);
+      }
+      return "unknown-reified-type";
+    },
+    _functionRtiToString: function(rti, onTypeVariable) {
+      var returnTypeText, $arguments, t1, argumentsText, sep, _i, argument, optionalArguments, namedArguments, t2, $name;
+      returnTypeText = !!rti.v ? "void" : H.runtimeTypeToString(rti.ret, onTypeVariable);
+      if ("args" in rti) {
+        $arguments = rti.args;
+        for (t1 = $arguments.length, argumentsText = "", sep = "", _i = 0; _i < t1; ++_i, sep = ", ") {
+          argument = $arguments[_i];
+          argumentsText = argumentsText + sep + H.runtimeTypeToString(argument, onTypeVariable);
+        }
+      } else {
+        argumentsText = "";
+        sep = "";
+      }
+      if ("opt" in rti) {
+        optionalArguments = rti.opt;
+        argumentsText += sep + "[";
+        for (t1 = optionalArguments.length, sep = "", _i = 0; _i < t1; ++_i, sep = ", ") {
+          argument = optionalArguments[_i];
+          argumentsText = argumentsText + sep + H.runtimeTypeToString(argument, onTypeVariable);
+        }
+        argumentsText += "]";
+      }
+      if ("named" in rti) {
+        namedArguments = rti.named;
+        argumentsText += sep + "{";
+        for (t1 = H.extractKeys(namedArguments), t2 = t1.length, sep = "", _i = 0; _i < t2; ++_i, sep = ", ") {
+          $name = t1[_i];
+          argumentsText = argumentsText + sep + H.runtimeTypeToString(namedArguments[$name], onTypeVariable) + (" " + H.S($name));
+        }
+        argumentsText += "}";
+      }
+      return "(" + argumentsText + ") => " + returnTypeText;
+    },
+    joinArguments: function(types, startIndex, onTypeVariable) {
+      var buffer, index, firstArgument, allDynamic, t1, argument;
+      if (types == null)
+        return "";
+      buffer = new P.StringBuffer("");
+      for (index = startIndex, firstArgument = true, allDynamic = true, t1 = ""; index < types.length; ++index) {
+        if (firstArgument)
+          firstArgument = false;
+        else
+          buffer._contents = t1 + ", ";
+        argument = types[index];
+        if (argument != null)
+          allDynamic = false;
+        t1 = buffer._contents += H.runtimeTypeToString(argument, onTypeVariable);
+      }
+      return allDynamic ? "" : "<" + buffer.toString$0(0) + ">";
+    },
+    ReflectionInfo: {
+      "^": "Object;jsFunction,data<,isAccessor,requiredParameterCount,optionalParameterCount,areOptionalParametersNamed,functionType,cachedSortedIndices",
+      static: {
+        ReflectionInfo_ReflectionInfo: function(jsFunction) {
+          var data, requiredParametersInfo, optionalParametersInfo;
+          data = jsFunction.$reflectionInfo;
+          if (data == null)
+            return;
+          data.fixed$length = Array;
+          data = data;
+          requiredParametersInfo = data[0];
+          optionalParametersInfo = data[1];
+          return new H.ReflectionInfo(jsFunction, data, (requiredParametersInfo & 1) === 1, requiredParametersInfo >> 1, optionalParametersInfo >> 1, (optionalParametersInfo & 1) === 1, data[2], null);
+        }
+      }
+    },
+    Primitives_initTicker_closure: {
+      "^": "Closure;performance",
+      call$0: function() {
+        return C.JSNumber_methods.floor$0(1000 * this.performance.now());
+      }
+    },
+    Closure: {
+      "^": "Object;",
+      toString$0: function(_) {
+        return "Closure '" + H.Primitives_objectTypeName(this).trim() + "'";
+      },
+      get$$call: function() {
+        return this;
+      },
+      get$$call: function() {
+        return this;
+      }
+    },
+    TearOffClosure: {
+      "^": "Closure;"
+    },
+    StaticClosure: {
+      "^": "TearOffClosure;",
+      toString$0: function(_) {
+        var $name = this.$static_name;
+        if ($name == null)
+          return "Closure of unknown static method";
+        return "Closure '" + $name + "'";
+      }
+    },
+    BoundClosure: {
+      "^": "TearOffClosure;_self,_target,_receiver,_name",
+      $eq: function(_, other) {
+        if (other == null)
+          return false;
+        if (this === other)
+          return true;
+        if (!(other instanceof H.BoundClosure))
+          return false;
+        return this._self === other._self && this._target === other._target && this._receiver === other._receiver;
+      },
+      get$hashCode: function(_) {
+        var t1, receiverHashCode;
+        t1 = this._receiver;
+        if (t1 == null)
+          receiverHashCode = H.Primitives_objectHashCode(this._self);
+        else
+          receiverHashCode = typeof t1 !== "object" ? J.get$hashCode$(t1) : H.Primitives_objectHashCode(t1);
+        return (receiverHashCode ^ H.Primitives_objectHashCode(this._target)) >>> 0;
+      },
+      toString$0: function(_) {
+        var receiver = this._receiver;
+        if (receiver == null)
+          receiver = this._self;
+        return "Closure '" + H.S(this._name) + "' of " + H.Primitives_objectToHumanReadableString(receiver);
+      },
+      static: {
+        BoundClosure_selfOf: function(closure) {
+          return closure._self;
+        },
+        BoundClosure_receiverOf: function(closure) {
+          return closure._receiver;
+        },
+        BoundClosure_selfFieldName: function() {
+          var t1 = $.BoundClosure_selfFieldNameCache;
+          if (t1 == null) {
+            t1 = H.BoundClosure_computeFieldNamed("self");
+            $.BoundClosure_selfFieldNameCache = t1;
+          }
+          return t1;
+        },
+        BoundClosure_computeFieldNamed: function(fieldName) {
+          var template, t1, names, i, $name;
+          template = new H.BoundClosure("self", "target", "receiver", "name");
+          t1 = Object.getOwnPropertyNames(template);
+          t1.fixed$length = Array;
+          names = t1;
+          for (t1 = names.length, i = 0; i < t1; ++i) {
+            $name = names[i];
+            if (template[$name] === fieldName)
+              return $name;
+          }
+        }
+      }
+    },
+    RuntimeError: {
+      "^": "Error;message",
+      toString$0: function(_) {
+        return "RuntimeError: " + this.message;
+      }
+    },
+    JsLinkedHashMap: {
+      "^": "Object;__js_helper$_length,_strings,_nums,_rest,_first,_last,_modifications",
+      get$length: function(_) {
+        return this.__js_helper$_length;
+      },
+      $index: function(_, key) {
+        var nums, cell;
+        if ((key & 0x3ffffff) === key) {
+          nums = this._nums;
+          if (nums == null)
+            return;
+          cell = this._getTableCell$2(nums, key);
+          return cell == null ? null : cell.get$hashMapCellValue();
+        } else
+          return this.internalGet$1(key);
+      },
+      internalGet$1: function(key) {
+        var rest, bucket, index;
+        rest = this._rest;
+        if (rest == null)
+          return;
+        bucket = this._getTableBucket$2(rest, C.JSInt_methods.get$hashCode(key) & 0x3ffffff);
+        index = this.internalFindBucketIndex$2(bucket, key);
+        if (index < 0)
+          return;
+        return bucket[index].get$hashMapCellValue();
+      },
+      $indexSet: function(_, key, value) {
+        var strings, nums, rest, hash, bucket, index;
+        if (typeof key === "string") {
+          strings = this._strings;
+          if (strings == null) {
+            strings = this._newHashTable$0();
+            this._strings = strings;
+          }
+          this._addHashTableEntry$3(strings, key, value);
+        } else if (typeof key === "number" && (key & 0x3ffffff) === key) {
+          nums = this._nums;
+          if (nums == null) {
+            nums = this._newHashTable$0();
+            this._nums = nums;
+          }
+          this._addHashTableEntry$3(nums, key, value);
+        } else {
+          rest = this._rest;
+          if (rest == null) {
+            rest = this._newHashTable$0();
+            this._rest = rest;
+          }
+          hash = J.get$hashCode$(key) & 0x3ffffff;
+          bucket = this._getTableBucket$2(rest, hash);
+          if (bucket == null)
+            this._setTableEntry$3(rest, hash, [this._newLinkedCell$2(key, value)]);
+          else {
+            index = this.internalFindBucketIndex$2(bucket, key);
+            if (index >= 0)
+              bucket[index].set$hashMapCellValue(value);
+            else
+              bucket.push(this._newLinkedCell$2(key, value));
+          }
+        }
+      },
+      forEach$1: function(_, action) {
+        var cell, modifications;
+        cell = this._first;
+        modifications = this._modifications;
+        for (; cell != null;) {
+          action.call$2(cell.hashMapCellKey, cell.hashMapCellValue);
+          if (modifications !== this._modifications)
+            throw H.wrapException(new P.ConcurrentModificationError(this));
+          cell = cell._next;
+        }
+      },
+      _addHashTableEntry$3: function(table, key, value) {
+        var cell = this._getTableCell$2(table, key);
+        if (cell == null)
+          this._setTableEntry$3(table, key, this._newLinkedCell$2(key, value));
+        else
+          cell.set$hashMapCellValue(value);
+      },
+      _newLinkedCell$2: function(key, value) {
+        var cell, last;
+        cell = new H.LinkedHashMapCell(key, value, null, null);
+        if (this._first == null) {
+          this._last = cell;
+          this._first = cell;
+        } else {
+          last = this._last;
+          cell._previous = last;
+          last._next = cell;
+          this._last = cell;
+        }
+        ++this.__js_helper$_length;
+        this._modifications = this._modifications + 1 & 67108863;
+        return cell;
+      },
+      internalFindBucketIndex$2: function(bucket, key) {
+        var $length, i;
+        if (bucket == null)
+          return -1;
+        $length = bucket.length;
+        for (i = 0; i < $length; ++i)
+          if (J.$eq$(bucket[i].get$hashMapCellKey(), key))
+            return i;
+        return -1;
+      },
+      toString$0: function(_) {
+        return P.Maps_mapToString(this);
+      },
+      _getTableCell$2: function(table, key) {
+        return table[key];
+      },
+      _getTableBucket$2: function(table, key) {
+        return table[key];
+      },
+      _setTableEntry$3: function(table, key, value) {
+        table[key] = value;
+      },
+      _deleteTableEntry$2: function(table, key) {
+        delete table[key];
+      },
+      _newHashTable$0: function() {
+        var table = Object.create(null);
+        this._setTableEntry$3(table, "<non-identifier-key>", table);
+        this._deleteTableEntry$2(table, "<non-identifier-key>");
+        return table;
+      }
+    },
+    LinkedHashMapCell: {
+      "^": "Object;hashMapCellKey<,hashMapCellValue@,_next,_previous"
+    }
+  }], ["dart._js_names", "dart:_js_names",, H, {
+    "^": "",
+    extractKeys: function(victim) {
+      var t1 = victim ? Object.keys(victim) : [];
+      t1.fixed$length = Array;
+      return t1;
+    }
+  }], ["dart2js._js_primitives", "dart:_js_primitives",, H, {
+    "^": "",
+    printString: function(string) {
+      if (typeof dartPrint == "function") {
+        dartPrint(string);
+        return;
+      }
+      if (typeof console == "object" && typeof console.log != "undefined") {
+        console.log(string);
+        return;
+      }
+      if (typeof window == "object")
+        return;
+      if (typeof print == "function") {
+        print(string);
+        return;
+      }
+      throw "Unable to print message: " + String(string);
+    }
+  }], ["dart.collection", "dart:collection",, P, {
+    "^": "",
+    IterableBase_iterableToFullString: function(iterable, leftDelimiter, rightDelimiter) {
+      var buffer, t1, t2;
+      if (P._isToStringVisiting(iterable))
+        return leftDelimiter + "..." + rightDelimiter;
+      buffer = new P.StringBuffer(leftDelimiter);
+      t1 = $.$get$_toStringVisiting();
+      t1.push(iterable);
+      try {
+        t2 = buffer;
+        t2._contents = P.StringBuffer__writeAll(t2.get$_contents(), iterable, ", ");
+      } finally {
+        if (0 >= t1.length)
+          return H.ioore(t1, -1);
+        t1.pop();
+      }
+      t1 = buffer;
+      t1._contents = t1.get$_contents() + rightDelimiter;
+      t1 = buffer.get$_contents();
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
+    },
+    _isToStringVisiting: function(o) {
+      var i, t1;
+      for (i = 0; t1 = $.$get$_toStringVisiting(), i < t1.length; ++i)
+        if (o === t1[i])
+          return true;
+      return false;
+    },
+    Maps_mapToString: function(m) {
+      var t1, result, t2;
+      t1 = {};
+      if (P._isToStringVisiting(m))
+        return "{...}";
+      result = new P.StringBuffer("");
+      try {
+        $.$get$_toStringVisiting().push(m);
+        t2 = result;
+        t2._contents = t2.get$_contents() + "{";
+        t1.first = true;
+        m.forEach$1(0, new P.Maps_mapToString_closure(t1, result));
+        t1 = result;
+        t1._contents = t1.get$_contents() + "}";
+      } finally {
+        t1 = $.$get$_toStringVisiting();
+        if (0 >= t1.length)
+          return H.ioore(t1, -1);
+        t1.pop();
+      }
+      t1 = result.get$_contents();
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
+    },
+    Maps_mapToString_closure: {
+      "^": "Closure;_box_0,result",
+      call$2: function(k, v) {
+        var t1, t2;
+        t1 = this._box_0;
+        if (!t1.first)
+          this.result._contents += ", ";
+        t1.first = false;
+        t1 = this.result;
+        t2 = t1._contents += H.S(k);
+        t1._contents = t2 + ": ";
+        t1._contents += H.S(v);
+      }
+    }
+  }], ["dart.core", "dart:core",, P, {
+    "^": "",
+    Error_safeToString: function(object) {
+      if (typeof object === "number" || typeof object === "boolean" || null == object)
+        return J.toString$0$(object);
+      if (typeof object === "string")
+        return JSON.stringify(object);
+      return P.Error__objectToString(object);
+    },
+    Error__objectToString: function(object) {
+      var t1 = J.getInterceptor(object);
+      if (!!t1.$isClosure)
+        return t1.toString$0(object);
+      return H.Primitives_objectToHumanReadableString(object);
+    },
+    bool: {
+      "^": "Object;",
+      get$hashCode: function(_) {
+        return P.Object.prototype.get$hashCode.call(this, this);
+      },
+      toString$0: function(_) {
+        return this ? "true" : "false";
+      }
+    },
+    "+bool": 0,
+    double: {
+      "^": "num;"
+    },
+    "+double": 0,
+    Error: {
+      "^": "Object;"
+    },
+    NullThrownError: {
+      "^": "Error;",
+      toString$0: function(_) {
+        return "Throw of null.";
+      }
+    },
+    ArgumentError: {
+      "^": "Error;_hasValue,invalidValue,name,message",
+      get$_errorName: function() {
+        return "Invalid argument" + (!this._hasValue ? "(s)" : "");
+      },
+      get$_errorExplanation: function() {
+        return "";
+      },
+      toString$0: function(_) {
+        var t1, nameString, message, prefix, explanation, errorValue;
+        t1 = this.name;
+        nameString = t1 != null ? " (" + t1 + ")" : "";
+        t1 = this.message;
+        message = t1 == null ? "" : ": " + t1;
+        prefix = this.get$_errorName() + nameString + message;
+        if (!this._hasValue)
+          return prefix;
+        explanation = this.get$_errorExplanation();
+        errorValue = P.Error_safeToString(this.invalidValue);
+        return prefix + explanation + ": " + H.S(errorValue);
+      },
+      static: {
+        ArgumentError$value: function(value, $name, message) {
+          return new P.ArgumentError(true, value, $name, message);
+        }
+      }
+    },
+    RangeError: {
+      "^": "ArgumentError;start,end,_hasValue,invalidValue,name,message",
+      get$_errorName: function() {
+        return "RangeError";
+      },
+      get$_errorExplanation: function() {
+        var t1, explanation, t2;
+        t1 = this.start;
+        if (t1 == null) {
+          t1 = this.end;
+          explanation = t1 != null ? ": Not less than or equal to " + H.S(t1) : "";
+        } else {
+          t2 = this.end;
+          if (t2 == null)
+            explanation = ": Not greater than or equal to " + H.S(t1);
+          else if (t2 > t1)
+            explanation = ": Not in range " + H.S(t1) + ".." + H.S(t2) + ", inclusive";
+          else
+            explanation = t2 < t1 ? ": Valid value range is empty" : ": Only valid value is " + H.S(t1);
+        }
+        return explanation;
+      },
+      static: {
+        RangeError$value: function(value, $name, message) {
+          return new P.RangeError(null, null, true, value, $name, "Value not in range");
+        },
+        RangeError$range: function(invalidValue, minValue, maxValue, $name, message) {
+          return new P.RangeError(minValue, maxValue, true, invalidValue, $name, "Invalid value");
+        }
+      }
+    },
+    IndexError: {
+      "^": "ArgumentError;indexable,length>,_hasValue,invalidValue,name,message",
+      get$_errorName: function() {
+        return "RangeError";
+      },
+      get$_errorExplanation: function() {
+        if (J.$lt$n(this.invalidValue, 0))
+          return ": index must not be negative";
+        var t1 = this.length;
+        if (t1 === 0)
+          return ": no indices are valid";
+        return ": index should be less than " + t1;
+      },
+      static: {
+        IndexError$: function(invalidValue, indexable, $name, message, $length) {
+          return new P.IndexError(indexable, $length, true, invalidValue, $name, "Index out of range");
+        }
+      }
+    },
+    UnsupportedError: {
+      "^": "Error;message",
+      toString$0: function(_) {
+        return "Unsupported operation: " + this.message;
+      }
+    },
+    ConcurrentModificationError: {
+      "^": "Error;modifiedObject",
+      toString$0: function(_) {
+        var t1 = this.modifiedObject;
+        if (t1 == null)
+          return "Concurrent modification during iteration.";
+        return "Concurrent modification during iteration: " + H.S(P.Error_safeToString(t1)) + ".";
+      }
+    },
+    OutOfMemoryError: {
+      "^": "Object;",
+      toString$0: function(_) {
+        return "Out of Memory";
+      }
+    },
+    CyclicInitializationError: {
+      "^": "Error;variableName",
+      toString$0: function(_) {
+        var t1 = this.variableName;
+        return t1 == null ? "Reading static variable during its initialization" : "Reading static variable '" + H.S(t1) + "' during its initialization";
+      }
+    },
+    int: {
+      "^": "num;"
+    },
+    "+int": 0,
+    List: {
+      "^": "Object;"
+    },
+    "+List": 0,
+    Null: {
+      "^": "Object;",
+      get$hashCode: function(_) {
+        return P.Object.prototype.get$hashCode.call(this, this);
+      },
+      toString$0: function(_) {
+        return "null";
+      }
+    },
+    "+Null": 0,
+    num: {
+      "^": "Object;"
+    },
+    "+num": 0,
+    Object: {
+      "^": ";",
+      $eq: function(_, other) {
+        return this === other;
+      },
+      get$hashCode: function(_) {
+        return H.Primitives_objectHashCode(this);
+      },
+      toString$0: function(_) {
+        return H.Primitives_objectToHumanReadableString(this);
+      },
+      toString: function() {
+        return this.toString$0(this);
+      }
+    },
+    Stopwatch: {
+      "^": "Object;_start,_stop"
+    },
+    String: {
+      "^": "Object;"
+    },
+    "+String": 0,
+    StringBuffer: {
+      "^": "Object;_contents<",
+      get$length: function(_) {
+        return this._contents.length;
+      },
+      toString$0: function(_) {
+        var t1 = this._contents;
+        return t1.charCodeAt(0) == 0 ? t1 : t1;
+      },
+      static: {
+        StringBuffer__writeAll: function(string, objects, separator) {
+          var iterator = new J.ArrayIterator(objects, objects.length, 0, null);
+          if (!iterator.moveNext$0())
+            return string;
+          if (separator.length === 0) {
+            do
+              string += H.S(iterator._current);
+            while (iterator.moveNext$0());
+          } else {
+            string += H.S(iterator._current);
+            for (; iterator.moveNext$0();)
+              string = string + separator + H.S(iterator._current);
+          }
+          return string;
+        }
+      }
+    }
+  }], ["bignum", "package:bignum/bignum.dart",, Z, {
+    "^": "",
+    BigInteger_ZERO: function() {
+      if ($.$get$BigInteger__useJsBigint() === true) {
+        var r = B.BigIntegerV8$(null, null, null);
+        r.fromInt$1(0);
+        return r;
+      } else
+        return N.BigIntegerDartvm$(0, null, null);
+    },
+    BigInteger_ONE: function() {
+      if ($.$get$BigInteger__useJsBigint() === true) {
+        var r = B.BigIntegerV8$(null, null, null);
+        r.fromInt$1(1);
+        return r;
+      } else
+        return N.BigIntegerDartvm$(1, null, null);
+    },
+    BigInteger_TWO: function() {
+      if ($.$get$BigInteger__useJsBigint() === true) {
+        var r = B.BigIntegerV8$(null, null, null);
+        r.fromInt$1(2);
+        return r;
+      } else
+        return N.BigIntegerDartvm$(2, null, null);
+    },
+    BigInteger_THREE: function() {
+      if ($.$get$BigInteger__useJsBigint() === true) {
+        var r = B.BigIntegerV8$(null, null, null);
+        r.fromInt$1(3);
+        return r;
+      } else
+        return N.BigIntegerDartvm$(3, null, null);
+    },
+    BigInteger_BigInteger: function(a, b, c) {
+      if ($.$get$BigInteger__useJsBigint() === true)
+        return B.BigIntegerV8$(a, b, c);
+      else
+        return N.BigIntegerDartvm$(a, b, c);
+    },
+    closure: {
+      "^": "Closure;",
+      call$0: function() {
+        return true;
+      }
+    }
+  }], ["bignum.dartvm", "package:bignum/src/big_integer_dartvm.dart",, N, {
+    "^": "",
+    BigIntegerDartvm: {
+      "^": "Object;data<",
+      fromString$2: function(s, b) {
+        this.data = H.Primitives_parseInt(s, b, new N.BigIntegerDartvm_fromString_closure());
+      },
+      fromByteArray$2: function(s, fixsign) {
+        var t1, v, _i, t2;
+        t1 = s.length;
+        if (t1 === 0) {
+          this.data = 0;
+          return;
+        }
+        if (0 >= t1)
+          return H.ioore(s, 0);
+        t1 = J.$gt$n(J.$and$n(s[0], 255), 127);
+        if (t1 && true) {
+          for (t1 = s.length, v = 0, _i = 0; _i < s.length; s.length === t1 || (0, H.throwConcurrentModificationError)(s), ++_i) {
+            t2 = J.$not$i(J.$sub$n(J.$and$n(s[_i], 255), 256));
+            if (typeof t2 !== "number")
+              return H.iae(t2);
+            v = v << 8 | t2;
+          }
+          this.data = ~v >>> 0;
+        } else {
+          for (t1 = s.length, v = 0, _i = 0; _i < s.length; s.length === t1 || (0, H.throwConcurrentModificationError)(s), ++_i) {
+            t2 = J.$and$n(s[_i], 255);
+            if (typeof t2 !== "number")
+              return H.iae(t2);
+            v = (v << 8 | t2) >>> 0;
+          }
+          this.data = v;
+        }
+      },
+      fromByteArray$1: function(s) {
+        return this.fromByteArray$2(s, false);
+      },
+      toString$1: function(_, b) {
+        return J.toRadixString$1$n(this.data, b);
+      },
+      toString$0: function($receiver) {
+        return this.toString$1($receiver, 10);
+      },
+      abs$0: function(_) {
+        var t1, t2;
+        t1 = J.$lt$n(this.data, 0);
+        t2 = this.data;
+        return t1 ? N.BigIntegerDartvm$(J.$negate$n(t2), null, null) : N.BigIntegerDartvm$(t2, null, null);
+      },
+      compareTo$1: function(_, a) {
+        if (typeof a === "number")
+          return J.compareTo$1$ns(this.data, a);
+        if (a instanceof N.BigIntegerDartvm)
+          return J.compareTo$1$ns(this.data, a.data);
+        return 0;
+      },
+      subTo$2: function(a, r) {
+        r.set$data(J.$sub$n(this.data, a.get$data()));
+      },
+      mod$1: function(a) {
+        return N.BigIntegerDartvm$(J.$mod$n(this.data, a.get$data()), null, null);
+      },
+      intValue$0: function() {
+        return this.data;
+      },
+      shiftLeft$1: function(n) {
+        return N.BigIntegerDartvm$(J.$shl$n(this.data, n), null, null);
+      },
+      add$1: function(_, a) {
+        return N.BigIntegerDartvm$(J.$add$ns(this.data, a.get$data()), null, null);
+      },
+      subtract$1: function(a) {
+        return N.BigIntegerDartvm$(J.$sub$n(this.data, a.get$data()), null, null);
+      },
+      multiply$1: function(a) {
+        return N.BigIntegerDartvm$(J.$mul$ns(this.data, a.get$data()), null, null);
+      },
+      divide$1: function(a) {
+        return N.BigIntegerDartvm$(J.$tdiv$n(this.data, a.get$data()), null, null);
+      },
+      $add: function(_, other) {
+        return N.BigIntegerDartvm$(J.$add$ns(this.data, other.get$data()), null, null);
+      },
+      $sub: function(_, other) {
+        return N.BigIntegerDartvm$(J.$sub$n(this.data, other.get$data()), null, null);
+      },
+      $mul: function(_, other) {
+        return N.BigIntegerDartvm$(J.$mul$ns(this.data, other.get$data()), null, null);
+      },
+      $mod: function(_, other) {
+        return N.BigIntegerDartvm$(J.$mod$n(this.data, other.get$data()), null, null);
+      },
+      $tdiv: function(_, other) {
+        return N.BigIntegerDartvm$(J.$tdiv$n(this.data, other.get$data()), null, null);
+      },
+      $negate: function(_) {
+        return N.BigIntegerDartvm$(J.$negate$n(this.data), null, null);
+      },
+      $lt: function(_, other) {
+        return J.$lt$n(this.compareTo$1(0, other), 0) && true;
+      },
+      $le: function(_, other) {
+        return J.$le$n(this.compareTo$1(0, other), 0) && true;
+      },
+      $gt: function(_, other) {
+        return J.$gt$n(this.compareTo$1(0, other), 0) && true;
+      },
+      $ge: function(_, other) {
+        return J.$ge$n(this.compareTo$1(0, other), 0) && true;
+      },
+      $eq: function(_, other) {
+        if (other == null)
+          return false;
+        return J.$eq$(this.compareTo$1(0, other), 0) && true;
+      },
+      $and: function(_, other) {
+        return N.BigIntegerDartvm$(J.$and$n(this.data, other.get$data()), null, null);
+      },
+      $or: function(_, other) {
+        return N.BigIntegerDartvm$(J.$or$n(this.data, other.get$data()), null, null);
+      },
+      $not: function(_) {
+        return N.BigIntegerDartvm$(J.$not$i(this.data), null, null);
+      },
+      $shl: function(_, shiftAmount) {
+        return N.BigIntegerDartvm$(J.$shl$n(this.data, shiftAmount), null, null);
+      },
+      $shr: function(_, shiftAmount) {
+        return N.BigIntegerDartvm$(J.$shr$n(this.data, shiftAmount), null, null);
+      },
+      BigIntegerDartvm$3: function(a, b, c) {
+        if (a != null)
+          if (typeof a === "number" && Math.floor(a) === a)
+            this.data = a;
+          else if (typeof a === "number")
+            this.data = C.JSNumber_methods.toInt$0(a);
+          else if (!!J.getInterceptor(a).$isList)
+            this.fromByteArray$1(a);
+          else
+            this.fromString$2(a, b);
+      },
+      static: {
+        BigIntegerDartvm$: function(a, b, c) {
+          var t1 = new N.BigIntegerDartvm(null);
+          t1.BigIntegerDartvm$3(a, b, c);
+          return t1;
+        }
+      }
+    },
+    BigIntegerDartvm_fromString_closure: {
+      "^": "Closure;",
+      call$1: function(str) {
+        return 0;
+      }
+    }
+  }], ["bignum.v8", "package:bignum/src/big_integer_v8.dart",, B, {
+    "^": "",
+    JSArray: {
+      "^": "Object;data<",
+      $indexSet: function(_, index, value) {
+        var t1 = J.getInterceptor$n(index);
+        if (t1.$gt(index, this.data.length - 1))
+          C.JSArray_methods.set$length(this.data, t1.$add(index, 1));
+        t1 = this.data;
+        if (index >>> 0 !== index || index >= t1.length)
+          return H.ioore(t1, index);
+        t1[index] = value;
+        return value;
+      }
+    },
+    BigIntegerV8: {
+      "^": "Object;array<,am,t<,s<,_debugging",
+      _am3$6: [function(i, x, w, j, c, n) {
+        var this_array, w_array, xl, xh, t1, l, i0, h, m, t2, t3, t4, j0;
+        this_array = this.array;
+        w_array = w.get$array();
+        xl = J.getInterceptor$n(x).toInt$0(x) & 16383;
+        xh = C.JSInt_methods._shrOtherPositive$1(C.JSNumber_methods.toInt$0(x), 14);
+        for (; n = J.$sub$n(n, 1), J.$ge$n(n, 0); j = j0, i = i0) {
+          t1 = this_array.data;
+          if (i >>> 0 !== i || i >= t1.length)
+            return H.ioore(t1, i);
+          l = J.$and$n(t1[i], 16383);
+          i0 = i + 1;
+          t1 = this_array.data;
+          if (i >= t1.length)
+            return H.ioore(t1, i);
+          h = J.$shr$n(t1[i], 14);
+          if (typeof l !== "number")
+            return H.iae(l);
+          t1 = J.$mul$ns(h, xl);
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          m = xh * l + t1;
+          t1 = w_array.data;
+          t2 = t1.length;
+          if (j >>> 0 !== j || j >= t2)
+            return H.ioore(t1, j);
+          t3 = t1[j];
+          if (typeof t3 !== "number")
+            return H.iae(t3);
+          if (typeof c !== "number")
+            return H.iae(c);
+          l = xl * l + ((m & 16383) << 14) + t3 + c;
+          t3 = C.JSNumber_methods._shrOtherPositive$1(l, 28);
+          t4 = C.JSNumber_methods._shrOtherPositive$1(m, 14);
+          if (typeof h !== "number")
+            return H.iae(h);
+          c = t3 + t4 + xh * h;
+          j0 = j + 1;
+          if (j > t2 - 1)
+            C.JSArray_methods.set$length(t1, j0);
+          t1 = w_array.data;
+          if (j >= t1.length)
+            return H.ioore(t1, j);
+          t1[j] = l & 268435455;
+        }
+        return c;
+      }, "call$6", "get$_am3", 12, 0, 1],
+      copyTo$1: function(r) {
+        var this_array, r_array, t1, i, t2;
+        this_array = this.array;
+        r_array = r.array;
+        t1 = this.t;
+        if (typeof t1 !== "number")
+          return t1.$sub();
+        i = t1 - 1;
+        for (; i >= 0; --i) {
+          t1 = this_array.data;
+          if (i >>> 0 !== i || i >= t1.length)
+            return H.ioore(t1, i);
+          t1 = t1[i];
+          t2 = r_array.data;
+          if (i > t2.length - 1)
+            C.JSArray_methods.set$length(t2, i + 1);
+          t2 = r_array.data;
+          if (i >= t2.length)
+            return H.ioore(t2, i);
+          t2[i] = t1;
+        }
+        r.t = this.t;
+        r.s = this.s;
+      },
+      fromInt$1: function(x) {
+        var this_array, t1;
+        this_array = this.array;
+        this.t = 1;
+        this.s = x < 0 ? -1 : 0;
+        if (x > 0)
+          this_array.$indexSet(0, 0, x);
+        else if (x < -1) {
+          t1 = $.BigIntegerV8_BI_DV;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          this_array.$indexSet(0, 0, x + t1);
+        } else
+          this.t = 0;
+      },
+      fromString$2: function(s, b) {
+        var this_array, k, i, t1, t2, mi, sh, x, c, t3, t4, t5, t6, r;
+        this_array = this.array;
+        if (b === 16)
+          k = 4;
+        else if (b === 8)
+          k = 3;
+        else if (b === 256)
+          k = 8;
+        else if (b === 2)
+          k = 1;
+        else if (b === 32)
+          k = 5;
+        else {
+          if (!(b === 4)) {
+            this.fromRadix$2(s, b);
+            return;
+          }
+          k = 2;
+        }
+        this.t = 0;
+        this.s = 0;
+        i = J.get$length$as(s);
+        for (t1 = k === 8, t2 = s.length, mi = false, sh = 0; --i, i >= 0;) {
+          if (t1) {
+            if (i >= t2)
+              return H.ioore(s, i);
+            x = C.JSString_methods.$and(s[i], 255);
+          } else {
+            c = $.BigIntegerV8_BI_RC.$index(0, C.JSString_methods.codeUnitAt$1(s, i));
+            x = c == null ? -1 : c;
+          }
+          t3 = J.getInterceptor$n(x);
+          if (t3.$lt(x, 0)) {
+            if (i >= t2)
+              return H.ioore(s, i);
+            if (s[i] === "-")
+              mi = true;
+            continue;
+          }
+          if (sh === 0) {
+            t3 = this.t;
+            if (typeof t3 !== "number")
+              return t3.$add();
+            t4 = t3 + 1;
+            this.t = t4;
+            t5 = this_array.data;
+            if (t3 > t5.length - 1)
+              C.JSArray_methods.set$length(t5, t4);
+            t4 = this_array.data;
+            if (t3 >>> 0 !== t3 || t3 >= t4.length)
+              return H.ioore(t4, t3);
+            t4[t3] = x;
+          } else {
+            t4 = $.BigIntegerV8_BI_DB;
+            if (typeof t4 !== "number")
+              return H.iae(t4);
+            t5 = this.t;
+            if (sh + k > t4) {
+              if (typeof t5 !== "number")
+                return t5.$sub();
+              --t5;
+              t6 = this_array.data;
+              if (t5 >>> 0 !== t5 || t5 >= t6.length)
+                return H.ioore(t6, t5);
+              t4 = J.$or$n(t6[t5], J.$shl$n(t3.$and(x, C.JSInt_methods.$shl(1, t4 - sh) - 1), sh));
+              t6 = this_array.data;
+              if (t5 > t6.length - 1)
+                C.JSArray_methods.set$length(t6, t5 + 1);
+              t6 = this_array.data;
+              if (t5 >= t6.length)
+                return H.ioore(t6, t5);
+              t6[t5] = t4;
+              t4 = this.t;
+              if (typeof t4 !== "number")
+                return t4.$add();
+              t5 = t4 + 1;
+              this.t = t5;
+              t6 = $.BigIntegerV8_BI_DB;
+              if (typeof t6 !== "number")
+                return t6.$sub();
+              t6 = t3.$shr(x, t6 - sh);
+              t3 = this_array.data;
+              if (t4 > t3.length - 1)
+                C.JSArray_methods.set$length(t3, t5);
+              t3 = this_array.data;
+              if (t4 >>> 0 !== t4 || t4 >= t3.length)
+                return H.ioore(t3, t4);
+              t3[t4] = t6;
+            } else {
+              if (typeof t5 !== "number")
+                return t5.$sub();
+              t4 = t5 - 1;
+              t5 = this_array.data;
+              if (t4 >>> 0 !== t4 || t4 >= t5.length)
+                return H.ioore(t5, t4);
+              t3 = J.$or$n(t5[t4], t3.$shl(x, sh));
+              t5 = this_array.data;
+              if (t4 > t5.length - 1)
+                C.JSArray_methods.set$length(t5, t4 + 1);
+              t5 = this_array.data;
+              if (t4 >= t5.length)
+                return H.ioore(t5, t4);
+              t5[t4] = t3;
+            }
+          }
+          sh += k;
+          t3 = $.BigIntegerV8_BI_DB;
+          if (typeof t3 !== "number")
+            return H.iae(t3);
+          if (sh >= t3)
+            sh -= t3;
+          mi = false;
+        }
+        if (t1) {
+          if (0 >= t2)
+            return H.ioore(s, 0);
+          C.JSString_methods.$and(s[0], 128);
+          t1 = true;
+        } else
+          t1 = false;
+        if (t1) {
+          this.s = -1;
+          if (sh > 0) {
+            t1 = this.t;
+            if (typeof t1 !== "number")
+              return t1.$sub();
+            --t1;
+            t2 = this_array.data;
+            if (t1 >>> 0 !== t1 || t1 >= t2.length)
+              return H.ioore(t2, t1);
+            t2 = t2[t1];
+            t3 = $.BigIntegerV8_BI_DB;
+            if (typeof t3 !== "number")
+              return t3.$sub();
+            this_array.$indexSet(0, t1, J.$or$n(t2, C.JSInt_methods.$shl(C.JSInt_methods.$shl(1, t3 - sh) - 1, sh)));
+          }
+        }
+        this.clamp$0(0);
+        if (mi) {
+          r = B.BigIntegerV8$(null, null, null);
+          r.fromInt$1(0);
+          r.subTo$2(this, this);
+        }
+      },
+      toString$1: function(_, b) {
+        var t1;
+        if (J.$lt$n(this.s, 0))
+          return "-" + this.negate_op$0().toString$1(0, b);
+        t1 = this.toRadix$1(b);
+        return t1;
+      },
+      toString$0: function($receiver) {
+        return this.toString$1($receiver, null);
+      },
+      negate_op$0: function() {
+        var r, r0;
+        r = B.BigIntegerV8$(null, null, null);
+        r0 = B.BigIntegerV8$(null, null, null);
+        r0.fromInt$1(0);
+        r0.subTo$2(this, r);
+        return r;
+      },
+      abs$0: function(_) {
+        return J.$lt$n(this.s, 0) ? this.negate_op$0() : this;
+      },
+      compareTo$1: function(_, a) {
+        var this_array, a_array, r, i, t1, t2;
+        if (typeof a === "number")
+          a = B.BigIntegerV8$(a, null, null);
+        this_array = this.array;
+        a_array = a.get$array();
+        r = J.$sub$n(this.s, a.s);
+        if (!J.$eq$(r, 0))
+          return r;
+        i = this.t;
+        t1 = a.t;
+        if (typeof i !== "number")
+          return i.$sub();
+        if (typeof t1 !== "number")
+          return H.iae(t1);
+        r = i - t1;
+        if (r !== 0)
+          return r;
+        for (; --i, i >= 0;) {
+          t1 = this_array.data;
+          if (i >>> 0 !== i || i >= t1.length)
+            return H.ioore(t1, i);
+          t1 = t1[i];
+          t2 = a_array.data;
+          if (i >= t2.length)
+            return H.ioore(t2, i);
+          r = J.$sub$n(t1, t2[i]);
+          if (!J.$eq$(r, 0))
+            return r;
+        }
+        return 0;
+      },
+      dlShiftTo$2: function(n, r) {
+        var this_array, r_array, t1, i, t2, t3;
+        this_array = this.array;
+        r_array = r.array;
+        t1 = this.t;
+        if (typeof t1 !== "number")
+          return t1.$sub();
+        i = t1 - 1;
+        for (; i >= 0; --i) {
+          t1 = i + n;
+          t2 = this_array.data;
+          if (i >>> 0 !== i || i >= t2.length)
+            return H.ioore(t2, i);
+          t2 = t2[i];
+          t3 = r_array.data;
+          if (t1 > t3.length - 1)
+            C.JSArray_methods.set$length(t3, t1 + 1);
+          t3 = r_array.data;
+          if (t1 >>> 0 !== t1 || t1 >= t3.length)
+            return H.ioore(t3, t1);
+          t3[t1] = t2;
+        }
+        for (i = n - 1; i >= 0; --i) {
+          t1 = r_array.data;
+          if (i > t1.length - 1)
+            C.JSArray_methods.set$length(t1, i + 1);
+          t1 = r_array.data;
+          if (i >>> 0 !== i || i >= t1.length)
+            return H.ioore(t1, i);
+          t1[i] = 0;
+        }
+        t1 = this.t;
+        if (typeof t1 !== "number")
+          return t1.$add();
+        r.t = t1 + n;
+        r.s = this.s;
+      },
+      drShiftTo$2: function(n, r) {
+        var this_array, r_array, i, t1, t2, t3;
+        this_array = this.array;
+        r_array = r.array;
+        i = n;
+        while (true) {
+          t1 = this.t;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          if (!(i < t1))
+            break;
+          t1 = i - n;
+          t2 = this_array.data;
+          if (i >>> 0 !== i || i >= t2.length)
+            return H.ioore(t2, i);
+          t2 = t2[i];
+          t3 = r_array.data;
+          if (t1 > t3.length - 1)
+            C.JSArray_methods.set$length(t3, t1 + 1);
+          t3 = r_array.data;
+          if (t1 >>> 0 !== t1 || t1 >= t3.length)
+            return H.ioore(t3, t1);
+          t3[t1] = t2;
+          ++i;
+        }
+        r.t = Math.max(t1 - n, 0);
+        r.s = this.s;
+      },
+      lShiftTo$2: function(n, r) {
+        var this_array, r_array, t1, bs, t2, cbs, bm, ds, c, i, t3;
+        this_array = this.array;
+        r_array = r.array;
+        t1 = J.getInterceptor$n(n);
+        bs = t1.$mod(n, $.BigIntegerV8_BI_DB);
+        t2 = $.BigIntegerV8_BI_DB;
+        if (typeof t2 !== "number")
+          return t2.$sub();
+        if (typeof bs !== "number")
+          return H.iae(bs);
+        cbs = t2 - bs;
+        bm = C.JSInt_methods.$shl(1, cbs) - 1;
+        ds = t1.$tdiv(n, t2);
+        c = J.$and$n(J.$shl$n(this.s, bs), $.BigIntegerV8_BI_DM);
+        t1 = this.t;
+        if (typeof t1 !== "number")
+          return t1.$sub();
+        i = t1 - 1;
+        for (; i >= 0; --i) {
+          if (typeof ds !== "number")
+            return H.iae(ds);
+          t1 = i + ds + 1;
+          t2 = this_array.data;
+          if (i >>> 0 !== i || i >= t2.length)
+            return H.ioore(t2, i);
+          t2 = J.$or$n(J.$shr$n(t2[i], cbs), c);
+          t3 = r_array.data;
+          if (t1 > t3.length - 1)
+            C.JSArray_methods.set$length(t3, t1 + 1);
+          t3 = r_array.data;
+          if (t1 >>> 0 !== t1 || t1 >= t3.length)
+            return H.ioore(t3, t1);
+          t3[t1] = t2;
+          t2 = this_array.data;
+          if (i >= t2.length)
+            return H.ioore(t2, i);
+          c = J.$shl$n(J.$and$n(t2[i], bm), bs);
+        }
+        for (i = J.$sub$n(ds, 1); t1 = J.getInterceptor$n(i), t1.$ge(i, 0); --i) {
+          if (t1.$gt(i, r_array.data.length - 1))
+            C.JSArray_methods.set$length(r_array.data, t1.$add(i, 1));
+          t1 = r_array.data;
+          if (i >>> 0 !== i || i >= t1.length)
+            return H.ioore(t1, i);
+          t1[i] = 0;
+        }
+        r_array.$indexSet(0, ds, c);
+        t1 = this.t;
+        if (typeof t1 !== "number")
+          return t1.$add();
+        if (typeof ds !== "number")
+          return H.iae(ds);
+        r.t = t1 + ds + 1;
+        r.s = this.s;
+        r.clamp$0(0);
+      },
+      rShiftTo$2: function(n, r) {
+        var this_array, r_array, t1, ds, bs, cbs, bm, i, t2, t3;
+        this_array = this.array;
+        r_array = r.array;
+        r.s = this.s;
+        t1 = J.getInterceptor$n(n);
+        ds = t1.$tdiv(n, $.BigIntegerV8_BI_DB);
+        if (J.$ge$n(ds, this.t)) {
+          r.t = 0;
+          return;
+        }
+        bs = t1.$mod(n, $.BigIntegerV8_BI_DB);
+        t1 = $.BigIntegerV8_BI_DB;
+        if (typeof t1 !== "number")
+          return t1.$sub();
+        if (typeof bs !== "number")
+          return H.iae(bs);
+        cbs = t1 - bs;
+        bm = C.JSInt_methods.$shl(1, bs) - 1;
+        t1 = this_array.data;
+        if (ds >>> 0 !== ds || ds >= t1.length)
+          return H.ioore(t1, ds);
+        r_array.$indexSet(0, 0, J.$shr$n(t1[ds], bs));
+        i = ds + 1;
+        while (true) {
+          t1 = this.t;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          if (!(i < t1))
+            break;
+          t1 = i - ds - 1;
+          t2 = r_array.data;
+          if (t1 < 0 || t1 >= t2.length)
+            return H.ioore(t2, t1);
+          t2 = t2[t1];
+          t3 = this_array.data;
+          if (i >= t3.length)
+            return H.ioore(t3, i);
+          t3 = J.$or$n(t2, J.$shl$n(J.$and$n(t3[i], bm), cbs));
+          t2 = r_array.data;
+          if (t1 > t2.length - 1)
+            C.JSArray_methods.set$length(t2, t1 + 1);
+          t2 = r_array.data;
+          if (t1 >= t2.length)
+            return H.ioore(t2, t1);
+          t2[t1] = t3;
+          t3 = i - ds;
+          t1 = this_array.data;
+          if (i >= t1.length)
+            return H.ioore(t1, i);
+          t1 = J.$shr$n(t1[i], bs);
+          t2 = r_array.data;
+          if (t3 > t2.length - 1)
+            C.JSArray_methods.set$length(t2, t3 + 1);
+          t2 = r_array.data;
+          if (t3 < 0 || t3 >= t2.length)
+            return H.ioore(t2, t3);
+          t2[t3] = t1;
+          ++i;
+        }
+        if (bs > 0) {
+          t1 = this.t;
+          if (typeof t1 !== "number")
+            return t1.$sub();
+          t1 = t1 - ds - 1;
+          t2 = r_array.data;
+          if (t1 >>> 0 !== t1 || t1 >= t2.length)
+            return H.ioore(t2, t1);
+          r_array.$indexSet(0, t1, J.$or$n(t2[t1], J.$shl$n(J.$and$n(this.s, bm), cbs)));
+        }
+        t1 = this.t;
+        if (typeof t1 !== "number")
+          return t1.$sub();
+        r.t = t1 - ds;
+        r.clamp$0(0);
+      },
+      clamp$0: function(_) {
+        var this_array, c, t1, t2;
+        this_array = this.array;
+        c = J.$and$n(this.s, $.BigIntegerV8_BI_DM);
+        while (true) {
+          t1 = this.t;
+          if (typeof t1 !== "number")
+            return t1.$gt();
+          if (t1 > 0) {
+            --t1;
+            t2 = this_array.data;
+            if (t1 >>> 0 !== t1 || t1 >= t2.length)
+              return H.ioore(t2, t1);
+            t1 = J.$eq$(t2[t1], c);
+          } else
+            t1 = false;
+          if (!t1)
+            break;
+          t1 = this.t;
+          if (typeof t1 !== "number")
+            return t1.$sub();
+          this.t = t1 - 1;
+        }
+      },
+      subTo$2: function(a, r) {
+        var this_array, r_array, a_array, t1, t2, m, i, c, i0;
+        this_array = this.array;
+        r_array = r.array;
+        a_array = a.get$array();
+        t1 = a.t;
+        t2 = this.t;
+        m = Math.min(H.checkNum(t1), H.checkNum(t2));
+        for (i = 0, c = 0; i < m; i = i0) {
+          t1 = this_array.data;
+          if (i >= t1.length)
+            return H.ioore(t1, i);
+          t1 = J.toInt$0$n(t1[i]);
+          t2 = a_array.data;
+          if (i >= t2.length)
+            return H.ioore(t2, i);
+          c += C.JSInt_methods.toInt$0(t1 - J.toInt$0$n(t2[i]));
+          i0 = i + 1;
+          t2 = $.BigIntegerV8_BI_DM;
+          if (typeof t2 !== "number")
+            return H.iae(t2);
+          t1 = r_array.data;
+          if (i > t1.length - 1)
+            C.JSArray_methods.set$length(t1, i0);
+          t1 = r_array.data;
+          if (i >= t1.length)
+            return H.ioore(t1, i);
+          t1[i] = (c & t2) >>> 0;
+          t2 = $.BigIntegerV8_BI_DB;
+          if (typeof t2 !== "number")
+            return H.iae(t2);
+          c = C.JSInt_methods._shrOtherPositive$1(c, t2);
+          if (c === 4294967295)
+            c = -1;
+        }
+        t1 = a.t;
+        t2 = this.t;
+        if (typeof t1 !== "number")
+          return t1.$lt();
+        if (typeof t2 !== "number")
+          return H.iae(t2);
+        if (t1 < t2) {
+          t1 = a.s;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          c -= t1;
+          while (true) {
+            t1 = this.t;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            if (!(i < t1))
+              break;
+            t1 = this_array.data;
+            if (i >= t1.length)
+              return H.ioore(t1, i);
+            t1 = t1[i];
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            c += t1;
+            i0 = i + 1;
+            t1 = $.BigIntegerV8_BI_DM;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            t2 = r_array.data;
+            if (i > t2.length - 1)
+              C.JSArray_methods.set$length(t2, i0);
+            t2 = r_array.data;
+            if (i >= t2.length)
+              return H.ioore(t2, i);
+            t2[i] = (c & t1) >>> 0;
+            t1 = $.BigIntegerV8_BI_DB;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            c = C.JSNumber_methods._shrOtherPositive$1(c, t1);
+            if (c === 4294967295)
+              c = -1;
+            i = i0;
+          }
+          t1 = this.s;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          c += t1;
+        } else {
+          t1 = this.s;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          c += t1;
+          while (true) {
+            t1 = a.t;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            if (!(i < t1))
+              break;
+            t1 = a_array.data;
+            if (i >= t1.length)
+              return H.ioore(t1, i);
+            t1 = t1[i];
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            c -= t1;
+            i0 = i + 1;
+            t1 = $.BigIntegerV8_BI_DM;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            t2 = r_array.data;
+            if (i > t2.length - 1)
+              C.JSArray_methods.set$length(t2, i0);
+            t2 = r_array.data;
+            if (i >= t2.length)
+              return H.ioore(t2, i);
+            t2[i] = (c & t1) >>> 0;
+            t1 = $.BigIntegerV8_BI_DB;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            c = C.JSNumber_methods._shrOtherPositive$1(c, t1);
+            if (c === 4294967295)
+              c = -1;
+            i = i0;
+          }
+          t1 = a.s;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          c -= t1;
+        }
+        r.s = c < 0 ? -1 : 0;
+        if (c < -1) {
+          i0 = i + 1;
+          t1 = $.BigIntegerV8_BI_DV;
+          if (typeof t1 !== "number")
+            return t1.$add();
+          r_array.$indexSet(0, i, t1 + c);
+          i = i0;
+        } else if (c > 0) {
+          i0 = i + 1;
+          r_array.$indexSet(0, i, c);
+          i = i0;
+        }
+        r.t = i;
+        r.clamp$0(0);
+      },
+      multiplyTo$2: function(a, r) {
+        var r_array, x, y, y_array, i, t1, t2, t3, r0;
+        r_array = r.array;
+        x = J.$lt$n(this.s, 0) ? this.negate_op$0() : this;
+        y = J.abs$0$n(a);
+        y_array = y.get$array();
+        i = x.t;
+        t1 = y.t;
+        if (typeof i !== "number")
+          return i.$add();
+        if (typeof t1 !== "number")
+          return H.iae(t1);
+        r.t = i + t1;
+        for (; --i, i >= 0;) {
+          t1 = r_array.data;
+          if (i > t1.length - 1)
+            C.JSArray_methods.set$length(t1, i + 1);
+          t1 = r_array.data;
+          if (i >>> 0 !== i || i >= t1.length)
+            return H.ioore(t1, i);
+          t1[i] = 0;
+        }
+        i = 0;
+        while (true) {
+          t1 = y.t;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          if (!(i < t1))
+            break;
+          t1 = x.t;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          t2 = i + t1;
+          t3 = y_array.data;
+          if (i >= t3.length)
+            return H.ioore(t3, i);
+          t3 = t3[i];
+          t1 = x.am.call$6(0, t3, r, i, 0, t1);
+          t3 = r_array.data;
+          if (t2 > t3.length - 1)
+            C.JSArray_methods.set$length(t3, t2 + 1);
+          t3 = r_array.data;
+          if (t2 >>> 0 !== t2 || t2 >= t3.length)
+            return H.ioore(t3, t2);
+          t3[t2] = t1;
+          ++i;
+        }
+        r.s = 0;
+        r.clamp$0(0);
+        if (!J.$eq$(this.s, a.get$s())) {
+          r0 = B.BigIntegerV8$(null, null, null);
+          r0.fromInt$1(0);
+          r0.subTo$2(r, r);
+        }
+      },
+      divRemTo$3: function(m, q, r) {
+        var pm, t1, pt, t2, y, ts, ms, pm_array, t3, x, t, r0, nsh, ys, y_array, y0, t4, yt, d1, d2, e, i, j, r_array, t5, qd;
+        pm = J.abs$0$n(m);
+        t1 = pm.get$t();
+        if (typeof t1 !== "number")
+          return t1.$le();
+        if (t1 <= 0)
+          return;
+        pt = J.$lt$n(this.s, 0) ? this.negate_op$0() : this;
+        t1 = pt.t;
+        t2 = pm.t;
+        if (typeof t1 !== "number")
+          return t1.$lt();
+        if (typeof t2 !== "number")
+          return H.iae(t2);
+        if (t1 < t2) {
+          if (q != null)
+            q.fromInt$1(0);
+          if (r != null)
+            this.copyTo$1(r);
+          return;
+        }
+        if (r == null)
+          r = B.BigIntegerV8$(null, null, null);
+        y = B.BigIntegerV8$(null, null, null);
+        ts = this.s;
+        ms = m.get$s();
+        pm_array = pm.array;
+        t1 = $.BigIntegerV8_BI_DB;
+        t2 = pm.t;
+        if (typeof t2 !== "number")
+          return t2.$sub();
+        --t2;
+        t3 = pm_array.data;
+        if (t2 >>> 0 !== t2 || t2 >= t3.length)
+          return H.ioore(t3, t2);
+        x = t3[t2];
+        if (typeof x === "number")
+          x = C.JSNumber_methods.toInt$0(x);
+        t = J.$shr$n(x, 16);
+        if (!J.$eq$(t, 0)) {
+          x = t;
+          r0 = 17;
+        } else
+          r0 = 1;
+        t = J.$shr$n(x, 8);
+        if (!J.$eq$(t, 0)) {
+          r0 += 8;
+          x = t;
+        }
+        t = J.$shr$n(x, 4);
+        if (!J.$eq$(t, 0)) {
+          r0 += 4;
+          x = t;
+        }
+        t = J.$shr$n(x, 2);
+        if (!J.$eq$(t, 0)) {
+          r0 += 2;
+          x = t;
+        }
+        if (!J.$eq$(J.$shr$n(x, 1), 0))
+          ++r0;
+        if (typeof t1 !== "number")
+          return t1.$sub();
+        nsh = t1 - r0;
+        t1 = nsh > 0;
+        if (t1) {
+          pm.lShiftTo$2(nsh, y);
+          pt.lShiftTo$2(nsh, r);
+        } else {
+          pm.copyTo$1(y);
+          pt.copyTo$1(r);
+        }
+        ys = y.t;
+        y_array = y.array;
+        if (typeof ys !== "number")
+          return ys.$sub();
+        t2 = ys - 1;
+        t3 = y_array.data;
+        if (t2 >>> 0 !== t2 || t2 >= t3.length)
+          return H.ioore(t3, t2);
+        y0 = t3[t2];
+        t2 = J.getInterceptor(y0);
+        if (t2.$eq(y0, 0))
+          return;
+        t3 = $.BigIntegerV8_BI_F1;
+        if (typeof t3 !== "number")
+          return H.iae(t3);
+        t3 = t2.$mul(y0, C.JSInt_methods.$shl(1, t3));
+        if (ys > 1) {
+          t2 = ys - 2;
+          t4 = y_array.data;
+          if (t2 >>> 0 !== t2 || t2 >= t4.length)
+            return H.ioore(t4, t2);
+          t2 = J.$shr$n(t4[t2], $.BigIntegerV8_BI_F2);
+        } else
+          t2 = 0;
+        yt = J.$add$ns(t3, t2);
+        t2 = $.BigIntegerV8_BI_FV;
+        if (typeof t2 !== "number")
+          return t2.$div();
+        if (typeof yt !== "number")
+          return H.iae(yt);
+        d1 = t2 / yt;
+        t2 = $.BigIntegerV8_BI_F1;
+        if (typeof t2 !== "number")
+          return H.iae(t2);
+        d2 = C.JSInt_methods.$shl(1, t2) / yt;
+        t2 = $.BigIntegerV8_BI_F2;
+        if (typeof t2 !== "number")
+          return H.iae(t2);
+        e = C.JSInt_methods.$shl(1, t2);
+        i = r.t;
+        if (typeof i !== "number")
+          return i.$sub();
+        j = i - ys;
+        t2 = q == null;
+        t = t2 ? B.BigIntegerV8$(null, null, null) : q;
+        y.dlShiftTo$2(j, t);
+        r_array = r.array;
+        if (J.$ge$n(r.compareTo$1(0, t), 0)) {
+          t3 = r.t;
+          if (typeof t3 !== "number")
+            return t3.$add();
+          r.t = t3 + 1;
+          r_array.$indexSet(0, t3, 1);
+          r.subTo$2(t, r);
+        }
+        r0 = B.BigIntegerV8$(null, null, null);
+        r0.fromInt$1(1);
+        r0.dlShiftTo$2(ys, t);
+        t.subTo$2(y, y);
+        while (true) {
+          t3 = y.t;
+          if (typeof t3 !== "number")
+            return t3.$lt();
+          if (!(t3 < ys))
+            break;
+          t4 = t3 + 1;
+          y.t = t4;
+          t5 = y_array.data;
+          if (t3 > t5.length - 1)
+            C.JSArray_methods.set$length(t5, t4);
+          t4 = y_array.data;
+          if (t3 >>> 0 !== t3 || t3 >= t4.length)
+            return H.ioore(t4, t3);
+          t4[t3] = 0;
+        }
+        for (; --j, j >= 0;) {
+          --i;
+          t3 = r_array.data;
+          if (i >>> 0 !== i || i >= t3.length)
+            return H.ioore(t3, i);
+          if (J.$eq$(t3[i], y0))
+            qd = $.BigIntegerV8_BI_DM;
+          else {
+            t3 = r_array.data;
+            if (i >= t3.length)
+              return H.ioore(t3, i);
+            t3 = J.$mul$ns(t3[i], d1);
+            t4 = i - 1;
+            t5 = r_array.data;
+            if (t4 < 0 || t4 >= t5.length)
+              return H.ioore(t5, t4);
+            qd = J.floor$0$n(J.$add$ns(t3, J.$mul$ns(J.$add$ns(t5[t4], e), d2)));
+          }
+          t3 = r_array.data;
+          if (i >= t3.length)
+            return H.ioore(t3, i);
+          t3 = J.$add$ns(t3[i], y.am.call$6(0, qd, r, j, 0, ys));
+          t4 = r_array.data;
+          if (i > t4.length - 1)
+            C.JSArray_methods.set$length(t4, i + 1);
+          t4 = r_array.data;
+          if (i >= t4.length)
+            return H.ioore(t4, i);
+          t4[i] = t3;
+          if (J.$lt$n(t3, qd)) {
+            y.dlShiftTo$2(j, t);
+            r.subTo$2(t, r);
+            while (true) {
+              t3 = r_array.data;
+              if (i >= t3.length)
+                return H.ioore(t3, i);
+              t3 = t3[i];
+              if (typeof qd !== "number")
+                return qd.$sub();
+              --qd;
+              if (!J.$lt$n(t3, qd))
+                break;
+              r.subTo$2(t, r);
+            }
+          }
+        }
+        if (!t2) {
+          r.drShiftTo$2(ys, q);
+          if (!J.$eq$(ts, ms)) {
+            r0 = B.BigIntegerV8$(null, null, null);
+            r0.fromInt$1(0);
+            r0.subTo$2(q, q);
+          }
+        }
+        r.t = ys;
+        r.clamp$0(0);
+        if (t1)
+          r.rShiftTo$2(nsh, r);
+        if (J.$lt$n(ts, 0)) {
+          r0 = B.BigIntegerV8$(null, null, null);
+          r0.fromInt$1(0);
+          r0.subTo$2(r, r);
+        }
+      },
+      mod$1: function(a) {
+        var r, r0, t1;
+        r = B.BigIntegerV8$(null, null, null);
+        (J.$lt$n(this.s, 0) ? this.negate_op$0() : this).divRemTo$3(a, null, r);
+        if (J.$lt$n(this.s, 0)) {
+          r0 = B.BigIntegerV8$(null, null, null);
+          r0.fromInt$1(0);
+          t1 = J.$gt$n(r.compareTo$1(0, r0), 0);
+        } else
+          t1 = false;
+        if (t1)
+          a.subTo$2(r, r);
+        return r;
+      },
+      intValue$0: function() {
+        var this_array, t1, t2;
+        this_array = this.array;
+        if (J.$lt$n(this.s, 0)) {
+          t1 = this.t;
+          if (t1 === 1) {
+            t1 = this_array.data;
+            if (0 >= t1.length)
+              return H.ioore(t1, 0);
+            return J.$sub$n(t1[0], $.BigIntegerV8_BI_DV);
+          } else if (t1 === 0)
+            return -1;
+        } else {
+          t1 = this.t;
+          if (t1 === 1) {
+            t1 = this_array.data;
+            if (0 >= t1.length)
+              return H.ioore(t1, 0);
+            return t1[0];
+          } else if (t1 === 0)
+            return 0;
+        }
+        t1 = this_array.data;
+        if (1 >= t1.length)
+          return H.ioore(t1, 1);
+        t1 = t1[1];
+        t2 = $.BigIntegerV8_BI_DB;
+        if (typeof t2 !== "number")
+          return H.iae(t2);
+        t2 = J.$shl$n(J.$and$n(t1, C.JSInt_methods.$shl(1, 32 - t2) - 1), $.BigIntegerV8_BI_DB);
+        t1 = this_array.data;
+        if (0 >= t1.length)
+          return H.ioore(t1, 0);
+        return J.$or$n(t2, t1[0]);
+      },
+      chunkSize$1: function(r) {
+        var t1 = $.BigIntegerV8_BI_DB;
+        if (typeof t1 !== "number")
+          return H.iae(t1);
+        return C.JSInt_methods.toInt$0(C.JSDouble_methods.floor$0(0.6931471805599453 * t1 / Math.log(r)));
+      },
+      signum$0: function() {
+        var this_array, t1;
+        this_array = this.array;
+        if (J.$lt$n(this.s, 0))
+          return -1;
+        else {
+          t1 = this.t;
+          if (typeof t1 !== "number")
+            return t1.$le();
+          if (!(t1 <= 0))
+            if (t1 === 1) {
+              t1 = this_array.data;
+              if (0 >= t1.length)
+                return H.ioore(t1, 0);
+              t1 = J.$le$n(t1[0], 0);
+            } else
+              t1 = false;
+          else
+            t1 = true;
+          if (t1)
+            return 0;
+          else
+            return 1;
+        }
+      },
+      toRadix$1: function(b) {
+        var t1, a, r, y, z, r0;
+        if (this.signum$0() !== 0)
+          t1 = false;
+        else
+          t1 = true;
+        if (t1)
+          return "0";
+        a = Math.pow(10, this.chunkSize$1(10));
+        r = B.BigIntegerV8$(null, null, null);
+        r.fromInt$1(a);
+        y = B.BigIntegerV8$(null, null, null);
+        z = B.BigIntegerV8$(null, null, null);
+        this.divRemTo$3(r, y, z);
+        for (r0 = ""; y.signum$0() > 0;) {
+          t1 = z.intValue$0();
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          r0 = C.JSString_methods.substring$1(C.JSInt_methods.toRadixString$1(C.JSNumber_methods.toInt$0(a + t1), 10), 1) + r0;
+          y.divRemTo$3(r, y, z);
+        }
+        return J.toRadixString$1$n(z.intValue$0(), 10) + r0;
+      },
+      fromRadix$2: function(s, b) {
+        var cs, d, t1, mi, j, w, i, c, x, r;
+        this.fromInt$1(0);
+        if (b == null)
+          b = 10;
+        cs = this.chunkSize$1(b);
+        d = Math.pow(b, cs);
+        for (t1 = J.getInterceptor$as(s), mi = false, j = 0, w = 0, i = 0; i < t1.get$length(s); ++i) {
+          c = $.BigIntegerV8_BI_RC.$index(0, C.JSString_methods._codeUnitAt$1(s, i));
+          x = c == null ? -1 : c;
+          if (J.$lt$n(x, 0)) {
+            if (0 >= s.length)
+              return H.ioore(s, 0);
+            if (s[0] === "-" && this.signum$0() === 0)
+              mi = true;
+            continue;
+          }
+          if (typeof x !== "number")
+            return H.iae(x);
+          w = b * w + x;
+          ++j;
+          if (j >= cs) {
+            this.dMultiply$1(d);
+            this.dAddOffset$2(w, 0);
+            j = 0;
+            w = 0;
+          }
+        }
+        if (j > 0) {
+          this.dMultiply$1(Math.pow(b, j));
+          if (w !== 0)
+            this.dAddOffset$2(w, 0);
+        }
+        if (mi) {
+          r = B.BigIntegerV8$(null, null, null);
+          r.fromInt$1(0);
+          r.subTo$2(this, this);
+        }
+      },
+      bitwiseTo$3: function(a, op, r) {
+        var this_array, a_array, r_array, t1, t2, m, i, t3, f;
+        this_array = this.array;
+        a_array = a.get$array();
+        r_array = r.array;
+        t1 = a.t;
+        t2 = this.t;
+        m = Math.min(H.checkNum(t1), H.checkNum(t2));
+        for (i = 0; i < m; ++i) {
+          t1 = this_array.data;
+          if (i >= t1.length)
+            return H.ioore(t1, i);
+          t1 = t1[i];
+          t2 = a_array.data;
+          if (i >= t2.length)
+            return H.ioore(t2, i);
+          t2 = op.call$2(t1, t2[i]);
+          t1 = r_array.data;
+          if (i > t1.length - 1)
+            C.JSArray_methods.set$length(t1, i + 1);
+          t1 = r_array.data;
+          if (i >= t1.length)
+            return H.ioore(t1, i);
+          t1[i] = t2;
+        }
+        t1 = a.t;
+        t2 = this.t;
+        if (typeof t1 !== "number")
+          return t1.$lt();
+        if (typeof t2 !== "number")
+          return H.iae(t2);
+        t3 = $.BigIntegerV8_BI_DM;
+        if (t1 < t2) {
+          f = J.$and$n(a.s, t3);
+          i = m;
+          while (true) {
+            t1 = this.t;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            if (!(i < t1))
+              break;
+            t1 = this_array.data;
+            if (i >>> 0 !== i || i >= t1.length)
+              return H.ioore(t1, i);
+            t1 = op.call$2(t1[i], f);
+            t2 = r_array.data;
+            if (i > t2.length - 1)
+              C.JSArray_methods.set$length(t2, i + 1);
+            t2 = r_array.data;
+            if (i >= t2.length)
+              return H.ioore(t2, i);
+            t2[i] = t1;
+            ++i;
+          }
+          r.t = t1;
+        } else {
+          f = J.$and$n(this.s, t3);
+          i = m;
+          while (true) {
+            t1 = a.t;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            if (!(i < t1))
+              break;
+            t1 = a_array.data;
+            if (i >>> 0 !== i || i >= t1.length)
+              return H.ioore(t1, i);
+            t1 = op.call$2(f, t1[i]);
+            t2 = r_array.data;
+            if (i > t2.length - 1)
+              C.JSArray_methods.set$length(t2, i + 1);
+            t2 = r_array.data;
+            if (i >= t2.length)
+              return H.ioore(t2, i);
+            t2[i] = t1;
+            ++i;
+          }
+          r.t = t1;
+        }
+        r.s = op.call$2(this.s, a.s);
+        r.clamp$0(0);
+      },
+      op_and$2: [function(x, y) {
+        return J.$and$n(x, y);
+      }, "call$2", "get$op_and", 4, 0, 0],
+      op_or$2: [function(x, y) {
+        return J.$or$n(x, y);
+      }, "call$2", "get$op_or", 4, 0, 0],
+      not$0: function() {
+        var this_array, r, r_array, i, t1, t2, t3;
+        this_array = this.array;
+        r = B.BigIntegerV8$(null, null, null);
+        r_array = r.array;
+        i = 0;
+        while (true) {
+          t1 = this.t;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          if (!(i < t1))
+            break;
+          t1 = $.BigIntegerV8_BI_DM;
+          t2 = this_array.data;
+          if (i >= t2.length)
+            return H.ioore(t2, i);
+          t2 = J.$not$i(t2[i]);
+          if (typeof t1 !== "number")
+            return t1.$and();
+          if (typeof t2 !== "number")
+            return H.iae(t2);
+          t3 = r_array.data;
+          if (i > t3.length - 1)
+            C.JSArray_methods.set$length(t3, i + 1);
+          t3 = r_array.data;
+          if (i >= t3.length)
+            return H.ioore(t3, i);
+          t3[i] = (t1 & t2) >>> 0;
+          ++i;
+        }
+        r.t = t1;
+        r.s = J.$not$i(this.s);
+        return r;
+      },
+      shiftLeft$1: function(n) {
+        var r, t1;
+        r = B.BigIntegerV8$(null, null, null);
+        t1 = J.getInterceptor$n(n);
+        if (t1.$lt(n, 0))
+          this.rShiftTo$2(t1.$negate(n), r);
+        else
+          this.lShiftTo$2(n, r);
+        return r;
+      },
+      addTo$2: function(a, r) {
+        var this_array, a_array, r_array, t1, t2, m, i, c, i0;
+        this_array = this.array;
+        a_array = a.get$array();
+        r_array = r.array;
+        t1 = a.t;
+        t2 = this.t;
+        m = Math.min(H.checkNum(t1), H.checkNum(t2));
+        for (i = 0, c = 0; i < m; i = i0) {
+          t1 = this_array.data;
+          if (i >= t1.length)
+            return H.ioore(t1, i);
+          t1 = t1[i];
+          t2 = a_array.data;
+          if (i >= t2.length)
+            return H.ioore(t2, i);
+          t2 = J.$add$ns(t1, t2[i]);
+          if (typeof t2 !== "number")
+            return H.iae(t2);
+          c += t2;
+          i0 = i + 1;
+          t2 = $.BigIntegerV8_BI_DM;
+          if (typeof t2 !== "number")
+            return H.iae(t2);
+          t1 = r_array.data;
+          if (i > t1.length - 1)
+            C.JSArray_methods.set$length(t1, i0);
+          t1 = r_array.data;
+          if (i >= t1.length)
+            return H.ioore(t1, i);
+          t1[i] = (c & t2) >>> 0;
+          t2 = $.BigIntegerV8_BI_DB;
+          if (typeof t2 !== "number")
+            return H.iae(t2);
+          c = C.JSNumber_methods._shrOtherPositive$1(c, t2);
+        }
+        t1 = a.t;
+        t2 = this.t;
+        if (typeof t1 !== "number")
+          return t1.$lt();
+        if (typeof t2 !== "number")
+          return H.iae(t2);
+        if (t1 < t2) {
+          t1 = a.s;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          c += t1;
+          while (true) {
+            t1 = this.t;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            if (!(i < t1))
+              break;
+            t1 = this_array.data;
+            if (i >= t1.length)
+              return H.ioore(t1, i);
+            t1 = t1[i];
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            c += t1;
+            i0 = i + 1;
+            t1 = $.BigIntegerV8_BI_DM;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            t2 = r_array.data;
+            if (i > t2.length - 1)
+              C.JSArray_methods.set$length(t2, i0);
+            t2 = r_array.data;
+            if (i >= t2.length)
+              return H.ioore(t2, i);
+            t2[i] = (c & t1) >>> 0;
+            t1 = $.BigIntegerV8_BI_DB;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            c = C.JSNumber_methods._shrOtherPositive$1(c, t1);
+            i = i0;
+          }
+          t1 = this.s;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          c += t1;
+        } else {
+          t1 = this.s;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          c += t1;
+          while (true) {
+            t1 = a.t;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            if (!(i < t1))
+              break;
+            t1 = a_array.data;
+            if (i >= t1.length)
+              return H.ioore(t1, i);
+            t1 = t1[i];
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            c += t1;
+            i0 = i + 1;
+            t1 = $.BigIntegerV8_BI_DM;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            t2 = r_array.data;
+            if (i > t2.length - 1)
+              C.JSArray_methods.set$length(t2, i0);
+            t2 = r_array.data;
+            if (i >= t2.length)
+              return H.ioore(t2, i);
+            t2[i] = (c & t1) >>> 0;
+            t1 = $.BigIntegerV8_BI_DB;
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            c = C.JSNumber_methods._shrOtherPositive$1(c, t1);
+            i = i0;
+          }
+          t1 = a.s;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          c += t1;
+        }
+        r.s = c < 0 ? -1 : 0;
+        if (c > 0) {
+          i0 = i + 1;
+          r_array.$indexSet(0, i, c);
+          i = i0;
+        } else if (c < -1) {
+          i0 = i + 1;
+          t1 = $.BigIntegerV8_BI_DV;
+          if (typeof t1 !== "number")
+            return t1.$add();
+          r_array.$indexSet(0, i, t1 + c);
+          i = i0;
+        }
+        r.t = i;
+        r.clamp$0(0);
+      },
+      add$1: function(_, a) {
+        var r = B.BigIntegerV8$(null, null, null);
+        this.addTo$2(a, r);
+        return r;
+      },
+      subtract$1: function(a) {
+        var r = B.BigIntegerV8$(null, null, null);
+        this.subTo$2(a, r);
+        return r;
+      },
+      multiply$1: function(a) {
+        var r = B.BigIntegerV8$(null, null, null);
+        this.multiplyTo$2(a, r);
+        return r;
+      },
+      divide$1: function(a) {
+        var r = B.BigIntegerV8$(null, null, null);
+        this.divRemTo$3(a, r, null);
+        return r;
+      },
+      remainder$1: function(_, a) {
+        var r = B.BigIntegerV8$(null, null, null);
+        this.divRemTo$3(a, null, r);
+        return r.signum$0() >= 0 ? r : r.add$1(0, a);
+      },
+      dMultiply$1: function(n) {
+        var this_array, t1, t2, t3, t4;
+        this_array = this.array;
+        t1 = this.t;
+        t2 = this.am.call$6(0, n - 1, this, 0, 0, t1);
+        t3 = this_array.data;
+        t4 = t3.length;
+        if (typeof t1 !== "number")
+          return t1.$gt();
+        if (t1 > t4 - 1)
+          C.JSArray_methods.set$length(t3, t1 + 1);
+        t3 = this_array.data;
+        if (t1 >>> 0 !== t1 || t1 >= t3.length)
+          return H.ioore(t3, t1);
+        t3[t1] = t2;
+        t2 = this.t;
+        if (typeof t2 !== "number")
+          return t2.$add();
+        this.t = t2 + 1;
+        this.clamp$0(0);
+      },
+      dAddOffset$2: function(n, w) {
+        var this_array, t1, t2, t3, t4;
+        this_array = this.array;
+        while (true) {
+          t1 = this.t;
+          if (typeof t1 !== "number")
+            return t1.$le();
+          if (!(t1 <= w))
+            break;
+          t2 = t1 + 1;
+          this.t = t2;
+          t3 = this_array.data;
+          if (t1 > t3.length - 1)
+            C.JSArray_methods.set$length(t3, t2);
+          t2 = this_array.data;
+          if (t1 >>> 0 !== t1 || t1 >= t2.length)
+            return H.ioore(t2, t1);
+          t2[t1] = 0;
+        }
+        t1 = this_array.data;
+        if (w >= t1.length)
+          return H.ioore(t1, w);
+        t1 = J.$add$ns(t1[w], n);
+        t2 = this_array.data;
+        if (w > t2.length - 1)
+          C.JSArray_methods.set$length(t2, w + 1);
+        t2 = this_array.data;
+        if (w >= t2.length)
+          return H.ioore(t2, w);
+        t2[w] = t1;
+        t1 = t2;
+        while (true) {
+          if (w >= t1.length)
+            return H.ioore(t1, w);
+          if (!J.$ge$n(t1[w], $.BigIntegerV8_BI_DV))
+            break;
+          t1 = this_array.data;
+          if (w >= t1.length)
+            return H.ioore(t1, w);
+          t1 = J.$sub$n(t1[w], $.BigIntegerV8_BI_DV);
+          t2 = this_array.data;
+          if (w > t2.length - 1)
+            C.JSArray_methods.set$length(t2, w + 1);
+          t2 = this_array.data;
+          t3 = t2.length;
+          if (w >= t3)
+            return H.ioore(t2, w);
+          t2[w] = t1;
+          ++w;
+          t1 = this.t;
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          if (w >= t1) {
+            t4 = t1 + 1;
+            this.t = t4;
+            if (t1 > t3 - 1)
+              C.JSArray_methods.set$length(t2, t4);
+            t2 = this_array.data;
+            if (t1 >>> 0 !== t1 || t1 >= t2.length)
+              return H.ioore(t2, t1);
+            t2[t1] = 0;
+            t1 = t2;
+          } else
+            t1 = t2;
+          if (w >= t1.length)
+            return H.ioore(t1, w);
+          t1 = J.$add$ns(t1[w], 1);
+          t2 = this_array.data;
+          if (w > t2.length - 1)
+            C.JSArray_methods.set$length(t2, w + 1);
+          t2 = this_array.data;
+          if (w >= t2.length)
+            return H.ioore(t2, w);
+          t2[w] = t1;
+          t1 = t2;
+        }
+      },
+      $add: function(_, other) {
+        return this.add$1(0, other);
+      },
+      $sub: function(_, other) {
+        return this.subtract$1(other);
+      },
+      $mul: function(_, other) {
+        return this.multiply$1(other);
+      },
+      $mod: function(_, other) {
+        return this.remainder$1(0, other);
+      },
+      $tdiv: function(_, other) {
+        return this.divide$1(other);
+      },
+      $negate: function(_) {
+        return this.negate_op$0();
+      },
+      $lt: function(_, other) {
+        return J.$lt$n(this.compareTo$1(0, other), 0) && true;
+      },
+      $le: function(_, other) {
+        return J.$le$n(this.compareTo$1(0, other), 0) && true;
+      },
+      $gt: function(_, other) {
+        return J.$gt$n(this.compareTo$1(0, other), 0) && true;
+      },
+      $ge: function(_, other) {
+        return J.$ge$n(this.compareTo$1(0, other), 0) && true;
+      },
+      $eq: function(_, other) {
+        if (other == null)
+          return false;
+        return J.$eq$(this.compareTo$1(0, other), 0) && true;
+      },
+      $and: function(_, other) {
+        var r = B.BigIntegerV8$(null, null, null);
+        this.bitwiseTo$3(other, this.get$op_and(), r);
+        return r;
+      },
+      $or: function(_, other) {
+        var r = B.BigIntegerV8$(null, null, null);
+        this.bitwiseTo$3(other, this.get$op_or(), r);
+        return r;
+      },
+      $not: function(_) {
+        return this.not$0();
+      },
+      $shl: function(_, shiftAmount) {
+        return this.shiftLeft$1(shiftAmount);
+      },
+      $shr: function(_, shiftAmount) {
+        var r, t1;
+        r = B.BigIntegerV8$(null, null, null);
+        t1 = J.getInterceptor$n(shiftAmount);
+        if (t1.$lt(shiftAmount, 0))
+          this.lShiftTo$2(t1.$negate(shiftAmount), r);
+        else
+          this.rShiftTo$2(shiftAmount, r);
+        return r;
+      },
+      BigIntegerV8$3: function(a, b, c) {
+        B.BigIntegerV8__init(28);
+        this.am = this.get$_am3();
+        this.array = new B.JSArray([]);
+        if (a != null)
+          if (typeof a === "number" && Math.floor(a) === a)
+            this.fromString$2(C.JSInt_methods.toString$0(a), 10);
+          else
+            this.fromString$2(C.JSInt_methods.toString$0(C.JSNumber_methods.toInt$0(a)), 10);
+      },
+      static: {
+        BigIntegerV8$: function(a, b, c) {
+          var t1 = new B.BigIntegerV8(null, null, null, null, true);
+          t1.BigIntegerV8$3(a, b, c);
+          return t1;
+        },
+        BigIntegerV8__init: function(bits) {
+          var t1, t2;
+          if ($.BigIntegerV8_BI_RC != null)
+            return;
+          $.BigIntegerV8_BI_RC = new H.JsLinkedHashMap(0, null, null, null, null, null, 0);
+          $.BigIntegerV8__j_lm = ($.BigIntegerV8_canary & 16777215) === 15715070;
+          B.BigIntegerV8__setupDigitConversions();
+          $.BigIntegerV8__lplim = 131844;
+          $.BigIntegerV8_dbits = bits;
+          $.BigIntegerV8_BI_DB = bits;
+          t1 = C.JSInt_methods._shlPositive$1(1, bits);
+          $.BigIntegerV8_BI_DM = t1 - 1;
+          $.BigIntegerV8_BI_DV = t1;
+          $.BigIntegerV8_BI_FP = 52;
+          $.BigIntegerV8_BI_FV = Math.pow(2, 52);
+          t1 = $.BigIntegerV8_BI_FP;
+          t2 = $.BigIntegerV8_dbits;
+          if (typeof t1 !== "number")
+            return t1.$sub();
+          if (typeof t2 !== "number")
+            return H.iae(t2);
+          $.BigIntegerV8_BI_F1 = t1 - t2;
+          $.BigIntegerV8_BI_F2 = 2 * t2 - t1;
+        },
+        BigIntegerV8__setupDigitConversions: function() {
+          var rr, vv, rr0;
+          $.BigIntegerV8_BI_RM = "0123456789abcdefghijklmnopqrstuvwxyz";
+          $.BigIntegerV8_BI_RC = new H.JsLinkedHashMap(0, null, null, null, null, null, 0);
+          for (rr = 48, vv = 0; vv <= 9; ++vv, rr = rr0) {
+            rr0 = rr + 1;
+            $.BigIntegerV8_BI_RC.$indexSet(0, rr, vv);
+          }
+          for (rr = 97, vv = 10; vv < 36; ++vv, rr = rr0) {
+            rr0 = rr + 1;
+            $.BigIntegerV8_BI_RC.$indexSet(0, rr, vv);
+          }
+          for (rr = 65, vv = 10; vv < 36; ++vv, rr = rr0) {
+            rr0 = rr + 1;
+            $.BigIntegerV8_BI_RC.$indexSet(0, rr, vv);
+          }
+        }
+      }
+    }
+  }], ["benchmark_base", "../benchmark-files/common/BenchmarkBase.dart",, V, {
+    "^": "",
+    BenchmarkBase_measureFor: function(f, timeMinimum) {
+      var t1, iter, elapsed, t2;
+      if ($.Stopwatch__frequency == null) {
+        H.Primitives_initTicker();
+        $.Stopwatch__frequency = $.Primitives_timerFrequency;
+      }
+      t1 = J.$sub$n($.Primitives_timerTicks.call$0(), 0);
+      if (typeof t1 !== "number")
+        return H.iae(t1);
+      t1 = 0 + t1;
+      for (iter = 0, elapsed = 0; J.$lt$n(elapsed, timeMinimum);) {
+        f.call$0();
+        t2 = $.Primitives_timerTicks.call$0();
+        elapsed = J.$tdiv$n(J.$mul$ns(J.$sub$n(t2, t1), 1000), $.Stopwatch__frequency);
+        ++iter;
+      }
+      if (typeof elapsed !== "number")
+        return H.iae(elapsed);
+      return 1000 * elapsed / iter;
+    },
+    BenchmarkBase: {
+      "^": "Object;",
+      measure$0: function() {
+        V.BenchmarkBase_measureFor(new V.BenchmarkBase_measure_closure(this), 100);
+        return V.BenchmarkBase_measureFor(new V.BenchmarkBase_measure_closure0(this), 2000);
+      }
+    },
+    BenchmarkBase_measure_closure: {
+      "^": "Closure;$this",
+      call$0: function() {
+        G.calculatePi(3000);
+      }
+    },
+    BenchmarkBase_measure_closure0: {
+      "^": "Closure;$this",
+      call$0: function() {
+        G.calculatePi(3000);
+      }
+    }
+  }], ["", "../benchmark-files/pidigits.dart",, G, {
+    "^": "",
+    pad: function(i, last) {
+      var res, count;
+      res = C.JSNumber_methods.toString$0(i);
+      count = 10 - res.length;
+      for (; count > 0;) {
+        res = last ? res + " " : "0" + res;
+        --count;
+      }
+      return res;
+    },
+    calculatePi: function($N) {
+      var bigint_TEN, k, k1, a, d, m, n, u, i, ns, t, t1, last;
+      bigint_TEN = Z.BigInteger_BigInteger(10, null, null);
+      k = Z.BigInteger_ZERO();
+      k1 = Z.BigInteger_ONE();
+      a = Z.BigInteger_ZERO();
+      d = Z.BigInteger_ONE();
+      m = Z.BigInteger_ZERO();
+      n = Z.BigInteger_ONE();
+      Z.BigInteger_ZERO();
+      u = Z.BigInteger_ZERO();
+      for (i = 0, ns = 0; true;) {
+        k = k.add$1(0, Z.BigInteger_ONE());
+        k1 = k1.add$1(0, Z.BigInteger_TWO());
+        t = n.shiftLeft$1(1);
+        n = n.multiply$1(k);
+        a = a.add$1(0, t).multiply$1(k1);
+        d = d.multiply$1(k1);
+        if (J.$ge$n(a.compareTo$1(0, n), 0)) {
+          m = n.multiply$1(Z.BigInteger_THREE()).add$1(0, a);
+          t = m.divide$1(d);
+          u = m.mod$1(d).add$1(0, n);
+          if (J.$gt$n(d.compareTo$1(0, u), 0)) {
+            t1 = t.intValue$0();
+            if (typeof t1 !== "number")
+              return H.iae(t1);
+            ns = ns * 10 + t1;
+            ++i;
+            last = i >= $N;
+            if (i % 10 === 0 || last) {
+              G.pad(ns, last);
+              ns = 0;
+            }
+            if (last)
+              break;
+            a = a.subtract$1(d.multiply$1(t)).multiply$1(bigint_TEN);
+            n = n.multiply$1(bigint_TEN);
+          }
+        }
+      }
+    },
+    main: function() {
+      H.printString("PiDigits(RunTime): " + H.S(new G.PiDigits("PiDigits").measure$0()) + " us.");
+    },
+    PiDigits: {
+      "^": "BenchmarkBase;name"
+    }
+  }, 1]];
+  setupProgram(dart, 0);
+  // getInterceptor methods
+  J.getInterceptor = function(receiver) {
+    if (typeof receiver == "number") {
+      if (Math.floor(receiver) == receiver)
+        return J.JSInt.prototype;
+      return J.JSDouble.prototype;
+    }
+    if (typeof receiver == "string")
+      return J.JSString.prototype;
+    if (receiver == null)
+      return J.JSNull.prototype;
+    if (typeof receiver == "boolean")
+      return J.JSBool.prototype;
+    if (receiver.constructor == Array)
+      return J.JSArray0.prototype;
+    return receiver;
+  };
+  J.getInterceptor$as = function(receiver) {
+    if (typeof receiver == "string")
+      return J.JSString.prototype;
+    if (receiver == null)
+      return receiver;
+    if (receiver.constructor == Array)
+      return J.JSArray0.prototype;
+    return receiver;
+  };
+  J.getInterceptor$i = function(receiver) {
+    if (typeof receiver == "number") {
+      if (Math.floor(receiver) == receiver)
+        return J.JSInt.prototype;
+      return J.JSNumber.prototype;
+    }
+    if (receiver == null)
+      return receiver;
+    return receiver;
+  };
+  J.getInterceptor$n = function(receiver) {
+    if (typeof receiver == "number")
+      return J.JSNumber.prototype;
+    if (receiver == null)
+      return receiver;
+    return receiver;
+  };
+  J.getInterceptor$ns = function(receiver) {
+    if (typeof receiver == "number")
+      return J.JSNumber.prototype;
+    if (typeof receiver == "string")
+      return J.JSString.prototype;
+    if (receiver == null)
+      return receiver;
+    return receiver;
+  };
+  J.get$length$as = function(receiver) {
+    return J.getInterceptor$as(receiver).get$length(receiver);
+  };
+  J.$add$ns = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return receiver + a0;
+    return J.getInterceptor$ns(receiver).$add(receiver, a0);
+  };
+  J.$and$n = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return (receiver & a0) >>> 0;
+    return J.getInterceptor$n(receiver).$and(receiver, a0);
+  };
+  J.$ge$n = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return receiver >= a0;
+    return J.getInterceptor$n(receiver).$ge(receiver, a0);
+  };
+  J.$gt$n = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return receiver > a0;
+    return J.getInterceptor$n(receiver).$gt(receiver, a0);
+  };
+  J.$le$n = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return receiver <= a0;
+    return J.getInterceptor$n(receiver).$le(receiver, a0);
+  };
+  J.$lt$n = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return receiver < a0;
+    return J.getInterceptor$n(receiver).$lt(receiver, a0);
+  };
+  J.$mod$n = function(receiver, a0) {
+    return J.getInterceptor$n(receiver).$mod(receiver, a0);
+  };
+  J.$mul$ns = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return receiver * a0;
+    return J.getInterceptor$ns(receiver).$mul(receiver, a0);
+  };
+  J.$negate$n = function(receiver) {
+    if (typeof receiver == "number")
+      return -receiver;
+    return J.getInterceptor$n(receiver).$negate(receiver);
+  };
+  J.$not$i = function(receiver) {
+    if (typeof receiver == "number" && Math.floor(receiver) == receiver)
+      return ~receiver >>> 0;
+    return J.getInterceptor$i(receiver).$not(receiver);
+  };
+  J.$or$n = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return (receiver | a0) >>> 0;
+    return J.getInterceptor$n(receiver).$or(receiver, a0);
+  };
+  J.$shl$n = function(receiver, a0) {
+    return J.getInterceptor$n(receiver).$shl(receiver, a0);
+  };
+  J.$shr$n = function(receiver, a0) {
+    return J.getInterceptor$n(receiver).$shr(receiver, a0);
+  };
+  J.$sub$n = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return receiver - a0;
+    return J.getInterceptor$n(receiver).$sub(receiver, a0);
+  };
+  J.$tdiv$n = function(receiver, a0) {
+    return J.getInterceptor$n(receiver).$tdiv(receiver, a0);
+  };
+  J.abs$0$n = function(receiver) {
+    return J.getInterceptor$n(receiver).abs$0(receiver);
+  };
+  J.compareTo$1$ns = function(receiver, a0) {
+    return J.getInterceptor$ns(receiver).compareTo$1(receiver, a0);
+  };
+  J.floor$0$n = function(receiver) {
+    return J.getInterceptor$n(receiver).floor$0(receiver);
+  };
+  J.toInt$0$n = function(receiver) {
+    return J.getInterceptor$n(receiver).toInt$0(receiver);
+  };
+  J.toRadixString$1$n = function(receiver, a0) {
+    return J.getInterceptor$n(receiver).toRadixString$1(receiver, a0);
+  };
+  J.get$hashCode$ = function(receiver) {
+    return J.getInterceptor(receiver).get$hashCode(receiver);
+  };
+  J.$eq$ = function(receiver, a0) {
+    if (receiver == null)
+      return a0 == null;
+    if (typeof receiver != "object")
+      return a0 != null && receiver === a0;
+    return J.getInterceptor(receiver).$eq(receiver, a0);
+  };
+  J.toString$0$ = function(receiver) {
+    return J.getInterceptor(receiver).toString$0(receiver);
+  };
+  // Output contains no constant list.
+  var $ = Isolate.$isolateProperties;
+  C.Interceptor_methods = J.Interceptor.prototype;
+  C.JSArray_methods = J.JSArray0.prototype;
+  C.JSDouble_methods = J.JSDouble.prototype;
+  C.JSInt_methods = J.JSInt.prototype;
+  C.JSNumber_methods = J.JSNumber.prototype;
+  C.JSString_methods = J.JSString.prototype;
+  C.C_OutOfMemoryError = new P.OutOfMemoryError();
+  C.JS_CONST_u2C = function getTagFallback(o) {
+  var s = Object.prototype.toString.call(o);
+  return s.substring(8, s.length - 1);
+};
+  $.Primitives_timerFrequency = null;
+  $.Primitives_timerTicks = null;
+  $.Closure_functionCounter = 0;
+  $.BoundClosure_selfFieldNameCache = null;
+  $.BoundClosure_receiverFieldNameCache = null;
+  $.Stopwatch__frequency = null;
+  $.BigIntegerV8_dbits = null;
+  $.BigIntegerV8_BI_DB = null;
+  $.BigIntegerV8_BI_DM = null;
+  $.BigIntegerV8_BI_DV = null;
+  $.BigIntegerV8_BI_FP = null;
+  $.BigIntegerV8_BI_FV = null;
+  $.BigIntegerV8_BI_F1 = null;
+  $.BigIntegerV8_BI_F2 = null;
+  $.BigIntegerV8__lplim = null;
+  $.BigIntegerV8_canary = 244837814094590;
+  $.BigIntegerV8__j_lm = null;
+  $.BigIntegerV8_BI_RM = "0123456789abcdefghijklmnopqrstuvwxyz";
+  $.BigIntegerV8_BI_RC = null;
+  $ = null;
+  init.isHunkLoaded = function(hunkHash) {
+    return !!$dart_deferred_initializers$[hunkHash];
+  };
+  init.deferredInitialized = new Object(null);
+  init.isHunkInitialized = function(hunkHash) {
+    return init.deferredInitialized[hunkHash];
+  };
+  init.initializeLoadedHunk = function(hunkHash) {
+    $dart_deferred_initializers$[hunkHash]($globals$, $);
+    init.deferredInitialized[hunkHash] = true;
+  };
+  init.deferredLibraryUris = {};
+  init.deferredLibraryHashes = {};
+  // Empty type-to-interceptor map.
+  (function(lazies) {
+    for (var i = 0; i < lazies.length;) {
+      var fieldName = lazies[i++];
+      var getterName = lazies[i++];
+      var lazyValue = lazies[i++];
+      var staticName = lazies[i++];
+      Isolate.$lazy(fieldName, getterName, lazyValue, staticName);
+    }
+  })(["_toStringVisiting", "$get$_toStringVisiting", function() {
+    return [];
+  }, "_toStringVisiting", "BigInteger__useJsBigint", "$get$BigInteger__useJsBigint", function() {
+    return new Z.closure().call$0();
+  }, "BigInteger__useJsBigint"]);
+  Isolate = Isolate.$finishIsolateConstructor(Isolate);
+  $ = new Isolate();
+  init.metadata = [];
+  init.types = [{func: 1, args: [,,]}, {func: 1, args: [,,,,,,]}, {func: 1, ret: P.num}];
+  function convertToFastObject(properties) {
+    function MyClass() {
+    }
+    MyClass.prototype = properties;
+    new MyClass();
+    return properties;
+  }
+  function convertToSlowObject(properties) {
+    properties.__MAGIC_SLOW_PROPERTY = 1;
+    delete properties.__MAGIC_SLOW_PROPERTY;
+    return properties;
+  }
+  A = convertToFastObject(A);
+  B = convertToFastObject(B);
+  C = convertToFastObject(C);
+  D = convertToFastObject(D);
+  E = convertToFastObject(E);
+  F = convertToFastObject(F);
+  G = convertToFastObject(G);
+  H = convertToFastObject(H);
+  J = convertToFastObject(J);
+  K = convertToFastObject(K);
+  L = convertToFastObject(L);
+  M = convertToFastObject(M);
+  N = convertToFastObject(N);
+  O = convertToFastObject(O);
+  P = convertToFastObject(P);
+  Q = convertToFastObject(Q);
+  R = convertToFastObject(R);
+  S = convertToFastObject(S);
+  T = convertToFastObject(T);
+  U = convertToFastObject(U);
+  V = convertToFastObject(V);
+  W = convertToFastObject(W);
+  X = convertToFastObject(X);
+  Y = convertToFastObject(Y);
+  Z = convertToFastObject(Z);
+  function init() {
+    Isolate.$isolateProperties = Object.create(null);
+    init.allClasses = map();
+    init.getTypeFromName = function(name) {
+      return init.allClasses[name];
+    };
+    init.interceptorsByTag = map();
+    init.leafTags = map();
+    init.finishedClasses = map();
+    Isolate.$lazy = function(fieldName, getterName, lazyValue, staticName, prototype) {
+      if (!init.lazies)
+        init.lazies = Object.create(null);
+      init.lazies[fieldName] = getterName;
+      prototype = prototype || Isolate.$isolateProperties;
+      var sentinelUndefined = {};
+      var sentinelInProgress = {};
+      prototype[fieldName] = sentinelUndefined;
+      prototype[getterName] = function() {
+        var result = this[fieldName];
+        if (result == sentinelInProgress)
+          H.throwCyclicInit(staticName || fieldName);
+        try {
+          if (result === sentinelUndefined) {
+            this[fieldName] = sentinelInProgress;
+            try {
+              result = this[fieldName] = lazyValue();
+            } finally {
+              if (result === sentinelUndefined)
+                this[fieldName] = null;
+            }
+          }
+          return result;
+        } finally {
+          this[getterName] = function() {
+            return this[fieldName];
+          };
+        }
+      };
+    };
+    Isolate.$finishIsolateConstructor = function(oldIsolate) {
+      var isolateProperties = oldIsolate.$isolateProperties;
+      function Isolate() {
+        var staticNames = Object.keys(isolateProperties);
+        for (var i = 0; i < staticNames.length; i++) {
+          var staticName = staticNames[i];
+          this[staticName] = isolateProperties[staticName];
+        }
+        var lazies = init.lazies;
+        var lazyInitializers = lazies ? Object.keys(lazies) : [];
+        for (var i = 0; i < lazyInitializers.length; i++)
+          this[lazies[lazyInitializers[i]]] = null;
+        function ForceEfficientMap() {
+        }
+        ForceEfficientMap.prototype = this;
+        new ForceEfficientMap();
+        for (var i = 0; i < lazyInitializers.length; i++) {
+          var lazyInitName = lazies[lazyInitializers[i]];
+          this[lazyInitName] = isolateProperties[lazyInitName];
+        }
+      }
+      Isolate.prototype = oldIsolate.prototype;
+      Isolate.prototype.constructor = Isolate;
+      Isolate.$isolateProperties = isolateProperties;
+      Isolate.functionThatReturnsNull = oldIsolate.functionThatReturnsNull;
+      return Isolate;
+    };
+  }
+  // BEGIN invoke [main].
+  (function(callback) {
+    if (typeof document === "undefined") {
+      callback(null);
+      return;
+    }
+    if (typeof document.currentScript != 'undefined') {
+      callback(document.currentScript);
+      return;
+    }
+    var scripts = document.scripts;
+    function onLoad(event) {
+      for (var i = 0; i < scripts.length; ++i)
+        scripts[i].removeEventListener("load", onLoad, false);
+      callback(event.target);
+    }
+    for (var i = 0; i < scripts.length; ++i)
+      scripts[i].addEventListener("load", onLoad, false);
+  })(function(currentScript) {
+    init.currentScript = currentScript;
+    if (typeof dartMainRunner === "function")
+      dartMainRunner(G.main, []);
+    else
+      G.main([]);
+  });
+  // END invoke [main].
+})();
+
+//# sourceMappingURL=pidigits.js.map

@@ -471,6 +471,11 @@
       get$length: function(receiver) {
         return receiver.length;
       },
+      $index: function(receiver, index) {
+        if (index >= receiver.length || index < 0)
+          throw H.wrapException(H.diagnoseIndexError(receiver, index));
+        return receiver[index];
+      },
       $isList: 1
     },
     JSUnmodifiableArray: {
@@ -538,11 +543,6 @@
           return Math.ceil(quotient);
         throw H.wrapException(new P.UnsupportedError("Result of truncating division is " + H.S(quotient) + ": " + H.S(receiver) + " ~/ " + other));
       },
-      $shl: function(receiver, other) {
-        if (other < 0)
-          throw H.wrapException(H.argumentErrorValue(other));
-        return other > 31 ? 0 : receiver << other >>> 0;
-      },
       $isnum: 1
     },
     JSInt: {
@@ -561,6 +561,14 @@
           throw H.wrapException(H.diagnoseIndexError(receiver, index));
         return receiver.charCodeAt(index);
       },
+      allMatches$2: function(receiver, string, start) {
+        if (start > string.length)
+          throw H.wrapException(P.RangeError$range(start, 0, string.length, null, null));
+        return new H._StringAllMatchesIterable(string, receiver, start);
+      },
+      allMatches$1: function($receiver, string) {
+        return this.allMatches$2($receiver, string, 0);
+      },
       $add: function(receiver, other) {
         if (typeof other !== "string")
           throw H.wrapException(P.ArgumentError$value(other, null, null));
@@ -569,6 +577,8 @@
       substring$2: function(receiver, startIndex, endIndex) {
         if (endIndex == null)
           endIndex = receiver.length;
+        if (startIndex < 0)
+          throw H.wrapException(P.RangeError$value(startIndex, null, null));
         if (startIndex > endIndex)
           throw H.wrapException(P.RangeError$value(startIndex, null, null));
         if (endIndex > receiver.length)
@@ -583,6 +593,11 @@
       },
       get$length: function(receiver) {
         return receiver.length;
+      },
+      $index: function(receiver, index) {
+        if (index >= receiver.length || false)
+          throw H.wrapException(H.diagnoseIndexError(receiver, index));
+        return receiver[index];
       },
       $isString: 1
     }
@@ -686,6 +701,11 @@
     },
     argumentErrorValue: function(object) {
       return new P.ArgumentError(true, object, null, null);
+    },
+    checkString: function(value) {
+      if (typeof value !== "string")
+        throw H.wrapException(H.argumentErrorValue(value));
+      return value;
     },
     wrapException: function(ex) {
       var wrapper;
@@ -1019,6 +1039,13 @@
       }
       return allDynamic ? "" : "<" + buffer.toString$0(0) + ">";
     },
+    stringReplaceAllUnchecked: function(receiver, pattern, replacement) {
+      var nativeRegexp, t1;
+      nativeRegexp = pattern.get$_nativeGlobalVersion();
+      nativeRegexp.lastIndex = 0;
+      t1 = receiver.replace(nativeRegexp, replacement.replace(/\$/g, "$$$$"));
+      return t1;
+    },
     ReflectionInfo: {
       "^": "Object;jsFunction,data,isAccessor,requiredParameterCount,optionalParameterCount,areOptionalParametersNamed,functionType,cachedSortedIndices",
       static: {
@@ -1107,6 +1134,130 @@
       toString$0: function(_) {
         return "RuntimeError: " + this.message;
       }
+    },
+    JSSyntaxRegExp: {
+      "^": "Object;pattern<,_nativeRegExp,_nativeGlobalRegExp,_nativeAnchoredRegExp",
+      toString$0: function(_) {
+        return "RegExp/" + H.S(this.pattern) + "/";
+      },
+      get$_nativeGlobalVersion: function() {
+        var t1 = this._nativeGlobalRegExp;
+        if (t1 != null)
+          return t1;
+        t1 = this._nativeRegExp;
+        t1 = H.JSSyntaxRegExp_makeNative(this.pattern, t1.multiline, !t1.ignoreCase, true);
+        this._nativeGlobalRegExp = t1;
+        return t1;
+      },
+      allMatches$2: function(_, string, start) {
+        if (start > string.length)
+          throw H.wrapException(P.RangeError$range(start, 0, string.length, null, null));
+        return new H._AllMatchesIterable(this, string, start);
+      },
+      allMatches$1: function($receiver, string) {
+        return this.allMatches$2($receiver, string, 0);
+      },
+      _execGlobal$2: function(string, start) {
+        var regexp, match;
+        regexp = this.get$_nativeGlobalVersion();
+        regexp.lastIndex = start;
+        match = regexp.exec(string);
+        if (match == null)
+          return;
+        return new H._MatchImplementation(this, match);
+      },
+      static: {
+        JSSyntaxRegExp_makeNative: function(source, multiLine, caseSensitive, global) {
+          var m, i, g, regexp;
+          H.checkString(source);
+          m = multiLine ? "m" : "";
+          i = caseSensitive ? "" : "i";
+          g = global ? "g" : "";
+          regexp = function(source, modifiers) {
+            try {
+              return new RegExp(source, modifiers);
+            } catch (e) {
+              return e;
+            }
+          }(source, m + i + g);
+          if (regexp instanceof RegExp)
+            return regexp;
+          throw H.wrapException(new P.FormatException("Illegal RegExp pattern (" + String(regexp) + ")", source, null));
+        }
+      }
+    },
+    _MatchImplementation: {
+      "^": "Object;pattern<,_match"
+    },
+    _AllMatchesIterable: {
+      "^": "IterableBase;_re,_string,_start",
+      get$iterator: function(_) {
+        return new H._AllMatchesIterator(this._re, this._string, this._start, null);
+      }
+    },
+    _AllMatchesIterator: {
+      "^": "Object;_regExp,_string,_nextIndex,__js_helper$_current",
+      get$current: function() {
+        return this.__js_helper$_current;
+      },
+      moveNext$0: function() {
+        var t1, t2, match, nextIndex;
+        t1 = this._string;
+        if (t1 == null)
+          return false;
+        t2 = this._nextIndex;
+        if (t2 <= t1.length) {
+          match = this._regExp._execGlobal$2(t1, t2);
+          if (match != null) {
+            this.__js_helper$_current = match;
+            t1 = match._match;
+            t2 = t1.index;
+            nextIndex = t2 + t1[0].length;
+            this._nextIndex = t2 === nextIndex ? nextIndex + 1 : nextIndex;
+            return true;
+          }
+        }
+        this.__js_helper$_current = null;
+        this._string = null;
+        return false;
+      }
+    },
+    StringMatch: {
+      "^": "Object;start,input,pattern<"
+    },
+    _StringAllMatchesIterable: {
+      "^": "Iterable;_input,_pattern,__js_helper$_index",
+      get$iterator: function(_) {
+        return new H._StringAllMatchesIterator(this._input, this._pattern, this.__js_helper$_index, null);
+      }
+    },
+    _StringAllMatchesIterator: {
+      "^": "Object;_input,_pattern,__js_helper$_index,__js_helper$_current",
+      moveNext$0: function() {
+        var t1, t2, t3, t4, t5, index, end;
+        t1 = this.__js_helper$_index;
+        t2 = this._pattern;
+        t3 = t2.length;
+        t4 = this._input;
+        t5 = t4.length;
+        if (t1 + t3 > t5) {
+          this.__js_helper$_current = null;
+          return false;
+        }
+        index = t4.indexOf(t2, t1);
+        if (index < 0) {
+          this.__js_helper$_index = t5 + 1;
+          this.__js_helper$_current = null;
+          return false;
+        }
+        end = index + t3;
+        this.__js_helper$_current = new H.StringMatch(index, t4, t2);
+        this.__js_helper$_index = end === this.__js_helper$_index ? end + 1 : end;
+        return true;
+      },
+      get$current: function() {
+        return this.__js_helper$_current;
+      }
     }
   }], ["dart._js_names", "dart:_js_names",, H, {
     "^": "",
@@ -1136,6 +1287,26 @@
     }
   }], ["dart.collection", "dart:collection",, P, {
     "^": "",
+    IterableBase_iterableToShortString: function(iterable, leftDelimiter, rightDelimiter) {
+      var parts, t1;
+      if (P._isToStringVisiting(iterable)) {
+        if (leftDelimiter === "(" && rightDelimiter === ")")
+          return "(...)";
+        return leftDelimiter + "..." + rightDelimiter;
+      }
+      parts = [];
+      t1 = $.$get$_toStringVisiting();
+      t1.push(iterable);
+      try {
+        P._iterablePartsToStrings(iterable, parts);
+      } finally {
+        if (0 >= t1.length)
+          return H.ioore(t1, -1);
+        t1.pop();
+      }
+      t1 = P.StringBuffer__writeAll(leftDelimiter, parts, ", ") + rightDelimiter;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
+    },
     IterableBase_iterableToFullString: function(iterable, leftDelimiter, rightDelimiter) {
       var buffer, t1, t2;
       if (P._isToStringVisiting(iterable))
@@ -1162,6 +1333,91 @@
         if (o === t1[i])
           return true;
       return false;
+    },
+    _iterablePartsToStrings: function(iterable, parts) {
+      var it, $length, count, next, ultimateString, penultimateString, penultimate, ultimate, ultimate0, elision;
+      it = iterable.get$iterator(iterable);
+      $length = 0;
+      count = 0;
+      while (true) {
+        if (!($length < 80 || count < 3))
+          break;
+        if (!it.moveNext$0())
+          return;
+        next = J.toString$0$(it.get$current());
+        parts.push(next);
+        $length += next.length + 2;
+        ++count;
+      }
+      if (!it.moveNext$0()) {
+        if (count <= 5)
+          return;
+        if (0 >= parts.length)
+          return H.ioore(parts, -1);
+        ultimateString = parts.pop();
+        if (0 >= parts.length)
+          return H.ioore(parts, -1);
+        penultimateString = parts.pop();
+      } else {
+        penultimate = it.get$current();
+        ++count;
+        if (!it.moveNext$0()) {
+          if (count <= 4) {
+            parts.push(J.toString$0$(penultimate));
+            return;
+          }
+          ultimateString = J.toString$0$(penultimate);
+          if (0 >= parts.length)
+            return H.ioore(parts, -1);
+          penultimateString = parts.pop();
+          $length += ultimateString.length + 2;
+        } else {
+          ultimate = it.get$current();
+          ++count;
+          for (; it.moveNext$0(); penultimate = ultimate, ultimate = ultimate0) {
+            ultimate0 = it.get$current();
+            ++count;
+            if (count > 100) {
+              while (true) {
+                if (!($length > 75 && count > 3))
+                  break;
+                if (0 >= parts.length)
+                  return H.ioore(parts, -1);
+                $length -= parts.pop().length + 2;
+                --count;
+              }
+              parts.push("...");
+              return;
+            }
+          }
+          penultimateString = H.S(penultimate);
+          ultimateString = H.S(ultimate);
+          $length += ultimateString.length + penultimateString.length + 4;
+        }
+      }
+      if (count > parts.length + 2) {
+        $length += 5;
+        elision = "...";
+      } else
+        elision = null;
+      while (true) {
+        if (!($length > 80 && parts.length > 3))
+          break;
+        if (0 >= parts.length)
+          return H.ioore(parts, -1);
+        $length -= parts.pop().length + 2;
+        if (elision == null) {
+          $length += 5;
+          elision = "...";
+        }
+      }
+      if (elision != null)
+        parts.push(elision);
+      parts.push(penultimateString);
+      parts.push(ultimateString);
+    },
+    IterableBase: {
+      "^": "Iterable;"
     }
   }], ["dart.core", "dart:core",, P, {
     "^": "",
@@ -1177,6 +1433,9 @@
       if (!!t1.$isClosure)
         return t1.toString$0(object);
       return H.Primitives_objectToHumanReadableString(object);
+    },
+    RegExp_RegExp: function(source, caseSensitive, multiLine) {
+      return new H.JSSyntaxRegExp(source, H.JSSyntaxRegExp_makeNative(source, multiLine, caseSensitive, false), null, null);
     },
     bool: {
       "^": "Object;",
@@ -1229,11 +1488,28 @@
         return "RangeError";
       },
       get$_errorExplanation: function() {
-        return "";
+        var t1, explanation, t2;
+        t1 = this.start;
+        if (t1 == null) {
+          t1 = this.end;
+          explanation = t1 != null ? ": Not less than or equal to " + H.S(t1) : "";
+        } else {
+          t2 = this.end;
+          if (t2 == null)
+            explanation = ": Not greater than or equal to " + H.S(t1);
+          else if (t2 > t1)
+            explanation = ": Not in range " + H.S(t1) + ".." + H.S(t2) + ", inclusive";
+          else
+            explanation = t2 < t1 ? ": Valid value range is empty" : ": Only valid value is " + H.S(t1);
+        }
+        return explanation;
       },
       static: {
         RangeError$value: function(value, $name, message) {
           return new P.RangeError(null, null, true, value, $name, "Value not in range");
+        },
+        RangeError$range: function(invalidValue, minValue, maxValue, $name, message) {
+          return new P.RangeError(minValue, maxValue, true, invalidValue, $name, "Invalid value");
         }
       }
     },
@@ -1281,10 +1557,37 @@
         return t1 == null ? "Reading static variable during its initialization" : "Reading static variable '" + H.S(t1) + "' during its initialization";
       }
     },
+    FormatException: {
+      "^": "Object;message,source,offset",
+      toString$0: function(_) {
+        var t1, report, source;
+        t1 = this.message;
+        report = "" !== t1 ? "FormatException: " + t1 : "FormatException";
+        source = this.source;
+        if (typeof source !== "string")
+          return report;
+        if (source.length > 78)
+          source = C.JSString_methods.substring$2(source, 0, 75) + "...";
+        return report + "\n" + source;
+      }
+    },
     int: {
       "^": "num;"
     },
     "+int": 0,
+    Iterable: {
+      "^": "Object;",
+      get$length: function(_) {
+        var it, count;
+        it = this.get$iterator(this);
+        for (count = 0; it.moveNext$0();)
+          ++count;
+        return count;
+      },
+      toString$0: function(_) {
+        return P.IterableBase_iterableToShortString(this, "(", ")");
+      }
+    },
     List: {
       "^": "Object;"
     },
@@ -1310,7 +1613,7 @@
       }
     },
     Stopwatch: {
-      "^": "Object;_start,_stop"
+      "^": "Object;_core$_start,_stop"
     },
     String: {
       "^": "Object;"
@@ -1378,50 +1681,58 @@
     BenchmarkBase_measure_closure: {
       "^": "Closure;$this",
       call$0: function() {
-        this.$this.run$0();
+        T.regexAllTheThings(">ONE Homo sapiens alu\nGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGA\nTCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACT\nAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAG\nGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCG\nCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGT\nGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCA\nGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAA\nTTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAG\nAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCA\nGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGT\nAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACC\nAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTG\nGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACC\nCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAG\nAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTT\nTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACA\nTGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCT\nGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGG\nTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGT\nCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGG\nCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCG\nTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTA\nCTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCG\nAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCG\nGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACC\nTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAA\nTACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGA\nGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACT\nGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTC\nACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGT\nTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGC\nCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCG\nCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTG\nGGCGACAGAGCGAGACTCCG\n>TWO IUB ambiguity codes\ncttBtatcatatgctaKggNcataaaSatgtaaaDcDRtBggDtctttataattcBgtcg\ntactDtDagcctatttSVHtHttKtgtHMaSattgWaHKHttttagacatWatgtRgaaa\nNtactMcSMtYtcMgRtacttctWBacgaaatatagScDtttgaagacacatagtVgYgt\ncattHWtMMWcStgttaggKtSgaYaaccWStcgBttgcgaMttBYatcWtgacaYcaga\ngtaBDtRacttttcWatMttDBcatWtatcttactaBgaYtcttgttttttttYaaScYa\nHgtgttNtSatcMtcVaaaStccRcctDaataataStcYtRDSaMtDttgttSagtRRca\ntttHatSttMtWgtcgtatSSagactYaaattcaMtWatttaSgYttaRgKaRtccactt\ntattRggaMcDaWaWagttttgacatgttctacaaaRaatataataaMttcgDacgaSSt\nacaStYRctVaNMtMgtaggcKatcttttattaaaaagVWaHKYagtttttatttaacct\ntacgtVtcVaattVMBcttaMtttaStgacttagattWWacVtgWYagWVRctDattBYt\ngtttaagaagattattgacVatMaacattVctgtBSgaVtgWWggaKHaatKWcBScSWa\naccRVacacaaactaccScattRatatKVtactatatttHttaagtttSKtRtacaaagt\nRDttcaaaaWgcacatWaDgtDKacgaacaattacaRNWaatHtttStgttattaaMtgt\ntgDcgtMgcatBtgcttcgcgaDWgagctgcgaggggVtaaScNatttacttaatgacag\ncccccacatYScaMgtaggtYaNgttctgaMaacNaMRaacaaacaKctacatagYWctg\nttWaaataaaataRattagHacacaagcgKatacBttRttaagtatttccgatctHSaat\nactcNttMaagtattMtgRtgaMgcataatHcMtaBSaRattagttgatHtMttaaKagg\nYtaaBataSaVatactWtataVWgKgttaaaacagtgcgRatatacatVtHRtVYataSa\nKtWaStVcNKHKttactatccctcatgWHatWaRcttactaggatctataDtDHBttata\naaaHgtacVtagaYttYaKcctattcttcttaataNDaaggaaaDYgcggctaaWSctBa\naNtgctggMBaKctaMVKagBaactaWaDaMaccYVtNtaHtVWtKgRtcaaNtYaNacg\ngtttNattgVtttctgtBaWgtaattcaagtcaVWtactNggattctttaYtaaagccgc\ntcttagHVggaYtgtNcDaVagctctctKgacgtatagYcctRYHDtgBattDaaDgccK\ntcHaaStttMcctagtattgcRgWBaVatHaaaataYtgtttagMDMRtaataaggatMt\nttctWgtNtgtgaaaaMaatatRtttMtDgHHtgtcattttcWattRSHcVagaagtacg\nggtaKVattKYagactNaatgtttgKMMgYNtcccgSKttctaStatatNVataYHgtNa\nBKRgNacaactgatttcctttaNcgatttctctataScaHtataRagtcRVttacDSDtt\naRtSatacHgtSKacYagttMHtWataggatgactNtatSaNctataVtttRNKtgRacc\ntttYtatgttactttttcctttaaacatacaHactMacacggtWataMtBVacRaSaatc\ncgtaBVttccagccBcttaRKtgtgcctttttRtgtcagcRttKtaaacKtaaatctcac\naattgcaNtSBaaccgggttattaaBcKatDagttactcttcattVtttHaaggctKKga\ntacatcBggScagtVcacattttgaHaDSgHatRMaHWggtatatRgccDttcgtatcga\naacaHtaagttaRatgaVacttagattVKtaaYttaaatcaNatccRttRRaMScNaaaD\ngttVHWgtcHaaHgacVaWtgttScactaagSgttatcttagggDtaccagWattWtRtg\nttHWHacgattBtgVcaYatcggttgagKcWtKKcaVtgaYgWctgYggVctgtHgaNcV\ntaBtWaaYatcDRaaRtSctgaHaYRttagatMatgcatttNattaDttaattgttctaa\nccctcccctagaWBtttHtBccttagaVaatMcBHagaVcWcagBVttcBtaYMccagat\ngaaaaHctctaacgttagNWRtcggattNatcRaNHttcagtKttttgWatWttcSaNgg\ngaWtactKKMaacatKatacNattgctWtatctaVgagctatgtRaHtYcWcttagccaa\ntYttWttaWSSttaHcaaaaagVacVgtaVaRMgattaVcDactttcHHggHRtgNcctt\ntYatcatKgctcctctatVcaaaaKaaaagtatatctgMtWtaaaacaStttMtcgactt\ntaSatcgDataaactaaacaagtaaVctaggaSccaatMVtaaSKNVattttgHccatca\ncBVctgcaVatVttRtactgtVcaattHgtaaattaaattttYtatattaaRSgYtgBag\naHSBDgtagcacRHtYcBgtcacttacactaYcgctWtattgSHtSatcataaatataHt\ncgtYaaMNgBaatttaRgaMaatatttBtttaaaHHKaatctgatWatYaacttMctctt\nttVctagctDaaagtaVaKaKRtaacBgtatccaaccactHHaagaagaaggaNaaatBW\nattccgStaMSaMatBttgcatgRSacgttVVtaaDMtcSgVatWcaSatcttttVatag\nttactttacgatcaccNtaDVgSRcgVcgtgaacgaNtaNatatagtHtMgtHcMtagaa\nattBgtataRaaaacaYKgtRccYtatgaagtaataKgtaaMttgaaRVatgcagaKStc\ntHNaaatctBBtcttaYaBWHgtVtgacagcaRcataWctcaBcYacYgatDgtDHccta\n>THREE Homo sapiens frequency\naacacttcaccaggtatcgtgaaggctcaagattacccagagaacctttgcaatataaga\natatgtatgcagcattaccctaagtaattatattctttttctgactcaaagtgacaagcc\nctagtgtatattaaatcggtatatttgggaaattcctcaaactatcctaatcaggtagcc\natgaaagtgatcaaaaaagttcgtacttataccatacatgaattctggccaagtaaaaaa\ntagattgcgcaaaattcgtaccttaagtctctcgccaagatattaggatcctattactca\ntatcgtgtttttctttattgccgccatccccggagtatctcacccatccttctcttaaag\ngcctaatattacctatgcaaataaacatatattgttgaaaattgagaacctgatcgtgat\ntcttatgtgtaccatatgtatagtaatcacgcgactatatagtgctttagtatcgcccgt\ngggtgagtgaatattctgggctagcgtgagatagtttcttgtcctaatatttttcagatc\ngaatagcttctatttttgtgtttattgacatatgtcgaaactccttactcagtgaaagtc\natgaccagatccacgaacaatcttcggaatcagtctcgttttacggcggaatcttgagtc\ntaacttatatcccgtcgcttactttctaacaccccttatgtatttttaaaattacgttta\nttcgaacgtacttggcggaagcgttattttttgaagtaagttacattgggcagactcttg\nacattttcgatacgactttctttcatccatcacaggactcgttcgtattgatatcagaag\nctcgtgatgattagttgtcttctttaccaatactttgaggcctattctgcgaaatttttg\nttgccctgcgaacttcacataccaaggaacacctcgcaacatgccttcatatccatcgtt\ncattgtaattcttacacaatgaatcctaagtaattacatccctgcgtaaaagatggtagg\nggcactgaggatatattaccaagcatttagttatgagtaatcagcaatgtttcttgtatt\naagttctctaaaatagttacatcgtaatgttatctcgggttccgcgaataaacgagatag\nattcattatatatggccctaagcaaaaacctcctcgtattctgttggtaattagaatcac\nacaatacgggttgagatattaattatttgtagtacgaagagatataaaaagatgaacaat\ntactcaagtcaagatgtatacgggatttataataaaaatcgggtagagatctgctttgca\nattcagacgtgccactaaatcgtaatatgtcgcgttacatcagaaagggtaactattatt\naattaataaagggcttaatcactacatattagatcttatccgatagtcttatctattcgt\ntgtatttttaagcggttctaattcagtcattatatcagtgctccgagttctttattattg\nttttaaggatgacaaaatgcctcttgttataacgctgggagaagcagactaagagtcgga\ngcagttggtagaatgaggctgcaaaagacggtctcgacgaatggacagactttactaaac\ncaatgaaagacagaagtagagcaaagtctgaagtggtatcagcttaattatgacaaccct\ntaatacttccctttcgccgaatactggcgtggaaaggttttaaaagtcgaagtagttaga\nggcatctctcgctcataaataggtagactactcgcaatccaatgtgactatgtaatactg\nggaacatcagtccgcgatgcagcgtgtttatcaaccgtccccactcgcctggggagacat\ngagaccacccccgtggggattattagtccgcagtaatcgactcttgacaatccttttcga\nttatgtcatagcaatttacgacagttcagcgaagtgactactcggcgaaatggtattact\naaagcattcgaacccacatgaatgtgattcttggcaatttctaatccactaaagcttttc\ncgttgaatctggttgtagatatttatataagttcactaattaagatcacggtagtatatt\ngatagtgatgtctttgcaagaggttggccgaggaatttacggattctctattgatacaat\nttgtctggcttataactcttaaggctgaaccaggcgtttttagacgacttgatcagctgt\ntagaatggtttggactccctctttcatgtcagtaacatttcagccgttattgttacgata\ntgcttgaacaatattgatctaccacacacccatagtatattttataggtcatgctgttac\nctacgagcatggtattccacttcccattcaatgagtattcaacatcactagcctcagaga\ntgatgacccacctctaataacgtcacgttgcggccatgtgaaacctgaacttgagtagac\ngatatcaagcgctttaaattgcatataacatttgagggtaaagctaagcggatgctttat\nataatcaatactcaataataagatttgattgcattttagagttatgacacgacatagttc\nactaacgagttactattcccagatctagactgaagtactgatcgagacgatccttacgtc\ngatgatcgttagttatcgacttaggtcgggtctctagcggtattggtacttaaccggaca\nctatactaataacccatgatcaaagcataacagaatacagacgataatttcgccaacata\ntatgtacagaccccaagcatgagaagctcattgaaagctatcattgaagtcccgctcaca\natgtgtcttttccagacggtttaactggttcccgggagtcctggagtttcgacttacata\naatggaaacaatgtattttgctaatttatctatagcgtcatttggaccaatacagaatat\ntatgttgcctagtaatccactataacccgcaagtgctgatagaaaatttttagacgattt\nataaatgccccaagtatccctcccgtgaatcctccgttatactaattagtattcgttcat\nacgtataccgcgcatatatgaacatttggcgataaggcgcgtgaattgttacgtgacaga\ngatagcagtttcttgtgatatggttaacagacgtacatgaagggaaactttatatctata\ngtgatgcttccgtagaaataccgccactggtctgccaatgatgaagtatgtagctttagg\ntttgtactatgaggctttcgtttgtttgcagagtataacagttgcgagtgaaaaaccgac\ngaatttatactaatacgctttcactattggctacaaaatagggaagagtttcaatcatga\ngagggagtatatggatgctttgtagctaaaggtagaacgtatgtatatgctgccgttcat\ntcttgaaagatacataagcgataagttacgacaattataagcaacatccctaccttcgta\nacgatttcactgttactgcgcttgaaatacactatggggctattggcggagagaagcaga\ntcgcgccgagcatatacgagacctataatgttgatgatagagaaggcgtctgaattgata\ncatcgaagtacactttctttcgtagtatctctcgtcctctttctatctccggacacaaga\nattaagttatatatatagagtcttaccaatcatgttgaatcctgattctcagagttcttt\nggcgggccttgtgatgactgagaaacaatgcaatattgctccaaatttcctaagcaaatt\nctcggttatgttatgttatcagcaaagcgttacgttatgttatttaaatctggaatgacg\ngagcgaagttcttatgtcggtgtgggaataattcttttgaagacagcactccttaaataa\ntatcgctccgtgtttgtatttatcgaatgggtctgtaaccttgcacaagcaaatcggtgg\ntgtatatatcggataacaattaatacgatgttcatagtgacagtatactgatcgagtcct\nctaaagtcaattacctcacttaacaatctcattgatgttgtgtcattcccggtatcgccc\ngtagtatgtgctctgattgaccgagtgtgaaccaaggaacatctactaatgcctttgtta\nggtaagatctctctgaattccttcgtgccaacttaaaacattatcaaaatttcttctact\ntggattaactacttttacgagcatggcaaattcccctgtggaagacggttcattattatc\nggaaaccttatagaaattgcgtgttgactgaaattagatttttattgtaagagttgcatc\ntttgcgattcctctggtctagcttccaatgaacagtcctcccttctattcgacatcgggt\nccttcgtacatgtctttgcgatgtaataattaggttcggagtgtggccttaatgggtgca\nactaggaatacaacgcaaatttgctgacatgatagcaaatcggtatgccggcaccaaaac\ngtgctccttgcttagcttgtgaatgagactcagtagttaaataaatccatatctgcaatc\ngattccacaggtattgtccactatctttgaactactctaagagatacaagcttagctgag\naccgaggtgtatatgactacgctgatatctgtaaggtaccaatgcaggcaaagtatgcga\ngaagctaataccggctgtttccagctttataagattaaaatttggctgtcctggcggcct\ncagaattgttctatcgtaatcagttggttcattaattagctaagtacgaggtacaactta\ntctgtcccagaacagctccacaagtttttttacagccgaaacccctgtgtgaatcttaat\natccaagcgcgttatctgattagagtttacaactcagtattttatcagtacgttttgttt\nccaacattacccggtatgacaaaatgacgccacgtgtcgaataatggtctgaccaatgta\nggaagtgaaaagataaatat");
       }
     },
     BenchmarkBase_measure_closure0: {
       "^": "Closure;$this",
       call$0: function() {
-        this.$this.run$0();
+        this.$this.exercise$0();
       }
     }
-  }], ["", "../benchmark-files/binary_tree.dart",, T, {
+  }], ["", "../benchmark-files/regexredux.dart",, T, {
     "^": "",
     main: function() {
-      H.printString("BinaryTree(RunTime): " + H.S(new T.BinaryTree("BinaryTree").measure$0()) + " us.");
+      H.printString("Regexredux(RunTime): " + H.S(new T.Regexredux("Regexredux").measure$0()) + " us.");
     },
-    BinaryTree: {
-      "^": "BenchmarkBase;name",
-      run$0: function() {
-        var depth, iterations, check, i;
-        T.TreeNode_bottomUpTree(21).itemCheck$0();
-        T.TreeNode_bottomUpTree(20);
-        for (depth = 4; depth <= 20; depth += 2) {
-          iterations = C.JSInt_methods.$shl(1, 20 - depth + 4);
-          for (check = 0, i = 1; i <= iterations; ++i)
-            check += T.TreeNode_bottomUpTree(depth).itemCheck$0();
-        }
+    regexAllTheThings: function(fullText) {
+      var regexp, replacements, t1, i, t2;
+      regexp = new T.regexAllTheThings_closure().call$0();
+      replacements = ["tHa[Nt]", "<4>", "aND|caN|Ha[DS]|WaS", "<3>", "a[NSt]|BY", "<2>", "<[^>]*>", "|", "\\|[^|][^|]*\\|", "-"];
+      fullText = H.stringReplaceAllUnchecked(fullText, P.RegExp_RegExp("^>.*\n|\n", true, true), "");
+      for (t1 = J.getInterceptor$as(regexp), i = 0; i < t1.get$length(regexp); ++i) {
+        t1.$index(regexp, i).get$pattern();
+        if (i >= regexp.length)
+          return H.ioore(regexp, i);
+        t2 = J.allMatches$1$s(regexp[i], fullText);
+        t2.get$length(t2);
+      }
+      for (i = -1; i < 9;) {
+        ++i;
+        t1 = P.RegExp_RegExp(replacements[i], true, false);
+        ++i;
+        if (i >= 10)
+          return H.ioore(replacements, i);
+        t2 = replacements[i];
+        fullText = H.stringReplaceAllUnchecked(fullText, t1, t2);
       }
     },
-    TreeNode: {
-      "^": "Object;left,right",
-      itemCheck$0: function() {
-        var t1 = this.left;
-        if (t1 == null)
-          return 1;
-        return 1 + t1.itemCheck$0() + this.right.itemCheck$0();
-      },
-      static: {
-        TreeNode_bottomUpTree: function(depth) {
-          var t1;
-          if (depth > 0) {
-            t1 = depth - 1;
-            return new T.TreeNode(T.TreeNode_bottomUpTree(t1), T.TreeNode_bottomUpTree(t1));
-          }
-          return new T.TreeNode(null, null);
-        }
+    Regexredux: {
+      "^": "BenchmarkBase;name",
+      exercise$0: function() {
+        for (var i = 0; i < 1000; ++i)
+          T.regexAllTheThings(">ONE Homo sapiens alu\nGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGA\nTCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACT\nAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAG\nGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCG\nCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGT\nGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCA\nGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAA\nTTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAG\nAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCA\nGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGT\nAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACC\nAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTG\nGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACC\nCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAG\nAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTT\nTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACA\nTGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCT\nGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGG\nTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGT\nCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGG\nCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCG\nTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTA\nCTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCG\nAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCG\nGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACC\nTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAA\nTACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGA\nGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACT\nGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTC\nACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGT\nTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGC\nCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCG\nCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTG\nGGCGACAGAGCGAGACTCCG\n>TWO IUB ambiguity codes\ncttBtatcatatgctaKggNcataaaSatgtaaaDcDRtBggDtctttataattcBgtcg\ntactDtDagcctatttSVHtHttKtgtHMaSattgWaHKHttttagacatWatgtRgaaa\nNtactMcSMtYtcMgRtacttctWBacgaaatatagScDtttgaagacacatagtVgYgt\ncattHWtMMWcStgttaggKtSgaYaaccWStcgBttgcgaMttBYatcWtgacaYcaga\ngtaBDtRacttttcWatMttDBcatWtatcttactaBgaYtcttgttttttttYaaScYa\nHgtgttNtSatcMtcVaaaStccRcctDaataataStcYtRDSaMtDttgttSagtRRca\ntttHatSttMtWgtcgtatSSagactYaaattcaMtWatttaSgYttaRgKaRtccactt\ntattRggaMcDaWaWagttttgacatgttctacaaaRaatataataaMttcgDacgaSSt\nacaStYRctVaNMtMgtaggcKatcttttattaaaaagVWaHKYagtttttatttaacct\ntacgtVtcVaattVMBcttaMtttaStgacttagattWWacVtgWYagWVRctDattBYt\ngtttaagaagattattgacVatMaacattVctgtBSgaVtgWWggaKHaatKWcBScSWa\naccRVacacaaactaccScattRatatKVtactatatttHttaagtttSKtRtacaaagt\nRDttcaaaaWgcacatWaDgtDKacgaacaattacaRNWaatHtttStgttattaaMtgt\ntgDcgtMgcatBtgcttcgcgaDWgagctgcgaggggVtaaScNatttacttaatgacag\ncccccacatYScaMgtaggtYaNgttctgaMaacNaMRaacaaacaKctacatagYWctg\nttWaaataaaataRattagHacacaagcgKatacBttRttaagtatttccgatctHSaat\nactcNttMaagtattMtgRtgaMgcataatHcMtaBSaRattagttgatHtMttaaKagg\nYtaaBataSaVatactWtataVWgKgttaaaacagtgcgRatatacatVtHRtVYataSa\nKtWaStVcNKHKttactatccctcatgWHatWaRcttactaggatctataDtDHBttata\naaaHgtacVtagaYttYaKcctattcttcttaataNDaaggaaaDYgcggctaaWSctBa\naNtgctggMBaKctaMVKagBaactaWaDaMaccYVtNtaHtVWtKgRtcaaNtYaNacg\ngtttNattgVtttctgtBaWgtaattcaagtcaVWtactNggattctttaYtaaagccgc\ntcttagHVggaYtgtNcDaVagctctctKgacgtatagYcctRYHDtgBattDaaDgccK\ntcHaaStttMcctagtattgcRgWBaVatHaaaataYtgtttagMDMRtaataaggatMt\nttctWgtNtgtgaaaaMaatatRtttMtDgHHtgtcattttcWattRSHcVagaagtacg\nggtaKVattKYagactNaatgtttgKMMgYNtcccgSKttctaStatatNVataYHgtNa\nBKRgNacaactgatttcctttaNcgatttctctataScaHtataRagtcRVttacDSDtt\naRtSatacHgtSKacYagttMHtWataggatgactNtatSaNctataVtttRNKtgRacc\ntttYtatgttactttttcctttaaacatacaHactMacacggtWataMtBVacRaSaatc\ncgtaBVttccagccBcttaRKtgtgcctttttRtgtcagcRttKtaaacKtaaatctcac\naattgcaNtSBaaccgggttattaaBcKatDagttactcttcattVtttHaaggctKKga\ntacatcBggScagtVcacattttgaHaDSgHatRMaHWggtatatRgccDttcgtatcga\naacaHtaagttaRatgaVacttagattVKtaaYttaaatcaNatccRttRRaMScNaaaD\ngttVHWgtcHaaHgacVaWtgttScactaagSgttatcttagggDtaccagWattWtRtg\nttHWHacgattBtgVcaYatcggttgagKcWtKKcaVtgaYgWctgYggVctgtHgaNcV\ntaBtWaaYatcDRaaRtSctgaHaYRttagatMatgcatttNattaDttaattgttctaa\nccctcccctagaWBtttHtBccttagaVaatMcBHagaVcWcagBVttcBtaYMccagat\ngaaaaHctctaacgttagNWRtcggattNatcRaNHttcagtKttttgWatWttcSaNgg\ngaWtactKKMaacatKatacNattgctWtatctaVgagctatgtRaHtYcWcttagccaa\ntYttWttaWSSttaHcaaaaagVacVgtaVaRMgattaVcDactttcHHggHRtgNcctt\ntYatcatKgctcctctatVcaaaaKaaaagtatatctgMtWtaaaacaStttMtcgactt\ntaSatcgDataaactaaacaagtaaVctaggaSccaatMVtaaSKNVattttgHccatca\ncBVctgcaVatVttRtactgtVcaattHgtaaattaaattttYtatattaaRSgYtgBag\naHSBDgtagcacRHtYcBgtcacttacactaYcgctWtattgSHtSatcataaatataHt\ncgtYaaMNgBaatttaRgaMaatatttBtttaaaHHKaatctgatWatYaacttMctctt\nttVctagctDaaagtaVaKaKRtaacBgtatccaaccactHHaagaagaaggaNaaatBW\nattccgStaMSaMatBttgcatgRSacgttVVtaaDMtcSgVatWcaSatcttttVatag\nttactttacgatcaccNtaDVgSRcgVcgtgaacgaNtaNatatagtHtMgtHcMtagaa\nattBgtataRaaaacaYKgtRccYtatgaagtaataKgtaaMttgaaRVatgcagaKStc\ntHNaaatctBBtcttaYaBWHgtVtgacagcaRcataWctcaBcYacYgatDgtDHccta\n>THREE Homo sapiens frequency\naacacttcaccaggtatcgtgaaggctcaagattacccagagaacctttgcaatataaga\natatgtatgcagcattaccctaagtaattatattctttttctgactcaaagtgacaagcc\nctagtgtatattaaatcggtatatttgggaaattcctcaaactatcctaatcaggtagcc\natgaaagtgatcaaaaaagttcgtacttataccatacatgaattctggccaagtaaaaaa\ntagattgcgcaaaattcgtaccttaagtctctcgccaagatattaggatcctattactca\ntatcgtgtttttctttattgccgccatccccggagtatctcacccatccttctcttaaag\ngcctaatattacctatgcaaataaacatatattgttgaaaattgagaacctgatcgtgat\ntcttatgtgtaccatatgtatagtaatcacgcgactatatagtgctttagtatcgcccgt\ngggtgagtgaatattctgggctagcgtgagatagtttcttgtcctaatatttttcagatc\ngaatagcttctatttttgtgtttattgacatatgtcgaaactccttactcagtgaaagtc\natgaccagatccacgaacaatcttcggaatcagtctcgttttacggcggaatcttgagtc\ntaacttatatcccgtcgcttactttctaacaccccttatgtatttttaaaattacgttta\nttcgaacgtacttggcggaagcgttattttttgaagtaagttacattgggcagactcttg\nacattttcgatacgactttctttcatccatcacaggactcgttcgtattgatatcagaag\nctcgtgatgattagttgtcttctttaccaatactttgaggcctattctgcgaaatttttg\nttgccctgcgaacttcacataccaaggaacacctcgcaacatgccttcatatccatcgtt\ncattgtaattcttacacaatgaatcctaagtaattacatccctgcgtaaaagatggtagg\nggcactgaggatatattaccaagcatttagttatgagtaatcagcaatgtttcttgtatt\naagttctctaaaatagttacatcgtaatgttatctcgggttccgcgaataaacgagatag\nattcattatatatggccctaagcaaaaacctcctcgtattctgttggtaattagaatcac\nacaatacgggttgagatattaattatttgtagtacgaagagatataaaaagatgaacaat\ntactcaagtcaagatgtatacgggatttataataaaaatcgggtagagatctgctttgca\nattcagacgtgccactaaatcgtaatatgtcgcgttacatcagaaagggtaactattatt\naattaataaagggcttaatcactacatattagatcttatccgatagtcttatctattcgt\ntgtatttttaagcggttctaattcagtcattatatcagtgctccgagttctttattattg\nttttaaggatgacaaaatgcctcttgttataacgctgggagaagcagactaagagtcgga\ngcagttggtagaatgaggctgcaaaagacggtctcgacgaatggacagactttactaaac\ncaatgaaagacagaagtagagcaaagtctgaagtggtatcagcttaattatgacaaccct\ntaatacttccctttcgccgaatactggcgtggaaaggttttaaaagtcgaagtagttaga\nggcatctctcgctcataaataggtagactactcgcaatccaatgtgactatgtaatactg\nggaacatcagtccgcgatgcagcgtgtttatcaaccgtccccactcgcctggggagacat\ngagaccacccccgtggggattattagtccgcagtaatcgactcttgacaatccttttcga\nttatgtcatagcaatttacgacagttcagcgaagtgactactcggcgaaatggtattact\naaagcattcgaacccacatgaatgtgattcttggcaatttctaatccactaaagcttttc\ncgttgaatctggttgtagatatttatataagttcactaattaagatcacggtagtatatt\ngatagtgatgtctttgcaagaggttggccgaggaatttacggattctctattgatacaat\nttgtctggcttataactcttaaggctgaaccaggcgtttttagacgacttgatcagctgt\ntagaatggtttggactccctctttcatgtcagtaacatttcagccgttattgttacgata\ntgcttgaacaatattgatctaccacacacccatagtatattttataggtcatgctgttac\nctacgagcatggtattccacttcccattcaatgagtattcaacatcactagcctcagaga\ntgatgacccacctctaataacgtcacgttgcggccatgtgaaacctgaacttgagtagac\ngatatcaagcgctttaaattgcatataacatttgagggtaaagctaagcggatgctttat\nataatcaatactcaataataagatttgattgcattttagagttatgacacgacatagttc\nactaacgagttactattcccagatctagactgaagtactgatcgagacgatccttacgtc\ngatgatcgttagttatcgacttaggtcgggtctctagcggtattggtacttaaccggaca\nctatactaataacccatgatcaaagcataacagaatacagacgataatttcgccaacata\ntatgtacagaccccaagcatgagaagctcattgaaagctatcattgaagtcccgctcaca\natgtgtcttttccagacggtttaactggttcccgggagtcctggagtttcgacttacata\naatggaaacaatgtattttgctaatttatctatagcgtcatttggaccaatacagaatat\ntatgttgcctagtaatccactataacccgcaagtgctgatagaaaatttttagacgattt\nataaatgccccaagtatccctcccgtgaatcctccgttatactaattagtattcgttcat\nacgtataccgcgcatatatgaacatttggcgataaggcgcgtgaattgttacgtgacaga\ngatagcagtttcttgtgatatggttaacagacgtacatgaagggaaactttatatctata\ngtgatgcttccgtagaaataccgccactggtctgccaatgatgaagtatgtagctttagg\ntttgtactatgaggctttcgtttgtttgcagagtataacagttgcgagtgaaaaaccgac\ngaatttatactaatacgctttcactattggctacaaaatagggaagagtttcaatcatga\ngagggagtatatggatgctttgtagctaaaggtagaacgtatgtatatgctgccgttcat\ntcttgaaagatacataagcgataagttacgacaattataagcaacatccctaccttcgta\nacgatttcactgttactgcgcttgaaatacactatggggctattggcggagagaagcaga\ntcgcgccgagcatatacgagacctataatgttgatgatagagaaggcgtctgaattgata\ncatcgaagtacactttctttcgtagtatctctcgtcctctttctatctccggacacaaga\nattaagttatatatatagagtcttaccaatcatgttgaatcctgattctcagagttcttt\nggcgggccttgtgatgactgagaaacaatgcaatattgctccaaatttcctaagcaaatt\nctcggttatgttatgttatcagcaaagcgttacgttatgttatttaaatctggaatgacg\ngagcgaagttcttatgtcggtgtgggaataattcttttgaagacagcactccttaaataa\ntatcgctccgtgtttgtatttatcgaatgggtctgtaaccttgcacaagcaaatcggtgg\ntgtatatatcggataacaattaatacgatgttcatagtgacagtatactgatcgagtcct\nctaaagtcaattacctcacttaacaatctcattgatgttgtgtcattcccggtatcgccc\ngtagtatgtgctctgattgaccgagtgtgaaccaaggaacatctactaatgcctttgtta\nggtaagatctctctgaattccttcgtgccaacttaaaacattatcaaaatttcttctact\ntggattaactacttttacgagcatggcaaattcccctgtggaagacggttcattattatc\nggaaaccttatagaaattgcgtgttgactgaaattagatttttattgtaagagttgcatc\ntttgcgattcctctggtctagcttccaatgaacagtcctcccttctattcgacatcgggt\nccttcgtacatgtctttgcgatgtaataattaggttcggagtgtggccttaatgggtgca\nactaggaatacaacgcaaatttgctgacatgatagcaaatcggtatgccggcaccaaaac\ngtgctccttgcttagcttgtgaatgagactcagtagttaaataaatccatatctgcaatc\ngattccacaggtattgtccactatctttgaactactctaagagatacaagcttagctgag\naccgaggtgtatatgactacgctgatatctgtaaggtaccaatgcaggcaaagtatgcga\ngaagctaataccggctgtttccagctttataagattaaaatttggctgtcctggcggcct\ncagaattgttctatcgtaatcagttggttcattaattagctaagtacgaggtacaactta\ntctgtcccagaacagctccacaagtttttttacagccgaaacccctgtgtgaatcttaat\natccaagcgcgttatctgattagagtttacaactcagtattttatcagtacgttttgttt\nccaacattacccggtatgacaaaatgacgccacgtgtcgaataatggtctgaccaatgta\nggaagtgaaaagataaatat");
+      }
+    },
+    regexAllTheThings_closure: {
+      "^": "Closure;",
+      call$0: function() {
+        var pattern, regexp, _i;
+        pattern = ["agggtaaa|tttaccct", "[cgt]gggtaaa|tttaccc[acg]", "a[act]ggtaaa|tttacc[agt]t", "ag[act]gtaaa|tttac[agt]ct", "agg[act]taaa|ttta[agt]cct", "aggg[acg]aaa|ttt[cgt]ccct", "agggt[cgt]aa|tt[acg]accct", "agggta[cgt]a|t[acg]taccct", "agggtaa[cgt]|[acg]ttaccct"];
+        regexp = [];
+        for (_i = 0; _i < 9; ++_i)
+          regexp.push(P.RegExp_RegExp(pattern[_i], false, false));
+        return regexp;
       }
     }
   }, 1]];
@@ -1461,6 +1772,13 @@
       return receiver;
     return receiver;
   };
+  J.getInterceptor$s = function(receiver) {
+    if (typeof receiver == "string")
+      return J.JSString.prototype;
+    if (receiver == null)
+      return receiver;
+    return receiver;
+  };
   J.get$length$as = function(receiver) {
     return J.getInterceptor$as(receiver).get$length(receiver);
   };
@@ -1469,13 +1787,15 @@
       return receiver + a0;
     return J.getInterceptor$ns(receiver).$add(receiver, a0);
   };
+  J.allMatches$1$s = function(receiver, a0) {
+    return J.getInterceptor$s(receiver).allMatches$1(receiver, a0);
+  };
   J.toString$0$ = function(receiver) {
     return J.getInterceptor(receiver).toString$0(receiver);
   };
   // Output contains no constant list.
   var $ = Isolate.$isolateProperties;
   C.Interceptor_methods = J.Interceptor.prototype;
-  C.JSInt_methods = J.JSInt.prototype;
   C.JSNumber_methods = J.JSNumber.prototype;
   C.JSString_methods = J.JSString.prototype;
   C.JS_CONST_u2C = function getTagFallback(o) {
@@ -1650,4 +1970,4 @@
   // END invoke [main].
 })();
 
-//# sourceMappingURL=binary_tree.js.map
+//# sourceMappingURL=regexredux.js.map

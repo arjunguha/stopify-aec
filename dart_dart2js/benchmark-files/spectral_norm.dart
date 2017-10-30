@@ -8,7 +8,7 @@
 
 import 'dart:math' as Math;
 import 'dart:typed_data';
-import './BenchmarkBase.dart';
+import 'common/BenchmarkBase.dart';
 
 main() {
   new SpectralNorm().report();

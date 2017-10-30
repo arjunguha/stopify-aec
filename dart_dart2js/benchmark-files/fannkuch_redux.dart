@@ -7,7 +7,7 @@
    which was transliterated from Mike Pall's Lua program
    */
 
-import "./BenchmarkBase.dart";
+import "common/BenchmarkBase.dart";
 
 main() {
   new Fannkuch().report();

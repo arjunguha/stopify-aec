@@ -9,7 +9,7 @@
    contributed by Sébastien Arnaud
    */
 import 'package:bignum/bignum.dart';
-import './BenchmarkBase.dart';
+import 'common/BenchmarkBase.dart';
 
 String pad(i, last) {
   var res = i.toString(), count;

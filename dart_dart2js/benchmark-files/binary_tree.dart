@@ -7,7 +7,7 @@
  Modified by Rachit Nigam on 10.04.2017
  */
 
-import "./BenchmarkBase.dart";
+import "common/BenchmarkBase.dart";
 final int minDepth = 4;
 
 main(){

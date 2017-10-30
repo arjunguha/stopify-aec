@@ -446,6 +446,12 @@
     },
     Interceptor: {
       "^": "Object;",
+      $eq: function(receiver, other) {
+        return receiver === other;
+      },
+      get$hashCode: function(receiver) {
+        return H.Primitives_objectHashCode(receiver);
+      },
       toString$0: function(receiver) {
         return H.Primitives_objectToHumanReadableString(receiver);
       }
@@ -455,26 +461,68 @@
       toString$0: function(receiver) {
         return String(receiver);
       },
+      get$hashCode: function(receiver) {
+        return receiver ? 519018 : 218159;
+      },
       $isbool: 1
     },
     JSNull: {
       "^": "Interceptor;",
+      $eq: function(receiver, other) {
+        return null == other;
+      },
       toString$0: function(receiver) {
         return "null";
+      },
+      get$hashCode: function(receiver) {
+        return 0;
       }
     },
     JSArray: {
-      "^": "Interceptor;",
+      "^": "Interceptor;$ti",
+      checkMutable$1: function(receiver, reason) {
+        if (!!receiver.immutable$list)
+          throw H.wrapException(new P.UnsupportedError(reason));
+      },
+      join$1: function(receiver, separator) {
+        var t1, list, i, t2;
+        t1 = receiver.length;
+        list = new Array(t1);
+        list.fixed$length = Array;
+        for (i = 0; i < receiver.length; ++i) {
+          t2 = H.S(receiver[i]);
+          if (i >= t1)
+            return H.ioore(list, i);
+          list[i] = t2;
+        }
+        return list.join(separator);
+      },
       toString$0: function(receiver) {
         return P.IterableBase_iterableToFullString(receiver, "[", "]");
+      },
+      get$hashCode: function(receiver) {
+        return H.Primitives_objectHashCode(receiver);
       },
       get$length: function(receiver) {
         return receiver.length;
       },
+      $index: function(receiver, index) {
+        if (typeof index !== "number" || Math.floor(index) !== index)
+          throw H.wrapException(H.diagnoseIndexError(receiver, index));
+        if (index >= receiver.length || index < 0)
+          throw H.wrapException(H.diagnoseIndexError(receiver, index));
+        return receiver[index];
+      },
+      $indexSet: function(receiver, index, value) {
+        this.checkMutable$1(receiver, "indexed set");
+        if (index >= receiver.length || index < 0)
+          throw H.wrapException(H.diagnoseIndexError(receiver, index));
+        receiver[index] = value;
+      },
       $isList: 1
     },
     JSUnmodifiableArray: {
-      "^": "JSArray;"
+      "^": "JSArray;$ti"
     },
     ArrayIterator: {
       "^": "Object;_iterable,_length,_index,_current",
@@ -496,6 +544,9 @@
     },
     JSNumber: {
       "^": "Interceptor;",
+      get$isNegative: function(receiver) {
+        return receiver === 0 ? 1 / receiver < 0 : receiver < 0;
+      },
       floor$0: function(receiver) {
         var truncated, d;
         if (receiver >= 0) {
@@ -510,14 +561,29 @@
           return d;
         throw H.wrapException(new P.UnsupportedError("" + receiver + ".floor()"));
       },
+      toStringAsFixed$1: function(receiver, fractionDigits) {
+        var result;
+        if (fractionDigits > 20)
+          throw H.wrapException(P.RangeError$range(fractionDigits, 0, 20, "fractionDigits", null));
+        result = receiver.toFixed(fractionDigits);
+        if (receiver === 0 && this.get$isNegative(receiver))
+          return "-" + result;
+        return result;
+      },
       toString$0: function(receiver) {
         if (receiver === 0 && 1 / receiver < 0)
           return "-0.0";
         else
           return "" + receiver;
       },
+      get$hashCode: function(receiver) {
+        return receiver & 0x1FFFFFFF;
+      },
       $add: function(receiver, other) {
         return receiver + other;
+      },
+      $mul: function(receiver, other) {
+        return receiver * other;
       },
       $tdiv: function(receiver, other) {
         if (typeof other !== "number")
@@ -526,6 +592,9 @@
           if (other >= 1 || false)
             return receiver / other | 0;
         return this._tdivSlow$1(receiver, other);
+      },
+      _tdivFast$1: function(receiver, other) {
+        return (receiver | 0) === receiver ? receiver / other | 0 : this._tdivSlow$1(receiver, other);
       },
       _tdivSlow$1: function(receiver, other) {
         var quotient = receiver / other;
@@ -537,11 +606,6 @@
         } else if (quotient > -1 / 0)
           return Math.ceil(quotient);
         throw H.wrapException(new P.UnsupportedError("Result of truncating division is " + H.S(quotient) + ": " + H.S(receiver) + " ~/ " + other));
-      },
-      $shl: function(receiver, other) {
-        if (other < 0)
-          throw H.wrapException(H.argumentErrorValue(other));
-        return other > 31 ? 0 : receiver << other >>> 0;
       },
       $isnum: 1
     },
@@ -569,6 +633,8 @@
       substring$2: function(receiver, startIndex, endIndex) {
         if (endIndex == null)
           endIndex = receiver.length;
+        if (startIndex < 0)
+          throw H.wrapException(P.RangeError$value(startIndex, null, null));
         if (startIndex > endIndex)
           throw H.wrapException(P.RangeError$value(startIndex, null, null));
         if (endIndex > receiver.length)
@@ -578,13 +644,396 @@
       substring$1: function($receiver, startIndex) {
         return this.substring$2($receiver, startIndex, null);
       },
+      $mul: function(receiver, times) {
+        var s, result;
+        if (0 >= times)
+          return "";
+        if (times === 1 || receiver.length === 0)
+          return receiver;
+        if (times !== times >>> 0)
+          throw H.wrapException(C.C_OutOfMemoryError);
+        for (s = receiver, result = ""; true;) {
+          if ((times & 1) === 1)
+            result = s + result;
+          times = times >>> 1;
+          if (times === 0)
+            break;
+          s += s;
+        }
+        return result;
+      },
       toString$0: function(receiver) {
         return receiver;
+      },
+      get$hashCode: function(receiver) {
+        var t1, hash, i;
+        for (t1 = receiver.length, hash = 0, i = 0; i < t1; ++i) {
+          hash = 536870911 & hash + receiver.charCodeAt(i);
+          hash = 536870911 & hash + ((524287 & hash) << 10);
+          hash ^= hash >> 6;
+        }
+        hash = 536870911 & hash + ((67108863 & hash) << 3);
+        hash ^= hash >> 11;
+        return 536870911 & hash + ((16383 & hash) << 15);
       },
       get$length: function(receiver) {
         return receiver.length;
       },
+      $index: function(receiver, index) {
+        if (index >= receiver.length || false)
+          throw H.wrapException(H.diagnoseIndexError(receiver, index));
+        return receiver[index];
+      },
       $isString: 1
+    }
+  }], ["dart._internal", "dart:_internal",, H, {
+    "^": "",
+    Sort__doSort: function(a, left, right, compare) {
+      if (right - left <= 32)
+        H.Sort__insertionSort(a, left, right, compare);
+      else
+        H.Sort__dualPivotQuicksort(a, left, right, compare);
+    },
+    Sort__insertionSort: function(a, left, right, compare) {
+      var i, el, j, t1, j0;
+      for (i = left + 1; i <= right; ++i) {
+        if (i < 0 || i >= a.length)
+          return H.ioore(a, i);
+        el = a[i];
+        j = i;
+        while (true) {
+          if (j > left) {
+            t1 = j - 1;
+            if (t1 < 0 || t1 >= a.length)
+              return H.ioore(a, t1);
+            t1 = compare.call$2(a[t1], el);
+            if (typeof t1 !== "number")
+              return t1.$gt();
+            t1 = t1 > 0;
+          } else
+            t1 = false;
+          if (!t1)
+            break;
+          j0 = j - 1;
+          if (j0 < 0 || j0 >= a.length)
+            return H.ioore(a, j0);
+          C.JSArray_methods.$indexSet(a, j, a[j0]);
+          j = j0;
+        }
+        C.JSArray_methods.$indexSet(a, j, el);
+      }
+    },
+    Sort__dualPivotQuicksort: function(a, left, right, compare) {
+      var sixth, index1, index5, index3, index2, index4, t1, el1, el2, el3, el4, el5, t0, less, great, k, ak, comp, great0, less0, pivots_are_equal, comp_pivot1, comp_pivot2;
+      sixth = C.JSInt_methods._tdivFast$1(right - left + 1, 6);
+      index1 = left + sixth;
+      index5 = right - sixth;
+      index3 = C.JSInt_methods._tdivFast$1(left + right, 2);
+      index2 = index3 - sixth;
+      index4 = index3 + sixth;
+      t1 = a.length;
+      if (index1 < 0 || index1 >= t1)
+        return H.ioore(a, index1);
+      el1 = a[index1];
+      if (index2 < 0 || index2 >= t1)
+        return H.ioore(a, index2);
+      el2 = a[index2];
+      if (index3 < 0 || index3 >= t1)
+        return H.ioore(a, index3);
+      el3 = a[index3];
+      if (index4 < 0 || index4 >= t1)
+        return H.ioore(a, index4);
+      el4 = a[index4];
+      if (index5 < 0 || index5 >= t1)
+        return H.ioore(a, index5);
+      el5 = a[index5];
+      t1 = compare.call$2(el1, el2);
+      if (typeof t1 !== "number")
+        return t1.$gt();
+      if (t1 > 0) {
+        t0 = el2;
+        el2 = el1;
+        el1 = t0;
+      }
+      t1 = compare.call$2(el4, el5);
+      if (typeof t1 !== "number")
+        return t1.$gt();
+      if (t1 > 0) {
+        t0 = el5;
+        el5 = el4;
+        el4 = t0;
+      }
+      t1 = compare.call$2(el1, el3);
+      if (typeof t1 !== "number")
+        return t1.$gt();
+      if (t1 > 0) {
+        t0 = el3;
+        el3 = el1;
+        el1 = t0;
+      }
+      t1 = compare.call$2(el2, el3);
+      if (typeof t1 !== "number")
+        return t1.$gt();
+      if (t1 > 0) {
+        t0 = el3;
+        el3 = el2;
+        el2 = t0;
+      }
+      t1 = compare.call$2(el1, el4);
+      if (typeof t1 !== "number")
+        return t1.$gt();
+      if (t1 > 0) {
+        t0 = el4;
+        el4 = el1;
+        el1 = t0;
+      }
+      t1 = compare.call$2(el3, el4);
+      if (typeof t1 !== "number")
+        return t1.$gt();
+      if (t1 > 0) {
+        t0 = el4;
+        el4 = el3;
+        el3 = t0;
+      }
+      t1 = compare.call$2(el2, el5);
+      if (typeof t1 !== "number")
+        return t1.$gt();
+      if (t1 > 0) {
+        t0 = el5;
+        el5 = el2;
+        el2 = t0;
+      }
+      t1 = compare.call$2(el2, el3);
+      if (typeof t1 !== "number")
+        return t1.$gt();
+      if (t1 > 0) {
+        t0 = el3;
+        el3 = el2;
+        el2 = t0;
+      }
+      t1 = compare.call$2(el4, el5);
+      if (typeof t1 !== "number")
+        return t1.$gt();
+      if (t1 > 0) {
+        t0 = el5;
+        el5 = el4;
+        el4 = t0;
+      }
+      C.JSArray_methods.$indexSet(a, index1, el1);
+      C.JSArray_methods.$indexSet(a, index3, el3);
+      C.JSArray_methods.$indexSet(a, index5, el5);
+      if (left < 0 || left >= a.length)
+        return H.ioore(a, left);
+      C.JSArray_methods.$indexSet(a, index2, a[left]);
+      if (right < 0 || right >= a.length)
+        return H.ioore(a, right);
+      C.JSArray_methods.$indexSet(a, index4, a[right]);
+      less = left + 1;
+      great = right - 1;
+      if (J.$eq$(compare.call$2(el2, el4), 0)) {
+        for (k = less; k <= great; ++k) {
+          if (k >= a.length)
+            return H.ioore(a, k);
+          ak = a[k];
+          comp = compare.call$2(ak, el2);
+          if (J.$eq$(comp, 0))
+            continue;
+          if (typeof comp !== "number")
+            return comp.$lt();
+          if (comp < 0) {
+            if (k !== less) {
+              if (less >= a.length)
+                return H.ioore(a, less);
+              C.JSArray_methods.$indexSet(a, k, a[less]);
+              C.JSArray_methods.$indexSet(a, less, ak);
+            }
+            ++less;
+          } else
+            for (; true;) {
+              if (great < 0 || great >= a.length)
+                return H.ioore(a, great);
+              comp = compare.call$2(a[great], el2);
+              if (typeof comp !== "number")
+                return comp.$gt();
+              if (comp > 0) {
+                --great;
+                continue;
+              } else {
+                t1 = a.length;
+                great0 = great - 1;
+                if (comp < 0) {
+                  if (less >= t1)
+                    return H.ioore(a, less);
+                  C.JSArray_methods.$indexSet(a, k, a[less]);
+                  less0 = less + 1;
+                  if (great >= a.length)
+                    return H.ioore(a, great);
+                  C.JSArray_methods.$indexSet(a, less, a[great]);
+                  C.JSArray_methods.$indexSet(a, great, ak);
+                  great = great0;
+                  less = less0;
+                  break;
+                } else {
+                  if (great >= t1)
+                    return H.ioore(a, great);
+                  C.JSArray_methods.$indexSet(a, k, a[great]);
+                  C.JSArray_methods.$indexSet(a, great, ak);
+                  great = great0;
+                  break;
+                }
+              }
+            }
+        }
+        pivots_are_equal = true;
+      } else {
+        for (k = less; k <= great; ++k) {
+          if (k >= a.length)
+            return H.ioore(a, k);
+          ak = a[k];
+          comp_pivot1 = compare.call$2(ak, el2);
+          if (typeof comp_pivot1 !== "number")
+            return comp_pivot1.$lt();
+          if (comp_pivot1 < 0) {
+            if (k !== less) {
+              if (less >= a.length)
+                return H.ioore(a, less);
+              C.JSArray_methods.$indexSet(a, k, a[less]);
+              C.JSArray_methods.$indexSet(a, less, ak);
+            }
+            ++less;
+          } else {
+            comp_pivot2 = compare.call$2(ak, el4);
+            if (typeof comp_pivot2 !== "number")
+              return comp_pivot2.$gt();
+            if (comp_pivot2 > 0)
+              for (; true;) {
+                if (great < 0 || great >= a.length)
+                  return H.ioore(a, great);
+                comp = compare.call$2(a[great], el4);
+                if (typeof comp !== "number")
+                  return comp.$gt();
+                if (comp > 0) {
+                  --great;
+                  if (great < k)
+                    break;
+                  continue;
+                } else {
+                  if (great >= a.length)
+                    return H.ioore(a, great);
+                  comp = compare.call$2(a[great], el2);
+                  if (typeof comp !== "number")
+                    return comp.$lt();
+                  great0 = great - 1;
+                  t1 = a.length;
+                  if (comp < 0) {
+                    if (less >= t1)
+                      return H.ioore(a, less);
+                    C.JSArray_methods.$indexSet(a, k, a[less]);
+                    less0 = less + 1;
+                    if (great >= a.length)
+                      return H.ioore(a, great);
+                    C.JSArray_methods.$indexSet(a, less, a[great]);
+                    C.JSArray_methods.$indexSet(a, great, ak);
+                    less = less0;
+                  } else {
+                    if (great >= t1)
+                      return H.ioore(a, great);
+                    C.JSArray_methods.$indexSet(a, k, a[great]);
+                    C.JSArray_methods.$indexSet(a, great, ak);
+                  }
+                  great = great0;
+                  break;
+                }
+              }
+          }
+        }
+        pivots_are_equal = false;
+      }
+      t1 = less - 1;
+      if (t1 >= a.length)
+        return H.ioore(a, t1);
+      C.JSArray_methods.$indexSet(a, left, a[t1]);
+      C.JSArray_methods.$indexSet(a, t1, el2);
+      t1 = great + 1;
+      if (t1 < 0 || t1 >= a.length)
+        return H.ioore(a, t1);
+      C.JSArray_methods.$indexSet(a, right, a[t1]);
+      C.JSArray_methods.$indexSet(a, t1, el4);
+      H.Sort__doSort(a, left, less - 2, compare);
+      H.Sort__doSort(a, great + 2, right, compare);
+      if (pivots_are_equal)
+        return;
+      if (less < index1 && great > index5) {
+        while (true) {
+          if (less >= a.length)
+            return H.ioore(a, less);
+          if (!J.$eq$(compare.call$2(a[less], el2), 0))
+            break;
+          ++less;
+        }
+        while (true) {
+          if (great < 0 || great >= a.length)
+            return H.ioore(a, great);
+          if (!J.$eq$(compare.call$2(a[great], el4), 0))
+            break;
+          --great;
+        }
+        for (k = less; k <= great; ++k) {
+          if (k >= a.length)
+            return H.ioore(a, k);
+          ak = a[k];
+          if (J.$eq$(compare.call$2(ak, el2), 0)) {
+            if (k !== less) {
+              if (less >= a.length)
+                return H.ioore(a, less);
+              C.JSArray_methods.$indexSet(a, k, a[less]);
+              C.JSArray_methods.$indexSet(a, less, ak);
+            }
+            ++less;
+          } else if (J.$eq$(compare.call$2(ak, el4), 0))
+            for (; true;) {
+              if (great < 0 || great >= a.length)
+                return H.ioore(a, great);
+              if (J.$eq$(compare.call$2(a[great], el4), 0)) {
+                --great;
+                if (great < k)
+                  break;
+                continue;
+              } else {
+                if (great >= a.length)
+                  return H.ioore(a, great);
+                comp = compare.call$2(a[great], el2);
+                if (typeof comp !== "number")
+                  return comp.$lt();
+                great0 = great - 1;
+                t1 = a.length;
+                if (comp < 0) {
+                  if (less >= t1)
+                    return H.ioore(a, less);
+                  C.JSArray_methods.$indexSet(a, k, a[less]);
+                  less0 = less + 1;
+                  if (great >= a.length)
+                    return H.ioore(a, great);
+                  C.JSArray_methods.$indexSet(a, less, a[great]);
+                  C.JSArray_methods.$indexSet(a, great, ak);
+                  less = less0;
+                } else {
+                  if (great >= t1)
+                    return H.ioore(a, great);
+                  C.JSArray_methods.$indexSet(a, k, a[great]);
+                  C.JSArray_methods.$indexSet(a, great, ak);
+                }
+                great = great0;
+                break;
+              }
+            }
+        }
+        H.Sort__doSort(a, less, great, compare);
+      } else
+        H.Sort__doSort(a, less, great, compare);
+    },
+    EfficientLengthIterable: {
+      "^": "Iterable;$ti"
     }
   }], ["_js_helper", "dart:_js_helper",, H, {
     "^": "",
@@ -608,6 +1057,14 @@
       if (typeof res !== "string")
         throw H.wrapException(H.argumentErrorValue(value));
       return res;
+    },
+    Primitives_objectHashCode: function(object) {
+      var hash = object.$identityHash;
+      if (hash == null) {
+        hash = Math.random() * 0x3fffffff | 0;
+        object.$identityHash = hash;
+      }
+      return hash;
     },
     Primitives_objectTypeName: function(object) {
       var interceptor, interceptorConstructor, interceptorConstructorName, $name, dispatchName, objectConstructor, match, decompiledName;
@@ -946,10 +1403,18 @@
     throwCyclicInit: function(staticName) {
       throw H.wrapException(new P.CyclicInitializationError(staticName));
     },
+    setRuntimeTypeInfo: function(target, rti) {
+      target.$ti = rti;
+      return target;
+    },
     getRuntimeTypeInfo: function(target) {
       if (target == null)
         return;
       return target.$ti;
+    },
+    getTypeArgumentByIndex: function(target, index) {
+      var rti = H.getRuntimeTypeInfo(target);
+      return rti == null ? null : rti[index];
     },
     runtimeTypeToString: function(rti, onTypeVariable) {
       var typedefInfo;
@@ -1067,6 +1532,24 @@
     },
     BoundClosure: {
       "^": "TearOffClosure;_self,_target,_receiver,_name",
+      $eq: function(_, other) {
+        if (other == null)
+          return false;
+        if (this === other)
+          return true;
+        if (!(other instanceof H.BoundClosure))
+          return false;
+        return this._self === other._self && this._target === other._target && this._receiver === other._receiver;
+      },
+      get$hashCode: function(_) {
+        var t1, receiverHashCode;
+        t1 = this._receiver;
+        if (t1 == null)
+          receiverHashCode = H.Primitives_objectHashCode(this._self);
+        else
+          receiverHashCode = typeof t1 !== "object" ? J.get$hashCode$(t1) : H.Primitives_objectHashCode(t1);
+        return (receiverHashCode ^ H.Primitives_objectHashCode(this._target)) >>> 0;
+      },
       toString$0: function(_) {
         var receiver = this._receiver;
         if (receiver == null)
@@ -1111,7 +1594,7 @@
   }], ["dart._js_names", "dart:_js_names",, H, {
     "^": "",
     extractKeys: function(victim) {
-      var t1 = victim ? Object.keys(victim) : [];
+      var t1 = H.setRuntimeTypeInfo(victim ? Object.keys(victim) : [], [null]);
       t1.fixed$length = Array;
       return t1;
     }
@@ -1136,6 +1619,29 @@
     }
   }], ["dart.collection", "dart:collection",, P, {
     "^": "",
+    HashMap_HashMap: function(equals, hashCode, isValidKey, $K, $V) {
+      return new P._HashMap(0, null, null, null, null, [$K, $V]);
+    },
+    IterableBase_iterableToShortString: function(iterable, leftDelimiter, rightDelimiter) {
+      var parts, t1;
+      if (P._isToStringVisiting(iterable)) {
+        if (leftDelimiter === "(" && rightDelimiter === ")")
+          return "(...)";
+        return leftDelimiter + "..." + rightDelimiter;
+      }
+      parts = [];
+      t1 = $.$get$_toStringVisiting();
+      t1.push(iterable);
+      try {
+        P._iterablePartsToStrings(iterable, parts);
+      } finally {
+        if (0 >= t1.length)
+          return H.ioore(t1, -1);
+        t1.pop();
+      }
+      t1 = P.StringBuffer__writeAll(leftDelimiter, parts, ", ") + rightDelimiter;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
+    },
     IterableBase_iterableToFullString: function(iterable, leftDelimiter, rightDelimiter) {
       var buffer, t1, t2;
       if (P._isToStringVisiting(iterable))
@@ -1162,6 +1668,286 @@
         if (o === t1[i])
           return true;
       return false;
+    },
+    _iterablePartsToStrings: function(iterable, parts) {
+      var it, $length, count, next, ultimateString, penultimateString, penultimate, ultimate, ultimate0, elision;
+      it = iterable.get$iterator(iterable);
+      $length = 0;
+      count = 0;
+      while (true) {
+        if (!($length < 80 || count < 3))
+          break;
+        if (!it.moveNext$0())
+          return;
+        next = H.S(it.get$current());
+        parts.push(next);
+        $length += next.length + 2;
+        ++count;
+      }
+      if (!it.moveNext$0()) {
+        if (count <= 5)
+          return;
+        if (0 >= parts.length)
+          return H.ioore(parts, -1);
+        ultimateString = parts.pop();
+        if (0 >= parts.length)
+          return H.ioore(parts, -1);
+        penultimateString = parts.pop();
+      } else {
+        penultimate = it.get$current();
+        ++count;
+        if (!it.moveNext$0()) {
+          if (count <= 4) {
+            parts.push(H.S(penultimate));
+            return;
+          }
+          ultimateString = H.S(penultimate);
+          if (0 >= parts.length)
+            return H.ioore(parts, -1);
+          penultimateString = parts.pop();
+          $length += ultimateString.length + 2;
+        } else {
+          ultimate = it.get$current();
+          ++count;
+          for (; it.moveNext$0(); penultimate = ultimate, ultimate = ultimate0) {
+            ultimate0 = it.get$current();
+            ++count;
+            if (count > 100) {
+              while (true) {
+                if (!($length > 75 && count > 3))
+                  break;
+                if (0 >= parts.length)
+                  return H.ioore(parts, -1);
+                $length -= parts.pop().length + 2;
+                --count;
+              }
+              parts.push("...");
+              return;
+            }
+          }
+          penultimateString = H.S(penultimate);
+          ultimateString = H.S(ultimate);
+          $length += ultimateString.length + penultimateString.length + 4;
+        }
+      }
+      if (count > parts.length + 2) {
+        $length += 5;
+        elision = "...";
+      } else
+        elision = null;
+      while (true) {
+        if (!($length > 80 && parts.length > 3))
+          break;
+        if (0 >= parts.length)
+          return H.ioore(parts, -1);
+        $length -= parts.pop().length + 2;
+        if (elision == null) {
+          $length += 5;
+          elision = "...";
+        }
+      }
+      if (elision != null)
+        parts.push(elision);
+      parts.push(penultimateString);
+      parts.push(ultimateString);
+    },
+    _HashMap: {
+      "^": "Object;_collection$_length,_strings,_nums,_rest,_keys,$ti",
+      get$length: function(_) {
+        return this._collection$_length;
+      },
+      containsKey$1: function(key) {
+        var strings, t1;
+        if (key !== "__proto__") {
+          strings = this._strings;
+          return strings == null ? false : strings[key] != null;
+        } else {
+          t1 = this._containsKey$1(key);
+          return t1;
+        }
+      },
+      _containsKey$1: function(key) {
+        var rest = this._rest;
+        if (rest == null)
+          return false;
+        return this._findBucketIndex$2(rest[this._computeHashCode$1(key)], key) >= 0;
+      },
+      $index: function(_, key) {
+        var strings, t1, entry, nums;
+        if (typeof key === "string" && key !== "__proto__") {
+          strings = this._strings;
+          if (strings == null)
+            t1 = null;
+          else {
+            entry = strings[key];
+            t1 = entry === strings ? null : entry;
+          }
+          return t1;
+        } else if (typeof key === "number" && (key & 0x3ffffff) === key) {
+          nums = this._nums;
+          if (nums == null)
+            t1 = null;
+          else {
+            entry = nums[key];
+            t1 = entry === nums ? null : entry;
+          }
+          return t1;
+        } else
+          return this._get$1(key);
+      },
+      _get$1: function(key) {
+        var rest, bucket, index;
+        rest = this._rest;
+        if (rest == null)
+          return;
+        bucket = rest[this._computeHashCode$1(key)];
+        index = this._findBucketIndex$2(bucket, key);
+        return index < 0 ? null : bucket[index + 1];
+      },
+      $indexSet: function(_, key, value) {
+        var strings;
+        if (key !== "__proto__") {
+          strings = this._strings;
+          if (strings == null) {
+            strings = P._HashMap__newHashTable();
+            this._strings = strings;
+          }
+          this._addHashTableEntry$3(strings, key, value);
+        } else
+          this._set$2(key, value);
+      },
+      _set$2: function(key, value) {
+        var rest, hash, bucket, index;
+        rest = this._rest;
+        if (rest == null) {
+          rest = P._HashMap__newHashTable();
+          this._rest = rest;
+        }
+        hash = this._computeHashCode$1(key);
+        bucket = rest[hash];
+        if (bucket == null) {
+          P._HashMap__setTableEntry(rest, hash, [key, value]);
+          ++this._collection$_length;
+          this._keys = null;
+        } else {
+          index = this._findBucketIndex$2(bucket, key);
+          if (index >= 0)
+            bucket[index + 1] = value;
+          else {
+            bucket.push(key, value);
+            ++this._collection$_length;
+            this._keys = null;
+          }
+        }
+      },
+      _computeKeys$0: function() {
+        var t1, result, strings, names, entries, index, i, nums, rest, bucket, $length, i0;
+        t1 = this._keys;
+        if (t1 != null)
+          return t1;
+        result = new Array(this._collection$_length);
+        result.fixed$length = Array;
+        strings = this._strings;
+        if (strings != null) {
+          names = Object.getOwnPropertyNames(strings);
+          entries = names.length;
+          for (index = 0, i = 0; i < entries; ++i) {
+            result[index] = names[i];
+            ++index;
+          }
+        } else
+          index = 0;
+        nums = this._nums;
+        if (nums != null) {
+          names = Object.getOwnPropertyNames(nums);
+          entries = names.length;
+          for (i = 0; i < entries; ++i) {
+            result[index] = +names[i];
+            ++index;
+          }
+        }
+        rest = this._rest;
+        if (rest != null) {
+          names = Object.getOwnPropertyNames(rest);
+          entries = names.length;
+          for (i = 0; i < entries; ++i) {
+            bucket = rest[names[i]];
+            $length = bucket.length;
+            for (i0 = 0; i0 < $length; i0 += 2) {
+              result[index] = bucket[i0];
+              ++index;
+            }
+          }
+        }
+        this._keys = result;
+        return result;
+      },
+      _addHashTableEntry$3: function(table, key, value) {
+        if (table[key] == null) {
+          ++this._collection$_length;
+          this._keys = null;
+        }
+        P._HashMap__setTableEntry(table, key, value);
+      },
+      _computeHashCode$1: function(key) {
+        return J.get$hashCode$(key) & 0x3ffffff;
+      },
+      _findBucketIndex$2: function(bucket, key) {
+        var $length, i;
+        if (bucket == null)
+          return -1;
+        $length = bucket.length;
+        for (i = 0; i < $length; i += 2)
+          if (J.$eq$(bucket[i], key))
+            return i;
+        return -1;
+      },
+      static: {
+        _HashMap__setTableEntry: function(table, key, value) {
+          if (value == null)
+            table[key] = table;
+          else
+            table[key] = value;
+        },
+        _HashMap__newHashTable: function() {
+          var table = Object.create(null);
+          P._HashMap__setTableEntry(table, "<non-identifier-key>", table);
+          delete table["<non-identifier-key>"];
+          return table;
+        }
+      }
+    },
+    _HashMapKeyIterable: {
+      "^": "EfficientLengthIterable;_map,$ti",
+      get$length: function(_) {
+        return this._map._collection$_length;
+      },
+      get$iterator: function(_) {
+        var t1 = this._map;
+        return new P._HashMapKeyIterator(t1, t1._computeKeys$0(), 0, null);
+      }
+    },
+    _HashMapKeyIterator: {
+      "^": "Object;_map,_keys,_offset,_collection$_current",
+      get$current: function() {
+        return this._collection$_current;
+      },
+      moveNext$0: function() {
+        var keys, offset, t1;
+        keys = this._keys;
+        offset = this._offset;
+        t1 = this._map;
+        if (keys !== t1._keys)
+          throw H.wrapException(new P.ConcurrentModificationError(t1));
+        else if (offset >= keys.length) {
+          this._collection$_current = null;
+          return false;
+        } else {
+          this._collection$_current = keys[offset];
+          this._offset = offset + 1;
+          return true;
+        }
+      }
     }
   }], ["dart.core", "dart:core",, P, {
     "^": "",
@@ -1178,8 +1964,18 @@
         return t1.toString$0(object);
       return H.Primitives_objectToHumanReadableString(object);
     },
+    List_List$from: function(elements, growable, $E) {
+      var list, t1;
+      list = H.setRuntimeTypeInfo([], [$E]);
+      for (t1 = elements.get$iterator(elements); t1.moveNext$0();)
+        list.push(t1.get$current());
+      return list;
+    },
     bool: {
       "^": "Object;",
+      get$hashCode: function(_) {
+        return P.Object.prototype.get$hashCode.call(this, this);
+      },
       toString$0: function(_) {
         return this ? "true" : "false";
       }
@@ -1229,11 +2025,28 @@
         return "RangeError";
       },
       get$_errorExplanation: function() {
-        return "";
+        var t1, explanation, t2;
+        t1 = this.start;
+        if (t1 == null) {
+          t1 = this.end;
+          explanation = t1 != null ? ": Not less than or equal to " + H.S(t1) : "";
+        } else {
+          t2 = this.end;
+          if (t2 == null)
+            explanation = ": Not greater than or equal to " + H.S(t1);
+          else if (t2 > t1)
+            explanation = ": Not in range " + H.S(t1) + ".." + H.S(t2) + ", inclusive";
+          else
+            explanation = t2 < t1 ? ": Valid value range is empty" : ": Only valid value is " + H.S(t1);
+        }
+        return explanation;
       },
       static: {
         RangeError$value: function(value, $name, message) {
           return new P.RangeError(null, null, true, value, $name, "Value not in range");
+        },
+        RangeError$range: function(invalidValue, minValue, maxValue, $name, message) {
+          return new P.RangeError(minValue, maxValue, true, invalidValue, $name, "Invalid value");
         }
       }
     },
@@ -1274,6 +2087,12 @@
         return "Concurrent modification during iteration: " + H.S(P.Error_safeToString(t1)) + ".";
       }
     },
+    OutOfMemoryError: {
+      "^": "Object;",
+      toString$0: function(_) {
+        return "Out of Memory";
+      }
+    },
     CyclicInitializationError: {
       "^": "Error;variableName",
       toString$0: function(_) {
@@ -1285,12 +2104,28 @@
       "^": "num;"
     },
     "+int": 0,
+    Iterable: {
+      "^": "Object;$ti",
+      get$length: function(_) {
+        var it, count;
+        it = this.get$iterator(this);
+        for (count = 0; it.moveNext$0();)
+          ++count;
+        return count;
+      },
+      toString$0: function(_) {
+        return P.IterableBase_iterableToShortString(this, "(", ")");
+      }
+    },
     List: {
-      "^": "Object;"
+      "^": "Object;$ti"
     },
     "+List": 0,
     Null: {
       "^": "Object;",
+      get$hashCode: function(_) {
+        return P.Object.prototype.get$hashCode.call(this, this);
+      },
       toString$0: function(_) {
         return "null";
       }
@@ -1302,6 +2137,12 @@
     "+num": 0,
     Object: {
       "^": ";",
+      $eq: function(_, other) {
+        return this === other;
+      },
+      get$hashCode: function(_) {
+        return H.Primitives_objectHashCode(this);
+      },
       toString$0: function(_) {
         return H.Primitives_objectToHumanReadableString(this);
       },
@@ -1384,44 +2225,103 @@
     BenchmarkBase_measure_closure0: {
       "^": "Closure;$this",
       call$0: function() {
-        this.$this.run$0();
+        this.$this.exercise$0();
       }
     }
-  }], ["", "../benchmark-files/binary_tree.dart",, T, {
+  }], ["", "../benchmark-files/common/IO.dart",, Q, {}], ["", "../benchmark-files/knucleotide.dart",, U, {
     "^": "",
     main: function() {
-      H.printString("BinaryTree(RunTime): " + H.S(new T.BinaryTree("BinaryTree").measure$0()) + " us.");
+      H.printString("Knucleotide(RunTime): " + H.S(new U.Knucleotide("Knucleotide").measure$0()) + " us.");
     },
-    BinaryTree: {
-      "^": "BenchmarkBase;name",
-      run$0: function() {
-        var depth, iterations, check, i;
-        T.TreeNode_bottomUpTree(21).itemCheck$0();
-        T.TreeNode_bottomUpTree(20);
-        for (depth = 4; depth <= 20; depth += 2) {
-          iterations = C.JSInt_methods.$shl(1, 20 - depth + 4);
-          for (check = 0, i = 1; i <= iterations; ++i)
-            check += T.TreeNode_bottomUpTree(depth).itemCheck$0();
-        }
+    readLine: function() {
+      var t1, t2, t3;
+      t1 = $.inputindex;
+      if (typeof t1 !== "number")
+        return t1.$add();
+      ++t1;
+      $.inputindex = t1;
+      t2 = $.$get$inputArray();
+      t3 = t2.length;
+      if (t1 >= t3)
+        return;
+      else {
+        if (t1 < 0)
+          return H.ioore(t2, t1);
+        return t2[t1];
       }
     },
-    TreeNode: {
-      "^": "Object;left,right",
-      itemCheck$0: function() {
-        var t1 = this.left;
-        if (t1 == null)
-          return 1;
-        return 1 + t1.itemCheck$0() + this.right.itemCheck$0();
+    readInput: function() {
+      var lines, line;
+      for (; J.substring$2$s(U.readLine(), 0, 6) !== ">THREE";)
+        ;
+      lines = [];
+      line = U.readLine();
+      while (true) {
+        if (!(line != null && !J.$eq$(J.$index$as(line, 0), ">")))
+          break;
+        lines.push(line);
+        line = U.readLine();
+      }
+      return C.JSArray_methods.join$1(lines, "").toUpperCase();
+    },
+    frequency: function(sequence, $length) {
+      var freq, n, i, sub;
+      freq = P.HashMap_HashMap(null, null, null, P.String, P.int);
+      n = sequence.length - $length + 1;
+      for (i = 0; i < n; ++i) {
+        sub = C.JSString_methods.substring$2(sequence, i, i + $length);
+        if (freq.containsKey$1(sub))
+          freq.$indexSet(0, sub, J.$add$ns(freq.$index(0, sub), 1));
+        else
+          freq.$indexSet(0, sub, 1);
+      }
+      return freq;
+    },
+    sort: function(sequence, $length) {
+      var freq, t1, keys, n, _i, t2;
+      freq = U.frequency(sequence, $length);
+      t1 = H.getTypeArgumentByIndex(freq, 0);
+      keys = P.List_List$from(new P._HashMapKeyIterable(freq, [t1]), true, t1);
+      n = sequence.length - $length + 1;
+      C.JSArray_methods.checkMutable$1(keys, "sort");
+      H.Sort__doSort(keys, 0, keys.length - 1, new U.sort_closure(freq));
+      for (t1 = keys.length, _i = 0; _i < keys.length; keys.length === t1 || (0, H.throwConcurrentModificationError)(keys), ++_i) {
+        t2 = J.$mul$ns(freq.$index(0, keys[_i]), 100);
+        if (typeof t2 !== "number")
+          return t2.$div();
+        C.JSDouble_methods.toStringAsFixed$1(t2 / n, 3);
+      }
+    },
+    sort_closure: {
+      "^": "Closure;freq",
+      call$2: function(a, b) {
+        var t1, t2;
+        t1 = this.freq;
+        t2 = t1.$index(0, b);
+        t1 = t1.$index(0, a);
+        if (typeof t2 !== "number")
+          return t2.$sub();
+        if (typeof t1 !== "number")
+          return H.iae(t1);
+        return t2 - t1;
+      }
+    },
+    Knucleotide: {
+      "^": "BenchmarkBase;name",
+      run$0: function() {
+        var sequence = U.readInput();
+        U.sort(sequence, 1);
+        U.sort(sequence, 2);
+        U.frequency(sequence, 3);
+        U.frequency(sequence, 4);
+        U.frequency(sequence, 6);
+        U.frequency(sequence, 12);
+        U.frequency(sequence, 18);
+        $.inputindex = -1;
       },
-      static: {
-        TreeNode_bottomUpTree: function(depth) {
-          var t1;
-          if (depth > 0) {
-            t1 = depth - 1;
-            return new T.TreeNode(T.TreeNode_bottomUpTree(t1), T.TreeNode_bottomUpTree(t1));
-          }
-          return new T.TreeNode(null, null);
-        }
+      exercise$0: function() {
+        for (var i = 0; i < 1000; ++i)
+          this.run$0();
       }
     }
   }, 1]];
@@ -1461,6 +2361,13 @@
       return receiver;
     return receiver;
   };
+  J.getInterceptor$s = function(receiver) {
+    if (typeof receiver == "string")
+      return J.JSString.prototype;
+    if (receiver == null)
+      return receiver;
+    return receiver;
+  };
   J.get$length$as = function(receiver) {
     return J.getInterceptor$as(receiver).get$length(receiver);
   };
@@ -1469,15 +2376,43 @@
       return receiver + a0;
     return J.getInterceptor$ns(receiver).$add(receiver, a0);
   };
+  J.$index$as = function(receiver, a0) {
+    if (typeof a0 === "number")
+      if (receiver.constructor == Array || typeof receiver == "string")
+        if (a0 >>> 0 === a0 && a0 < receiver.length)
+          return receiver[a0];
+    return J.getInterceptor$as(receiver).$index(receiver, a0);
+  };
+  J.$mul$ns = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return receiver * a0;
+    return J.getInterceptor$ns(receiver).$mul(receiver, a0);
+  };
+  J.substring$2$s = function(receiver, a0, a1) {
+    return J.getInterceptor$s(receiver).substring$2(receiver, a0, a1);
+  };
+  J.get$hashCode$ = function(receiver) {
+    return J.getInterceptor(receiver).get$hashCode(receiver);
+  };
+  J.$eq$ = function(receiver, a0) {
+    if (receiver == null)
+      return a0 == null;
+    if (typeof receiver != "object")
+      return a0 != null && receiver === a0;
+    return J.getInterceptor(receiver).$eq(receiver, a0);
+  };
   J.toString$0$ = function(receiver) {
     return J.getInterceptor(receiver).toString$0(receiver);
   };
   // Output contains no constant list.
   var $ = Isolate.$isolateProperties;
   C.Interceptor_methods = J.Interceptor.prototype;
+  C.JSArray_methods = J.JSArray.prototype;
+  C.JSDouble_methods = J.JSDouble.prototype;
   C.JSInt_methods = J.JSInt.prototype;
   C.JSNumber_methods = J.JSNumber.prototype;
   C.JSString_methods = J.JSString.prototype;
+  C.C_OutOfMemoryError = new P.OutOfMemoryError();
   C.JS_CONST_u2C = function getTagFallback(o) {
   var s = Object.prototype.toString.call(o);
   return s.substring(8, s.length - 1);
@@ -1488,6 +2423,7 @@
   $.BoundClosure_selfFieldNameCache = null;
   $.BoundClosure_receiverFieldNameCache = null;
   $.Stopwatch__frequency = null;
+  $.inputindex = -1;
   $ = null;
   init.isHunkLoaded = function(hunkHash) {
     return !!$dart_deferred_initializers$[hunkHash];
@@ -1513,7 +2449,9 @@
     }
   })(["_toStringVisiting", "$get$_toStringVisiting", function() {
     return [];
-  }, "_toStringVisiting"]);
+  }, "_toStringVisiting", "inputArray", "$get$inputArray", function() {
+    return ">ONE Homo sapiens alu\nGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGA\nTCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACT\nAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAG\nGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCG\nCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGT\nGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCA\nGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAA\nTTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAG\nAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCA\nGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGT\nAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACC\nAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTG\nGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACC\nCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAG\nAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTT\nTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACA\nTGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCT\nGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGG\nTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGT\nCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGG\nCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCG\nTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTA\nCTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCG\nAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCG\nGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACC\nTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAA\nTACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGA\nGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACT\nGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTC\nACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGT\nTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGC\nCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCG\nCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTG\nGGCGACAGAGCGAGACTCCG\n>TWO IUB ambiguity codes\ncttBtatcatatgctaKggNcataaaSatgtaaaDcDRtBggDtctttataattcBgtcg\ntactDtDagcctatttSVHtHttKtgtHMaSattgWaHKHttttagacatWatgtRgaaa\nNtactMcSMtYtcMgRtacttctWBacgaaatatagScDtttgaagacacatagtVgYgt\ncattHWtMMWcStgttaggKtSgaYaaccWStcgBttgcgaMttBYatcWtgacaYcaga\ngtaBDtRacttttcWatMttDBcatWtatcttactaBgaYtcttgttttttttYaaScYa\nHgtgttNtSatcMtcVaaaStccRcctDaataataStcYtRDSaMtDttgttSagtRRca\ntttHatSttMtWgtcgtatSSagactYaaattcaMtWatttaSgYttaRgKaRtccactt\ntattRggaMcDaWaWagttttgacatgttctacaaaRaatataataaMttcgDacgaSSt\nacaStYRctVaNMtMgtaggcKatcttttattaaaaagVWaHKYagtttttatttaacct\ntacgtVtcVaattVMBcttaMtttaStgacttagattWWacVtgWYagWVRctDattBYt\ngtttaagaagattattgacVatMaacattVctgtBSgaVtgWWggaKHaatKWcBScSWa\naccRVacacaaactaccScattRatatKVtactatatttHttaagtttSKtRtacaaagt\nRDttcaaaaWgcacatWaDgtDKacgaacaattacaRNWaatHtttStgttattaaMtgt\ntgDcgtMgcatBtgcttcgcgaDWgagctgcgaggggVtaaScNatttacttaatgacag\ncccccacatYScaMgtaggtYaNgttctgaMaacNaMRaacaaacaKctacatagYWctg\nttWaaataaaataRattagHacacaagcgKatacBttRttaagtatttccgatctHSaat\nactcNttMaagtattMtgRtgaMgcataatHcMtaBSaRattagttgatHtMttaaKagg\nYtaaBataSaVatactWtataVWgKgttaaaacagtgcgRatatacatVtHRtVYataSa\nKtWaStVcNKHKttactatccctcatgWHatWaRcttactaggatctataDtDHBttata\naaaHgtacVtagaYttYaKcctattcttcttaataNDaaggaaaDYgcggctaaWSctBa\naNtgctggMBaKctaMVKagBaactaWaDaMaccYVtNtaHtVWtKgRtcaaNtYaNacg\ngtttNattgVtttctgtBaWgtaattcaagtcaVWtactNggattctttaYtaaagccgc\ntcttagHVggaYtgtNcDaVagctctctKgacgtatagYcctRYHDtgBattDaaDgccK\ntcHaaStttMcctagtattgcRgWBaVatHaaaataYtgtttagMDMRtaataaggatMt\nttctWgtNtgtgaaaaMaatatRtttMtDgHHtgtcattttcWattRSHcVagaagtacg\nggtaKVattKYagactNaatgtttgKMMgYNtcccgSKttctaStatatNVataYHgtNa\nBKRgNacaactgatttcctttaNcgatttctctataScaHtataRagtcRVttacDSDtt\naRtSatacHgtSKacYagttMHtWataggatgactNtatSaNctataVtttRNKtgRacc\ntttYtatgttactttttcctttaaacatacaHactMacacggtWataMtBVacRaSaatc\ncgtaBVttccagccBcttaRKtgtgcctttttRtgtcagcRttKtaaacKtaaatctcac\naattgcaNtSBaaccgggttattaaBcKatDagttactcttcattVtttHaaggctKKga\ntacatcBggScagtVcacattttgaHaDSgHatRMaHWggtatatRgccDttcgtatcga\naacaHtaagttaRatgaVacttagattVKtaaYttaaatcaNatccRttRRaMScNaaaD\ngttVHWgtcHaaHgacVaWtgttScactaagSgttatcttagggDtaccagWattWtRtg\nttHWHacgattBtgVcaYatcggttgagKcWtKKcaVtgaYgWctgYggVctgtHgaNcV\ntaBtWaaYatcDRaaRtSctgaHaYRttagatMatgcatttNattaDttaattgttctaa\nccctcccctagaWBtttHtBccttagaVaatMcBHagaVcWcagBVttcBtaYMccagat\ngaaaaHctctaacgttagNWRtcggattNatcRaNHttcagtKttttgWatWttcSaNgg\ngaWtactKKMaacatKatacNattgctWtatctaVgagctatgtRaHtYcWcttagccaa\ntYttWttaWSSttaHcaaaaagVacVgtaVaRMgattaVcDactttcHHggHRtgNcctt\ntYatcatKgctcctctatVcaaaaKaaaagtatatctgMtWtaaaacaStttMtcgactt\ntaSatcgDataaactaaacaagtaaVctaggaSccaatMVtaaSKNVattttgHccatca\ncBVctgcaVatVttRtactgtVcaattHgtaaattaaattttYtatattaaRSgYtgBag\naHSBDgtagcacRHtYcBgtcacttacactaYcgctWtattgSHtSatcataaatataHt\ncgtYaaMNgBaatttaRgaMaatatttBtttaaaHHKaatctgatWatYaacttMctctt\nttVctagctDaaagtaVaKaKRtaacBgtatccaaccactHHaagaagaaggaNaaatBW\nattccgStaMSaMatBttgcatgRSacgttVVtaaDMtcSgVatWcaSatcttttVatag\nttactttacgatcaccNtaDVgSRcgVcgtgaacgaNtaNatatagtHtMgtHcMtagaa\nattBgtataRaaaacaYKgtRccYtatgaagtaataKgtaaMttgaaRVatgcagaKStc\ntHNaaatctBBtcttaYaBWHgtVtgacagcaRcataWctcaBcYacYgatDgtDHccta\n>THREE Homo sapiens frequency\naacacttcaccaggtatcgtgaaggctcaagattacccagagaacctttgcaatataaga\natatgtatgcagcattaccctaagtaattatattctttttctgactcaaagtgacaagcc\nctagtgtatattaaatcggtatatttgggaaattcctcaaactatcctaatcaggtagcc\natgaaagtgatcaaaaaagttcgtacttataccatacatgaattctggccaagtaaaaaa\ntagattgcgcaaaattcgtaccttaagtctctcgccaagatattaggatcctattactca\ntatcgtgtttttctttattgccgccatccccggagtatctcacccatccttctcttaaag\ngcctaatattacctatgcaaataaacatatattgttgaaaattgagaacctgatcgtgat\ntcttatgtgtaccatatgtatagtaatcacgcgactatatagtgctttagtatcgcccgt\ngggtgagtgaatattctgggctagcgtgagatagtttcttgtcctaatatttttcagatc\ngaatagcttctatttttgtgtttattgacatatgtcgaaactccttactcagtgaaagtc\natgaccagatccacgaacaatcttcggaatcagtctcgttttacggcggaatcttgagtc\ntaacttatatcccgtcgcttactttctaacaccccttatgtatttttaaaattacgttta\nttcgaacgtacttggcggaagcgttattttttgaagtaagttacattgggcagactcttg\nacattttcgatacgactttctttcatccatcacaggactcgttcgtattgatatcagaag\nctcgtgatgattagttgtcttctttaccaatactttgaggcctattctgcgaaatttttg\nttgccctgcgaacttcacataccaaggaacacctcgcaacatgccttcatatccatcgtt\ncattgtaattcttacacaatgaatcctaagtaattacatccctgcgtaaaagatggtagg\nggcactgaggatatattaccaagcatttagttatgagtaatcagcaatgtttcttgtatt\naagttctctaaaatagttacatcgtaatgttatctcgggttccgcgaataaacgagatag\nattcattatatatggccctaagcaaaaacctcctcgtattctgttggtaattagaatcac\nacaatacgggttgagatattaattatttgtagtacgaagagatataaaaagatgaacaat\ntactcaagtcaagatgtatacgggatttataataaaaatcgggtagagatctgctttgca\nattcagacgtgccactaaatcgtaatatgtcgcgttacatcagaaagggtaactattatt\naattaataaagggcttaatcactacatattagatcttatccgatagtcttatctattcgt\ntgtatttttaagcggttctaattcagtcattatatcagtgctccgagttctttattattg\nttttaaggatgacaaaatgcctcttgttataacgctgggagaagcagactaagagtcgga\ngcagttggtagaatgaggctgcaaaagacggtctcgacgaatggacagactttactaaac\ncaatgaaagacagaagtagagcaaagtctgaagtggtatcagcttaattatgacaaccct\ntaatacttccctttcgccgaatactggcgtggaaaggttttaaaagtcgaagtagttaga\nggcatctctcgctcataaataggtagactactcgcaatccaatgtgactatgtaatactg\nggaacatcagtccgcgatgcagcgtgtttatcaaccgtccccactcgcctggggagacat\ngagaccacccccgtggggattattagtccgcagtaatcgactcttgacaatccttttcga\nttatgtcatagcaatttacgacagttcagcgaagtgactactcggcgaaatggtattact\naaagcattcgaacccacatgaatgtgattcttggcaatttctaatccactaaagcttttc\ncgttgaatctggttgtagatatttatataagttcactaattaagatcacggtagtatatt\ngatagtgatgtctttgcaagaggttggccgaggaatttacggattctctattgatacaat\nttgtctggcttataactcttaaggctgaaccaggcgtttttagacgacttgatcagctgt\ntagaatggtttggactccctctttcatgtcagtaacatttcagccgttattgttacgata\ntgcttgaacaatattgatctaccacacacccatagtatattttataggtcatgctgttac\nctacgagcatggtattccacttcccattcaatgagtattcaacatcactagcctcagaga\ntgatgacccacctctaataacgtcacgttgcggccatgtgaaacctgaacttgagtagac\ngatatcaagcgctttaaattgcatataacatttgagggtaaagctaagcggatgctttat\nataatcaatactcaataataagatttgattgcattttagagttatgacacgacatagttc\nactaacgagttactattcccagatctagactgaagtactgatcgagacgatccttacgtc\ngatgatcgttagttatcgacttaggtcgggtctctagcggtattggtacttaaccggaca\nctatactaataacccatgatcaaagcataacagaatacagacgataatttcgccaacata\ntatgtacagaccccaagcatgagaagctcattgaaagctatcattgaagtcccgctcaca\natgtgtcttttccagacggtttaactggttcccgggagtcctggagtttcgacttacata\naatggaaacaatgtattttgctaatttatctatagcgtcatttggaccaatacagaatat\ntatgttgcctagtaatccactataacccgcaagtgctgatagaaaatttttagacgattt\nataaatgccccaagtatccctcccgtgaatcctccgttatactaattagtattcgttcat\nacgtataccgcgcatatatgaacatttggcgataaggcgcgtgaattgttacgtgacaga\ngatagcagtttcttgtgatatggttaacagacgtacatgaagggaaactttatatctata\ngtgatgcttccgtagaaataccgccactggtctgccaatgatgaagtatgtagctttagg\ntttgtactatgaggctttcgtttgtttgcagagtataacagttgcgagtgaaaaaccgac\ngaatttatactaatacgctttcactattggctacaaaatagggaagagtttcaatcatga\ngagggagtatatggatgctttgtagctaaaggtagaacgtatgtatatgctgccgttcat\ntcttgaaagatacataagcgataagttacgacaattataagcaacatccctaccttcgta\nacgatttcactgttactgcgcttgaaatacactatggggctattggcggagagaagcaga\ntcgcgccgagcatatacgagacctataatgttgatgatagagaaggcgtctgaattgata\ncatcgaagtacactttctttcgtagtatctctcgtcctctttctatctccggacacaaga\nattaagttatatatatagagtcttaccaatcatgttgaatcctgattctcagagttcttt\nggcgggccttgtgatgactgagaaacaatgcaatattgctccaaatttcctaagcaaatt\nctcggttatgttatgttatcagcaaagcgttacgttatgttatttaaatctggaatgacg\ngagcgaagttcttatgtcggtgtgggaataattcttttgaagacagcactccttaaataa\ntatcgctccgtgtttgtatttatcgaatgggtctgtaaccttgcacaagcaaatcggtgg\ntgtatatatcggataacaattaatacgatgttcatagtgacagtatactgatcgagtcct\nctaaagtcaattacctcacttaacaatctcattgatgttgtgtcattcccggtatcgccc\ngtagtatgtgctctgattgaccgagtgtgaaccaaggaacatctactaatgcctttgtta\nggtaagatctctctgaattccttcgtgccaacttaaaacattatcaaaatttcttctact\ntggattaactacttttacgagcatggcaaattcccctgtggaagacggttcattattatc\nggaaaccttatagaaattgcgtgttgactgaaattagatttttattgtaagagttgcatc\ntttgcgattcctctggtctagcttccaatgaacagtcctcccttctattcgacatcgggt\nccttcgtacatgtctttgcgatgtaataattaggttcggagtgtggccttaatgggtgca\nactaggaatacaacgcaaatttgctgacatgatagcaaatcggtatgccggcaccaaaac\ngtgctccttgcttagcttgtgaatgagactcagtagttaaataaatccatatctgcaatc\ngattccacaggtattgtccactatctttgaactactctaagagatacaagcttagctgag\naccgaggtgtatatgactacgctgatatctgtaaggtaccaatgcaggcaaagtatgcga\ngaagctaataccggctgtttccagctttataagattaaaatttggctgtcctggcggcct\ncagaattgttctatcgtaatcagttggttcattaattagctaagtacgaggtacaactta\ntctgtcccagaacagctccacaagtttttttacagccgaaacccctgtgtgaatcttaat\natccaagcgcgttatctgattagagtttacaactcagtattttatcagtacgttttgttt\nccaacattacccggtatgacaaaatgacgccacgtgtcgaataatggtctgaccaatgta\nggaagtgaaaagataaatat".split("\n");
+  }, "inputArray"]);
   Isolate = Isolate.$finishIsolateConstructor(Isolate);
   $ = new Isolate();
   init.metadata = [];
@@ -1643,11 +2581,11 @@
   })(function(currentScript) {
     init.currentScript = currentScript;
     if (typeof dartMainRunner === "function")
-      dartMainRunner(T.main, []);
+      dartMainRunner(U.main, []);
     else
-      T.main([]);
+      U.main([]);
   });
   // END invoke [main].
 })();
 
-//# sourceMappingURL=binary_tree.js.map
+//# sourceMappingURL=knucleotide.js.map

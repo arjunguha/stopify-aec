@@ -465,11 +465,37 @@
     },
     JSArray: {
       "^": "Interceptor;",
+      checkGrowable$1: function(receiver, reason) {
+        if (!!receiver.fixed$length)
+          throw H.wrapException(new P.UnsupportedError(reason));
+      },
+      elementAt$1: function(receiver, index) {
+        if (index < 0 || index >= receiver.length)
+          return H.ioore(receiver, index);
+        return receiver[index];
+      },
+      sublist$2: function(receiver, start, end) {
+        var t1 = receiver.length;
+        if (start > t1)
+          throw H.wrapException(P.RangeError$range(start, 0, receiver.length, "start", null));
+        if (end < start || end > receiver.length)
+          throw H.wrapException(P.RangeError$range(end, start, receiver.length, "end", null));
+        if (start === end)
+          return [];
+        return receiver.slice(start, end);
+      },
       toString$0: function(receiver) {
         return P.IterableBase_iterableToFullString(receiver, "[", "]");
       },
+      get$iterator: function(receiver) {
+        return new J.ArrayIterator(receiver, receiver.length, 0, null);
+      },
       get$length: function(receiver) {
         return receiver.length;
+      },
+      set$length: function(receiver, newLength) {
+        this.checkGrowable$1(receiver, "set length");
+        receiver.length = newLength;
       },
       $isList: 1
     },
@@ -478,6 +504,9 @@
     },
     ArrayIterator: {
       "^": "Object;_iterable,_length,_index,_current",
+      get$current: function() {
+        return this._current;
+      },
       moveNext$0: function() {
         var t1, $length, t2;
         t1 = this._iterable;
@@ -517,6 +546,8 @@
           return "" + receiver;
       },
       $add: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
         return receiver + other;
       },
       $tdiv: function(receiver, other) {
@@ -538,10 +569,15 @@
           return Math.ceil(quotient);
         throw H.wrapException(new P.UnsupportedError("Result of truncating division is " + H.S(quotient) + ": " + H.S(receiver) + " ~/ " + other));
       },
-      $shl: function(receiver, other) {
-        if (other < 0)
-          throw H.wrapException(H.argumentErrorValue(other));
-        return other > 31 ? 0 : receiver << other >>> 0;
+      _shrOtherPositive$1: function(receiver, other) {
+        var t1;
+        if (receiver > 0)
+          t1 = other > 31 ? 0 : receiver >>> other;
+        else {
+          t1 = other > 31 ? 31 : other;
+          t1 = receiver >> t1 >>> 0;
+        }
+        return t1;
       },
       $isnum: 1
     },
@@ -569,6 +605,8 @@
       substring$2: function(receiver, startIndex, endIndex) {
         if (endIndex == null)
           endIndex = receiver.length;
+        if (startIndex < 0)
+          throw H.wrapException(P.RangeError$value(startIndex, null, null));
         if (startIndex > endIndex)
           throw H.wrapException(P.RangeError$value(startIndex, null, null));
         if (endIndex > receiver.length)
@@ -578,6 +616,9 @@
       substring$1: function($receiver, startIndex) {
         return this.substring$2($receiver, startIndex, null);
       },
+      get$runes: function(receiver) {
+        return new P.Runes(receiver);
+      },
       toString$0: function(receiver) {
         return receiver;
       },
@@ -585,6 +626,111 @@
         return receiver.length;
       },
       $isString: 1
+    }
+  }], ["dart._internal", "dart:_internal",, H, {
+    "^": "",
+    EfficientLengthIterable: {
+      "^": "Iterable;"
+    },
+    ListIterable: {
+      "^": "EfficientLengthIterable;",
+      get$iterator: function(_) {
+        return new H.ListIterator(this, this.get$length(this), 0, null);
+      },
+      forEach$1: function(_, action) {
+        var $length, i;
+        $length = this.get$length(this);
+        for (i = 0; i < $length; ++i) {
+          action.call$1(this.elementAt$1(0, i));
+          if ($length !== this.get$length(this))
+            throw H.wrapException(new P.ConcurrentModificationError(this));
+        }
+      }
+    },
+    SubListIterable: {
+      "^": "ListIterable;__internal$_iterable,_start,_endOrLength",
+      get$_endIndex: function() {
+        var $length, t1;
+        $length = this.__internal$_iterable.length;
+        t1 = this._endOrLength;
+        if (t1 > $length)
+          return $length;
+        return t1;
+      },
+      get$_startIndex: function() {
+        var $length, t1;
+        $length = this.__internal$_iterable.length;
+        t1 = this._start;
+        if (t1 > $length)
+          return $length;
+        return t1;
+      },
+      get$length: function(_) {
+        var $length, t1, t2;
+        $length = this.__internal$_iterable.length;
+        t1 = this._start;
+        if (t1 >= $length)
+          return 0;
+        t2 = this._endOrLength;
+        if (t2 >= $length)
+          return $length - t1;
+        return t2 - t1;
+      },
+      elementAt$1: function(_, index) {
+        var realIndex, t1;
+        realIndex = this.get$_startIndex() + index;
+        if (index < 0 || realIndex >= this.get$_endIndex())
+          throw H.wrapException(P.IndexError$(index, this, "index", null, null));
+        t1 = this.__internal$_iterable;
+        if (realIndex < 0 || realIndex >= t1.length)
+          return H.ioore(t1, realIndex);
+        return t1[realIndex];
+      }
+    },
+    ListIterator: {
+      "^": "Object;__internal$_iterable,__internal$_length,__internal$_index,__internal$_current",
+      get$current: function() {
+        return this.__internal$_current;
+      },
+      moveNext$0: function() {
+        var t1, $length, t2;
+        t1 = this.__internal$_iterable;
+        $length = t1.get$length(t1);
+        if (this.__internal$_length !== $length)
+          throw H.wrapException(new P.ConcurrentModificationError(t1));
+        t2 = this.__internal$_index;
+        if (t2 >= $length) {
+          this.__internal$_current = null;
+          return false;
+        }
+        this.__internal$_current = t1.elementAt$1(0, t2);
+        ++this.__internal$_index;
+        return true;
+      }
+    },
+    MappedListIterable: {
+      "^": "ListIterable;_source,_f",
+      get$length: function(_) {
+        return J.get$length$as(this._source);
+      },
+      elementAt$1: function(_, index) {
+        return this._f.call$1(J.elementAt$1$a(this._source, index));
+      }
+    },
+    ReversedListIterable: {
+      "^": "ListIterable;_source",
+      get$length: function(_) {
+        return this._source.length;
+      },
+      elementAt$1: function(_, index) {
+        var t1, t2, t3;
+        t1 = this._source;
+        t2 = t1.length;
+        t3 = t2 - 1 - index;
+        if (t3 < 0 || t3 >= t2)
+          return H.ioore(t1, t3);
+        return t1[t3];
+      }
     }
   }], ["_js_helper", "dart:_js_helper",, H, {
     "^": "",
@@ -667,6 +813,48 @@
       $.Primitives_timerFrequency = 1000000;
       $.Primitives_timerTicks = new H.Primitives_initTicker_closure(performance);
     },
+    Primitives__fromCharCodeApply: function(array) {
+      var end, result, i, i0, chunkEnd;
+      end = array.length;
+      if (end <= 500)
+        return String.fromCharCode.apply(null, array);
+      for (result = "", i = 0; i < end; i = i0) {
+        i0 = i + 500;
+        chunkEnd = i0 < end ? i0 : end;
+        result += String.fromCharCode.apply(null, array.slice(i, chunkEnd));
+      }
+      return result;
+    },
+    Primitives_stringFromCodePoints: function(codePoints) {
+      var a, t1, _i, i;
+      a = [];
+      for (t1 = codePoints.length, _i = 0; _i < codePoints.length; codePoints.length === t1 || (0, H.throwConcurrentModificationError)(codePoints), ++_i) {
+        i = codePoints[_i];
+        if (typeof i !== "number" || Math.floor(i) !== i)
+          throw H.wrapException(H.argumentErrorValue(i));
+        if (i <= 65535)
+          a.push(i);
+        else if (i <= 1114111) {
+          a.push(55296 + (C.JSInt_methods._shrOtherPositive$1(i - 65536, 10) & 1023));
+          a.push(56320 + (i & 1023));
+        } else
+          throw H.wrapException(H.argumentErrorValue(i));
+      }
+      return H.Primitives__fromCharCodeApply(a);
+    },
+    Primitives_stringFromCharCodes: function(charCodes) {
+      var t1, _i, t2, i;
+      for (t1 = charCodes.length, _i = 0; t2 = charCodes.length, _i < t2; t2 === t1 || (0, H.throwConcurrentModificationError)(charCodes), ++_i) {
+        i = charCodes[_i];
+        if (typeof i !== "number" || Math.floor(i) !== i)
+          throw H.wrapException(H.argumentErrorValue(i));
+        if (i < 0)
+          throw H.wrapException(H.argumentErrorValue(i));
+        if (i > 65535)
+          return H.Primitives_stringFromCodePoints(charCodes);
+      }
+      return H.Primitives__fromCharCodeApply(charCodes);
+    },
     iae: function(argument) {
       throw H.wrapException(H.argumentErrorValue(argument));
     },
@@ -702,6 +890,9 @@
     },
     toStringWrapper: function() {
       return J.toString$0$(this.dartException);
+    },
+    throwExpression: function(ex) {
+      throw H.wrapException(ex);
     },
     throwConcurrentModificationError: function(collection) {
       throw H.wrapException(new P.ConcurrentModificationError(collection));
@@ -1136,6 +1327,26 @@
     }
   }], ["dart.collection", "dart:collection",, P, {
     "^": "",
+    IterableBase_iterableToShortString: function(iterable, leftDelimiter, rightDelimiter) {
+      var parts, t1;
+      if (P._isToStringVisiting(iterable)) {
+        if (leftDelimiter === "(" && rightDelimiter === ")")
+          return "(...)";
+        return leftDelimiter + "..." + rightDelimiter;
+      }
+      parts = [];
+      t1 = $.$get$_toStringVisiting();
+      t1.push(iterable);
+      try {
+        P._iterablePartsToStrings(iterable, parts);
+      } finally {
+        if (0 >= t1.length)
+          return H.ioore(t1, -1);
+        t1.pop();
+      }
+      t1 = P.StringBuffer__writeAll(leftDelimiter, parts, ", ") + rightDelimiter;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
+    },
     IterableBase_iterableToFullString: function(iterable, leftDelimiter, rightDelimiter) {
       var buffer, t1, t2;
       if (P._isToStringVisiting(iterable))
@@ -1162,9 +1373,102 @@
         if (o === t1[i])
           return true;
       return false;
+    },
+    _iterablePartsToStrings: function(iterable, parts) {
+      var it, $length, count, next, ultimateString, penultimateString, penultimate, ultimate, ultimate0, elision;
+      it = iterable.get$iterator(iterable);
+      $length = 0;
+      count = 0;
+      while (true) {
+        if (!($length < 80 || count < 3))
+          break;
+        if (!it.moveNext$0())
+          return;
+        next = H.S(it.get$current());
+        parts.push(next);
+        $length += next.length + 2;
+        ++count;
+      }
+      if (!it.moveNext$0()) {
+        if (count <= 5)
+          return;
+        if (0 >= parts.length)
+          return H.ioore(parts, -1);
+        ultimateString = parts.pop();
+        if (0 >= parts.length)
+          return H.ioore(parts, -1);
+        penultimateString = parts.pop();
+      } else {
+        penultimate = it.get$current();
+        ++count;
+        if (!it.moveNext$0()) {
+          if (count <= 4) {
+            parts.push(H.S(penultimate));
+            return;
+          }
+          ultimateString = H.S(penultimate);
+          if (0 >= parts.length)
+            return H.ioore(parts, -1);
+          penultimateString = parts.pop();
+          $length += ultimateString.length + 2;
+        } else {
+          ultimate = it.get$current();
+          ++count;
+          for (; it.moveNext$0(); penultimate = ultimate, ultimate = ultimate0) {
+            ultimate0 = it.get$current();
+            ++count;
+            if (count > 100) {
+              while (true) {
+                if (!($length > 75 && count > 3))
+                  break;
+                if (0 >= parts.length)
+                  return H.ioore(parts, -1);
+                $length -= parts.pop().length + 2;
+                --count;
+              }
+              parts.push("...");
+              return;
+            }
+          }
+          penultimateString = H.S(penultimate);
+          ultimateString = H.S(ultimate);
+          $length += ultimateString.length + penultimateString.length + 4;
+        }
+      }
+      if (count > parts.length + 2) {
+        $length += 5;
+        elision = "...";
+      } else
+        elision = null;
+      while (true) {
+        if (!($length > 80 && parts.length > 3))
+          break;
+        if (0 >= parts.length)
+          return H.ioore(parts, -1);
+        $length -= parts.pop().length + 2;
+        if (elision == null) {
+          $length += 5;
+          elision = "...";
+        }
+      }
+      if (elision != null)
+        parts.push(elision);
+      parts.push(penultimateString);
+      parts.push(ultimateString);
     }
   }], ["dart.core", "dart:core",, P, {
     "^": "",
+    String__stringFromIterable: function(charCodes, start, end) {
+      var it, i, list;
+      it = J.get$iterator$a(charCodes);
+      for (i = 0; i < start; ++i)
+        if (!it.moveNext$0())
+          throw H.wrapException(P.RangeError$range(start, 0, i, null, null));
+      list = [];
+      for (; it.moveNext$0();)
+        list.push(it.get$current());
+      return H.Primitives_stringFromCharCodes(list);
+    },
     Error_safeToString: function(object) {
       if (typeof object === "number" || typeof object === "boolean" || null == object)
         return J.toString$0$(object);
@@ -1177,6 +1481,18 @@
       if (!!t1.$isClosure)
         return t1.toString$0(object);
       return H.Primitives_objectToHumanReadableString(object);
+    },
+    String_String$fromCharCodes: function(charCodes, start, end) {
+      var len;
+      if (charCodes.constructor === Array) {
+        len = charCodes.length;
+        end = P.RangeError_checkValidRange(start, end, len, null, null, null);
+        return H.Primitives_stringFromCharCodes(start > 0 || end < len ? C.JSArray_methods.sublist$2(charCodes, start, end) : charCodes);
+      }
+      return P.String__stringFromIterable(charCodes, start, end);
+    },
+    _combineSurrogatePair: function(start, end) {
+      return 65536 + ((start & 1023) << 10) + (end & 1023);
     },
     bool: {
       "^": "Object;",
@@ -1201,7 +1517,7 @@
     ArgumentError: {
       "^": "Error;_hasValue,invalidValue,name,message",
       get$_errorName: function() {
-        return "Invalid argument";
+        return "Invalid argument" + (!this._hasValue ? "(s)" : "");
       },
       get$_errorExplanation: function() {
         return "";
@@ -1213,6 +1529,8 @@
         t1 = this.message;
         message = t1 == null ? "" : ": " + t1;
         prefix = this.get$_errorName() + nameString + message;
+        if (!this._hasValue)
+          return prefix;
         explanation = this.get$_errorExplanation();
         errorValue = P.Error_safeToString(this.invalidValue);
         return prefix + explanation + ": " + H.S(errorValue);
@@ -1229,11 +1547,38 @@
         return "RangeError";
       },
       get$_errorExplanation: function() {
-        return "";
+        var t1, explanation, t2;
+        t1 = this.start;
+        if (t1 == null) {
+          t1 = this.end;
+          explanation = t1 != null ? ": Not less than or equal to " + H.S(t1) : "";
+        } else {
+          t2 = this.end;
+          if (t2 == null)
+            explanation = ": Not greater than or equal to " + H.S(t1);
+          else if (t2 > t1)
+            explanation = ": Not in range " + H.S(t1) + ".." + H.S(t2) + ", inclusive";
+          else
+            explanation = t2 < t1 ? ": Valid value range is empty" : ": Only valid value is " + H.S(t1);
+        }
+        return explanation;
       },
       static: {
         RangeError$value: function(value, $name, message) {
           return new P.RangeError(null, null, true, value, $name, "Value not in range");
+        },
+        RangeError$range: function(invalidValue, minValue, maxValue, $name, message) {
+          return new P.RangeError(minValue, maxValue, true, invalidValue, $name, "Invalid value");
+        },
+        RangeError_checkValidRange: function(start, end, $length, startName, endName, message) {
+          if (start > $length)
+            throw H.wrapException(P.RangeError$range(start, 0, $length, "start", message));
+          if (end != null) {
+            if (start > end || end > $length)
+              throw H.wrapException(P.RangeError$range(end, start, $length, "end", message));
+            return end;
+          }
+          return $length;
         }
       }
     },
@@ -1255,7 +1600,8 @@
       },
       static: {
         IndexError$: function(invalidValue, indexable, $name, message, $length) {
-          return new P.IndexError(indexable, $length, true, invalidValue, $name, "Index out of range");
+          var t1 = $length != null ? $length : J.get$length$as(indexable);
+          return new P.IndexError(indexable, t1, true, invalidValue, $name, "Index out of range");
         }
       }
     },
@@ -1285,6 +1631,31 @@
       "^": "num;"
     },
     "+int": 0,
+    Iterable: {
+      "^": "Object;",
+      get$length: function(_) {
+        var it, count;
+        it = this.get$iterator(this);
+        for (count = 0; it.moveNext$0();)
+          ++count;
+        return count;
+      },
+      elementAt$1: function(_, index) {
+        var t1, elementIndex, element;
+        if (index < 0)
+          H.throwExpression(P.RangeError$range(index, 0, null, "index", null));
+        for (t1 = this.get$iterator(this), elementIndex = 0; t1.moveNext$0();) {
+          element = t1.get$current();
+          if (index === elementIndex)
+            return element;
+          ++elementIndex;
+        }
+        throw H.wrapException(P.IndexError$(index, this, "index", null, elementIndex));
+      },
+      toString$0: function(_) {
+        return P.IterableBase_iterableToShortString(this, "(", ")");
+      }
+    },
     List: {
       "^": "Object;"
     },
@@ -1310,12 +1681,48 @@
       }
     },
     Stopwatch: {
-      "^": "Object;_start,_stop"
+      "^": "Object;_core$_start,_stop"
     },
     String: {
       "^": "Object;"
     },
     "+String": 0,
+    Runes: {
+      "^": "Iterable;string",
+      get$iterator: function(_) {
+        return new P.RuneIterator(this.string, 0, 0, null);
+      }
+    },
+    RuneIterator: {
+      "^": "Object;string,_position,_nextPosition,_currentCodePoint",
+      get$current: function() {
+        return this._currentCodePoint;
+      },
+      moveNext$0: function() {
+        var t1, t2, t3, codeUnit, nextPosition, nextCodeUnit;
+        t1 = this._nextPosition;
+        this._position = t1;
+        t2 = this.string;
+        t3 = t2.length;
+        if (t1 === t3) {
+          this._currentCodePoint = null;
+          return false;
+        }
+        codeUnit = C.JSString_methods._codeUnitAt$1(t2, t1);
+        nextPosition = t1 + 1;
+        if ((codeUnit & 64512) === 55296 && nextPosition < t3) {
+          nextCodeUnit = C.JSString_methods._codeUnitAt$1(t2, nextPosition);
+          if ((nextCodeUnit & 64512) === 56320) {
+            this._nextPosition = nextPosition + 1;
+            this._currentCodePoint = P._combineSurrogatePair(codeUnit, nextCodeUnit);
+            return true;
+          }
+        }
+        this._nextPosition = nextPosition;
+        this._currentCodePoint = codeUnit;
+        return true;
+      }
+    },
     StringBuffer: {
       "^": "Object;_contents<",
       get$length: function(_) {
@@ -1384,43 +1791,112 @@
     BenchmarkBase_measure_closure0: {
       "^": "Closure;$this",
       call$0: function() {
-        this.$this.run$0();
+        this.$this.exercise$0();
       }
     }
-  }], ["", "../benchmark-files/binary_tree.dart",, T, {
+  }], ["", "../benchmark-files/common/IO.dart",, Q, {}], ["", "../benchmark-files/revcomp.dart",, Z, {
     "^": "",
     main: function() {
-      H.printString("BinaryTree(RunTime): " + H.S(new T.BinaryTree("BinaryTree").measure$0()) + " us.");
+      H.printString("Revcomp(RunTime): " + H.S(new Z.Revcomp("Revcomp").measure$0()) + " us.");
     },
-    BinaryTree: {
+    Revcomp: {
       "^": "BenchmarkBase;name",
       run$0: function() {
-        var depth, iterations, check, i;
-        T.TreeNode_bottomUpTree(21).itemCheck$0();
-        T.TreeNode_bottomUpTree(20);
-        for (depth = 4; depth <= 20; depth += 2) {
-          iterations = C.JSInt_methods.$shl(1, 20 - depth + 4);
-          for (check = 0, i = 1; i <= iterations; ++i)
-            check += T.TreeNode_bottomUpTree(depth).itemCheck$0();
+        var _box_0, tbl, i, t1, t2, buffer, list, count, data, count0;
+        _box_0 = {};
+        tbl = new Array(256);
+        for (i = 0; i < 256; ++i)
+          tbl[i] = i;
+        for (i = 0; i < 12; ++i) {
+          t1 = C.JSString_methods._codeUnitAt$1("CGATMKRYVBHD", i);
+          t2 = C.JSString_methods._codeUnitAt$1("GCTAKMYRBVDH", i);
+          if (t1 >= 256)
+            return H.ioore(tbl, t1);
+          tbl[t1] = t2;
+          t1 = C.JSString_methods._codeUnitAt$1("CGATMKRYVBHD".toLowerCase(), i);
+          if (t1 >= 256)
+            return H.ioore(tbl, t1);
+          tbl[t1] = t2;
         }
+        buffer = new Array(60);
+        buffer.fixed$length = Array;
+        list = [];
+        _box_0.commentLine = false;
+        _box_0.sbuf = new P.StringBuffer("");
+        t1 = $.$get$inputArray();
+        t1.toString;
+        new H.MappedListIterable(t1, new Z.Revcomp_run_closure()).forEach$1(0, new Z.Revcomp_run_closure0(_box_0, tbl, buffer, list));
+        if (_box_0.commentLine)
+          _box_0.sbuf._contents += P.String_String$fromCharCodes(list, 0, null);
+        else {
+          for (t1 = new H.ReversedListIterable(list), t1 = new H.ListIterator(t1, t1.get$length(t1), 0, null), count = 0; t1.moveNext$0(); count = count0) {
+            data = t1.__internal$_current;
+            if (count === 60) {
+              _box_0.sbuf._contents += P.String_String$fromCharCodes(buffer, 0, null) + "\n";
+              count = 0;
+            }
+            count0 = count + 1;
+            if (count >= 60)
+              return H.ioore(buffer, count);
+            buffer[count] = data;
+          }
+          if (count > 0) {
+            t1 = _box_0.sbuf;
+            P.RangeError_checkValidRange(0, count, 60, null, null, null);
+            t1._contents += P.String_String$fromCharCodes(new H.SubListIterable(buffer, 0, count), 0, null);
+          }
+        }
+      },
+      exercise$0: function() {
+        for (var i = 0; i < 1000; ++i)
+          this.run$0();
       }
     },
-    TreeNode: {
-      "^": "Object;left,right",
-      itemCheck$0: function() {
-        var t1 = this.left;
-        if (t1 == null)
-          return 1;
-        return 1 + t1.itemCheck$0() + this.right.itemCheck$0();
-      },
-      static: {
-        TreeNode_bottomUpTree: function(depth) {
-          var t1;
-          if (depth > 0) {
-            t1 = depth - 1;
-            return new T.TreeNode(T.TreeNode_bottomUpTree(t1), T.TreeNode_bottomUpTree(t1));
+    Revcomp_run_closure: {
+      "^": "Closure;",
+      call$1: function(line) {
+        return J.$add$ns(line, "\n");
+      }
+    },
+    Revcomp_run_closure0: {
+      "^": "Closure;_box_0,tbl,buffer,list",
+      call$1: function(dataList) {
+        var t1, t2, t3, t4, t5, data, t6, count, g, count0;
+        for (t1 = new P.RuneIterator(J.get$runes$s(dataList).string, 0, 0, null), t2 = this._box_0, t3 = this.list, t4 = this.buffer, t5 = this.tbl; t1.moveNext$0();) {
+          data = t1._currentCodePoint;
+          if (data === 62 && !t2.commentLine) {
+            for (t6 = new H.ReversedListIterable(t3), t6 = new H.ListIterator(t6, t6.get$length(t6), 0, null), count = 0; t6.moveNext$0(); count = count0) {
+              g = t6.__internal$_current;
+              if (count === 60) {
+                t2.sbuf._contents += P.String_String$fromCharCodes(t4, 0, null) + "\n";
+                count = 0;
+              }
+              count0 = count + 1;
+              if (count >= 60)
+                return H.ioore(t4, count);
+              t4[count] = g;
+            }
+            if (count > 0) {
+              t6 = t2.sbuf;
+              P.RangeError_checkValidRange(0, count, 60, null, null, null);
+              t6._contents += P.String_String$fromCharCodes(new H.SubListIterable(t4, 0, count), 0, null) + "\n";
+            }
+            C.JSArray_methods.set$length(t3, 0);
+            t2.commentLine = true;
           }
-          return new T.TreeNode(null, null);
+          if (t2.commentLine)
+            if (data === 10) {
+              t2.sbuf._contents += P.String_String$fromCharCodes(t3, 0, null);
+              t2.sbuf = new P.StringBuffer("");
+              t2.commentLine = false;
+              C.JSArray_methods.set$length(t3, 0);
+            } else
+              t3.push(data);
+          else if (data !== 10) {
+            if (data >>> 0 !== data || data >= 256)
+              return H.ioore(t5, data);
+            t3.push(t5[data]);
+          }
         }
       }
     }
@@ -1443,6 +1919,13 @@
       return J.JSArray.prototype;
     return receiver;
   };
+  J.getInterceptor$a = function(receiver) {
+    if (receiver == null)
+      return receiver;
+    if (receiver.constructor == Array)
+      return J.JSArray.prototype;
+    return receiver;
+  };
   J.getInterceptor$as = function(receiver) {
     if (typeof receiver == "string")
       return J.JSString.prototype;
@@ -1461,13 +1944,29 @@
       return receiver;
     return receiver;
   };
+  J.getInterceptor$s = function(receiver) {
+    if (typeof receiver == "string")
+      return J.JSString.prototype;
+    if (receiver == null)
+      return receiver;
+    return receiver;
+  };
+  J.get$iterator$a = function(receiver) {
+    return J.getInterceptor$a(receiver).get$iterator(receiver);
+  };
   J.get$length$as = function(receiver) {
     return J.getInterceptor$as(receiver).get$length(receiver);
+  };
+  J.get$runes$s = function(receiver) {
+    return J.getInterceptor$s(receiver).get$runes(receiver);
   };
   J.$add$ns = function(receiver, a0) {
     if (typeof receiver == "number" && typeof a0 == "number")
       return receiver + a0;
     return J.getInterceptor$ns(receiver).$add(receiver, a0);
+  };
+  J.elementAt$1$a = function(receiver, a0) {
+    return J.getInterceptor$a(receiver).elementAt$1(receiver, a0);
   };
   J.toString$0$ = function(receiver) {
     return J.getInterceptor(receiver).toString$0(receiver);
@@ -1475,6 +1974,7 @@
   // Output contains no constant list.
   var $ = Isolate.$isolateProperties;
   C.Interceptor_methods = J.Interceptor.prototype;
+  C.JSArray_methods = J.JSArray.prototype;
   C.JSInt_methods = J.JSInt.prototype;
   C.JSNumber_methods = J.JSNumber.prototype;
   C.JSString_methods = J.JSString.prototype;
@@ -1513,7 +2013,9 @@
     }
   })(["_toStringVisiting", "$get$_toStringVisiting", function() {
     return [];
-  }, "_toStringVisiting"]);
+  }, "_toStringVisiting", "inputArray", "$get$inputArray", function() {
+    return ">ONE Homo sapiens alu\nGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGA\nTCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACT\nAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAG\nGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCG\nCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGT\nGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCA\nGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAA\nTTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAG\nAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCA\nGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGT\nAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACC\nAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTG\nGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACC\nCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAG\nAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTT\nTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACA\nTGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCT\nGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGG\nTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGT\nCTCAAAAAGGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGG\nCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCG\nTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTA\nCTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCG\nAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCG\nGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACC\nTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAA\nTACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGA\nGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACT\nGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAAGGCCGGGCGCGGTGGCTC\nACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGT\nTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGC\nCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCG\nCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTG\nGGCGACAGAGCGAGACTCCG\n>TWO IUB ambiguity codes\ncttBtatcatatgctaKggNcataaaSatgtaaaDcDRtBggDtctttataattcBgtcg\ntactDtDagcctatttSVHtHttKtgtHMaSattgWaHKHttttagacatWatgtRgaaa\nNtactMcSMtYtcMgRtacttctWBacgaaatatagScDtttgaagacacatagtVgYgt\ncattHWtMMWcStgttaggKtSgaYaaccWStcgBttgcgaMttBYatcWtgacaYcaga\ngtaBDtRacttttcWatMttDBcatWtatcttactaBgaYtcttgttttttttYaaScYa\nHgtgttNtSatcMtcVaaaStccRcctDaataataStcYtRDSaMtDttgttSagtRRca\ntttHatSttMtWgtcgtatSSagactYaaattcaMtWatttaSgYttaRgKaRtccactt\ntattRggaMcDaWaWagttttgacatgttctacaaaRaatataataaMttcgDacgaSSt\nacaStYRctVaNMtMgtaggcKatcttttattaaaaagVWaHKYagtttttatttaacct\ntacgtVtcVaattVMBcttaMtttaStgacttagattWWacVtgWYagWVRctDattBYt\ngtttaagaagattattgacVatMaacattVctgtBSgaVtgWWggaKHaatKWcBScSWa\naccRVacacaaactaccScattRatatKVtactatatttHttaagtttSKtRtacaaagt\nRDttcaaaaWgcacatWaDgtDKacgaacaattacaRNWaatHtttStgttattaaMtgt\ntgDcgtMgcatBtgcttcgcgaDWgagctgcgaggggVtaaScNatttacttaatgacag\ncccccacatYScaMgtaggtYaNgttctgaMaacNaMRaacaaacaKctacatagYWctg\nttWaaataaaataRattagHacacaagcgKatacBttRttaagtatttccgatctHSaat\nactcNttMaagtattMtgRtgaMgcataatHcMtaBSaRattagttgatHtMttaaKagg\nYtaaBataSaVatactWtataVWgKgttaaaacagtgcgRatatacatVtHRtVYataSa\nKtWaStVcNKHKttactatccctcatgWHatWaRcttactaggatctataDtDHBttata\naaaHgtacVtagaYttYaKcctattcttcttaataNDaaggaaaDYgcggctaaWSctBa\naNtgctggMBaKctaMVKagBaactaWaDaMaccYVtNtaHtVWtKgRtcaaNtYaNacg\ngtttNattgVtttctgtBaWgtaattcaagtcaVWtactNggattctttaYtaaagccgc\ntcttagHVggaYtgtNcDaVagctctctKgacgtatagYcctRYHDtgBattDaaDgccK\ntcHaaStttMcctagtattgcRgWBaVatHaaaataYtgtttagMDMRtaataaggatMt\nttctWgtNtgtgaaaaMaatatRtttMtDgHHtgtcattttcWattRSHcVagaagtacg\nggtaKVattKYagactNaatgtttgKMMgYNtcccgSKttctaStatatNVataYHgtNa\nBKRgNacaactgatttcctttaNcgatttctctataScaHtataRagtcRVttacDSDtt\naRtSatacHgtSKacYagttMHtWataggatgactNtatSaNctataVtttRNKtgRacc\ntttYtatgttactttttcctttaaacatacaHactMacacggtWataMtBVacRaSaatc\ncgtaBVttccagccBcttaRKtgtgcctttttRtgtcagcRttKtaaacKtaaatctcac\naattgcaNtSBaaccgggttattaaBcKatDagttactcttcattVtttHaaggctKKga\ntacatcBggScagtVcacattttgaHaDSgHatRMaHWggtatatRgccDttcgtatcga\naacaHtaagttaRatgaVacttagattVKtaaYttaaatcaNatccRttRRaMScNaaaD\ngttVHWgtcHaaHgacVaWtgttScactaagSgttatcttagggDtaccagWattWtRtg\nttHWHacgattBtgVcaYatcggttgagKcWtKKcaVtgaYgWctgYggVctgtHgaNcV\ntaBtWaaYatcDRaaRtSctgaHaYRttagatMatgcatttNattaDttaattgttctaa\nccctcccctagaWBtttHtBccttagaVaatMcBHagaVcWcagBVttcBtaYMccagat\ngaaaaHctctaacgttagNWRtcggattNatcRaNHttcagtKttttgWatWttcSaNgg\ngaWtactKKMaacatKatacNattgctWtatctaVgagctatgtRaHtYcWcttagccaa\ntYttWttaWSSttaHcaaaaagVacVgtaVaRMgattaVcDactttcHHggHRtgNcctt\ntYatcatKgctcctctatVcaaaaKaaaagtatatctgMtWtaaaacaStttMtcgactt\ntaSatcgDataaactaaacaagtaaVctaggaSccaatMVtaaSKNVattttgHccatca\ncBVctgcaVatVttRtactgtVcaattHgtaaattaaattttYtatattaaRSgYtgBag\naHSBDgtagcacRHtYcBgtcacttacactaYcgctWtattgSHtSatcataaatataHt\ncgtYaaMNgBaatttaRgaMaatatttBtttaaaHHKaatctgatWatYaacttMctctt\nttVctagctDaaagtaVaKaKRtaacBgtatccaaccactHHaagaagaaggaNaaatBW\nattccgStaMSaMatBttgcatgRSacgttVVtaaDMtcSgVatWcaSatcttttVatag\nttactttacgatcaccNtaDVgSRcgVcgtgaacgaNtaNatatagtHtMgtHcMtagaa\nattBgtataRaaaacaYKgtRccYtatgaagtaataKgtaaMttgaaRVatgcagaKStc\ntHNaaatctBBtcttaYaBWHgtVtgacagcaRcataWctcaBcYacYgatDgtDHccta\n>THREE Homo sapiens frequency\naacacttcaccaggtatcgtgaaggctcaagattacccagagaacctttgcaatataaga\natatgtatgcagcattaccctaagtaattatattctttttctgactcaaagtgacaagcc\nctagtgtatattaaatcggtatatttgggaaattcctcaaactatcctaatcaggtagcc\natgaaagtgatcaaaaaagttcgtacttataccatacatgaattctggccaagtaaaaaa\ntagattgcgcaaaattcgtaccttaagtctctcgccaagatattaggatcctattactca\ntatcgtgtttttctttattgccgccatccccggagtatctcacccatccttctcttaaag\ngcctaatattacctatgcaaataaacatatattgttgaaaattgagaacctgatcgtgat\ntcttatgtgtaccatatgtatagtaatcacgcgactatatagtgctttagtatcgcccgt\ngggtgagtgaatattctgggctagcgtgagatagtttcttgtcctaatatttttcagatc\ngaatagcttctatttttgtgtttattgacatatgtcgaaactccttactcagtgaaagtc\natgaccagatccacgaacaatcttcggaatcagtctcgttttacggcggaatcttgagtc\ntaacttatatcccgtcgcttactttctaacaccccttatgtatttttaaaattacgttta\nttcgaacgtacttggcggaagcgttattttttgaagtaagttacattgggcagactcttg\nacattttcgatacgactttctttcatccatcacaggactcgttcgtattgatatcagaag\nctcgtgatgattagttgtcttctttaccaatactttgaggcctattctgcgaaatttttg\nttgccctgcgaacttcacataccaaggaacacctcgcaacatgccttcatatccatcgtt\ncattgtaattcttacacaatgaatcctaagtaattacatccctgcgtaaaagatggtagg\nggcactgaggatatattaccaagcatttagttatgagtaatcagcaatgtttcttgtatt\naagttctctaaaatagttacatcgtaatgttatctcgggttccgcgaataaacgagatag\nattcattatatatggccctaagcaaaaacctcctcgtattctgttggtaattagaatcac\nacaatacgggttgagatattaattatttgtagtacgaagagatataaaaagatgaacaat\ntactcaagtcaagatgtatacgggatttataataaaaatcgggtagagatctgctttgca\nattcagacgtgccactaaatcgtaatatgtcgcgttacatcagaaagggtaactattatt\naattaataaagggcttaatcactacatattagatcttatccgatagtcttatctattcgt\ntgtatttttaagcggttctaattcagtcattatatcagtgctccgagttctttattattg\nttttaaggatgacaaaatgcctcttgttataacgctgggagaagcagactaagagtcgga\ngcagttggtagaatgaggctgcaaaagacggtctcgacgaatggacagactttactaaac\ncaatgaaagacagaagtagagcaaagtctgaagtggtatcagcttaattatgacaaccct\ntaatacttccctttcgccgaatactggcgtggaaaggttttaaaagtcgaagtagttaga\nggcatctctcgctcataaataggtagactactcgcaatccaatgtgactatgtaatactg\nggaacatcagtccgcgatgcagcgtgtttatcaaccgtccccactcgcctggggagacat\ngagaccacccccgtggggattattagtccgcagtaatcgactcttgacaatccttttcga\nttatgtcatagcaatttacgacagttcagcgaagtgactactcggcgaaatggtattact\naaagcattcgaacccacatgaatgtgattcttggcaatttctaatccactaaagcttttc\ncgttgaatctggttgtagatatttatataagttcactaattaagatcacggtagtatatt\ngatagtgatgtctttgcaagaggttggccgaggaatttacggattctctattgatacaat\nttgtctggcttataactcttaaggctgaaccaggcgtttttagacgacttgatcagctgt\ntagaatggtttggactccctctttcatgtcagtaacatttcagccgttattgttacgata\ntgcttgaacaatattgatctaccacacacccatagtatattttataggtcatgctgttac\nctacgagcatggtattccacttcccattcaatgagtattcaacatcactagcctcagaga\ntgatgacccacctctaataacgtcacgttgcggccatgtgaaacctgaacttgagtagac\ngatatcaagcgctttaaattgcatataacatttgagggtaaagctaagcggatgctttat\nataatcaatactcaataataagatttgattgcattttagagttatgacacgacatagttc\nactaacgagttactattcccagatctagactgaagtactgatcgagacgatccttacgtc\ngatgatcgttagttatcgacttaggtcgggtctctagcggtattggtacttaaccggaca\nctatactaataacccatgatcaaagcataacagaatacagacgataatttcgccaacata\ntatgtacagaccccaagcatgagaagctcattgaaagctatcattgaagtcccgctcaca\natgtgtcttttccagacggtttaactggttcccgggagtcctggagtttcgacttacata\naatggaaacaatgtattttgctaatttatctatagcgtcatttggaccaatacagaatat\ntatgttgcctagtaatccactataacccgcaagtgctgatagaaaatttttagacgattt\nataaatgccccaagtatccctcccgtgaatcctccgttatactaattagtattcgttcat\nacgtataccgcgcatatatgaacatttggcgataaggcgcgtgaattgttacgtgacaga\ngatagcagtttcttgtgatatggttaacagacgtacatgaagggaaactttatatctata\ngtgatgcttccgtagaaataccgccactggtctgccaatgatgaagtatgtagctttagg\ntttgtactatgaggctttcgtttgtttgcagagtataacagttgcgagtgaaaaaccgac\ngaatttatactaatacgctttcactattggctacaaaatagggaagagtttcaatcatga\ngagggagtatatggatgctttgtagctaaaggtagaacgtatgtatatgctgccgttcat\ntcttgaaagatacataagcgataagttacgacaattataagcaacatccctaccttcgta\nacgatttcactgttactgcgcttgaaatacactatggggctattggcggagagaagcaga\ntcgcgccgagcatatacgagacctataatgttgatgatagagaaggcgtctgaattgata\ncatcgaagtacactttctttcgtagtatctctcgtcctctttctatctccggacacaaga\nattaagttatatatatagagtcttaccaatcatgttgaatcctgattctcagagttcttt\nggcgggccttgtgatgactgagaaacaatgcaatattgctccaaatttcctaagcaaatt\nctcggttatgttatgttatcagcaaagcgttacgttatgttatttaaatctggaatgacg\ngagcgaagttcttatgtcggtgtgggaataattcttttgaagacagcactccttaaataa\ntatcgctccgtgtttgtatttatcgaatgggtctgtaaccttgcacaagcaaatcggtgg\ntgtatatatcggataacaattaatacgatgttcatagtgacagtatactgatcgagtcct\nctaaagtcaattacctcacttaacaatctcattgatgttgtgtcattcccggtatcgccc\ngtagtatgtgctctgattgaccgagtgtgaaccaaggaacatctactaatgcctttgtta\nggtaagatctctctgaattccttcgtgccaacttaaaacattatcaaaatttcttctact\ntggattaactacttttacgagcatggcaaattcccctgtggaagacggttcattattatc\nggaaaccttatagaaattgcgtgttgactgaaattagatttttattgtaagagttgcatc\ntttgcgattcctctggtctagcttccaatgaacagtcctcccttctattcgacatcgggt\nccttcgtacatgtctttgcgatgtaataattaggttcggagtgtggccttaatgggtgca\nactaggaatacaacgcaaatttgctgacatgatagcaaatcggtatgccggcaccaaaac\ngtgctccttgcttagcttgtgaatgagactcagtagttaaataaatccatatctgcaatc\ngattccacaggtattgtccactatctttgaactactctaagagatacaagcttagctgag\naccgaggtgtatatgactacgctgatatctgtaaggtaccaatgcaggcaaagtatgcga\ngaagctaataccggctgtttccagctttataagattaaaatttggctgtcctggcggcct\ncagaattgttctatcgtaatcagttggttcattaattagctaagtacgaggtacaactta\ntctgtcccagaacagctccacaagtttttttacagccgaaacccctgtgtgaatcttaat\natccaagcgcgttatctgattagagtttacaactcagtattttatcagtacgttttgttt\nccaacattacccggtatgacaaaatgacgccacgtgtcgaataatggtctgaccaatgta\nggaagtgaaaagataaatat".split("\n");
+  }, "inputArray"]);
   Isolate = Isolate.$finishIsolateConstructor(Isolate);
   $ = new Isolate();
   init.metadata = [];
@@ -1643,11 +2145,11 @@
   })(function(currentScript) {
     init.currentScript = currentScript;
     if (typeof dartMainRunner === "function")
-      dartMainRunner(T.main, []);
+      dartMainRunner(Z.main, []);
     else
-      T.main([]);
+      Z.main([]);
   });
   // END invoke [main].
 })();
 
-//# sourceMappingURL=binary_tree.js.map
+//# sourceMappingURL=revcomp.js.map

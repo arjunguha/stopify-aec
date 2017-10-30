@@ -446,6 +446,12 @@
     },
     Interceptor: {
       "^": "Object;",
+      $eq: function(receiver, other) {
+        return receiver === other;
+      },
+      get$hashCode: function(receiver) {
+        return H.Primitives_objectHashCode(receiver);
+      },
       toString$0: function(receiver) {
         return H.Primitives_objectToHumanReadableString(receiver);
       }
@@ -455,18 +461,51 @@
       toString$0: function(receiver) {
         return String(receiver);
       },
+      get$hashCode: function(receiver) {
+        return receiver ? 519018 : 218159;
+      },
       $isbool: 1
     },
     JSNull: {
       "^": "Interceptor;",
+      $eq: function(receiver, other) {
+        return null == other;
+      },
       toString$0: function(receiver) {
         return "null";
+      },
+      get$hashCode: function(receiver) {
+        return 0;
       }
     },
     JSArray: {
-      "^": "Interceptor;",
+      "^": "Interceptor;$ti",
+      forEach$1: function(receiver, f) {
+        var end, i;
+        end = receiver.length;
+        for (i = 0; i < end; ++i) {
+          f.call$1(receiver[i]);
+          if (receiver.length !== end)
+            throw H.wrapException(new P.ConcurrentModificationError(receiver));
+        }
+      },
+      indexOf$2: function(receiver, element, start) {
+        var i;
+        if (start >= receiver.length)
+          return -1;
+        for (i = start; i < receiver.length; ++i)
+          if (J.$eq$(receiver[i], element))
+            return i;
+        return -1;
+      },
+      indexOf$1: function($receiver, element) {
+        return this.indexOf$2($receiver, element, 0);
+      },
       toString$0: function(receiver) {
         return P.IterableBase_iterableToFullString(receiver, "[", "]");
+      },
+      get$hashCode: function(receiver) {
+        return H.Primitives_objectHashCode(receiver);
       },
       get$length: function(receiver) {
         return receiver.length;
@@ -474,7 +513,7 @@
       $isList: 1
     },
     JSUnmodifiableArray: {
-      "^": "JSArray;"
+      "^": "JSArray;$ti"
     },
     ArrayIterator: {
       "^": "Object;_iterable,_length,_index,_current",
@@ -516,7 +555,12 @@
         else
           return "" + receiver;
       },
+      get$hashCode: function(receiver) {
+        return receiver & 0x1FFFFFFF;
+      },
       $add: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
         return receiver + other;
       },
       $tdiv: function(receiver, other) {
@@ -537,11 +581,6 @@
         } else if (quotient > -1 / 0)
           return Math.ceil(quotient);
         throw H.wrapException(new P.UnsupportedError("Result of truncating division is " + H.S(quotient) + ": " + H.S(receiver) + " ~/ " + other));
-      },
-      $shl: function(receiver, other) {
-        if (other < 0)
-          throw H.wrapException(H.argumentErrorValue(other));
-        return other > 31 ? 0 : receiver << other >>> 0;
       },
       $isnum: 1
     },
@@ -581,6 +620,17 @@
       toString$0: function(receiver) {
         return receiver;
       },
+      get$hashCode: function(receiver) {
+        var t1, hash, i;
+        for (t1 = receiver.length, hash = 0, i = 0; i < t1; ++i) {
+          hash = 536870911 & hash + receiver.charCodeAt(i);
+          hash = 536870911 & hash + ((524287 & hash) << 10);
+          hash ^= hash >> 6;
+        }
+        hash = 536870911 & hash + ((67108863 & hash) << 3);
+        hash ^= hash >> 11;
+        return 536870911 & hash + ((16383 & hash) << 15);
+      },
       get$length: function(receiver) {
         return receiver.length;
       },
@@ -608,6 +658,14 @@
       if (typeof res !== "string")
         throw H.wrapException(H.argumentErrorValue(value));
       return res;
+    },
+    Primitives_objectHashCode: function(object) {
+      var hash = object.$identityHash;
+      if (hash == null) {
+        hash = Math.random() * 0x3fffffff | 0;
+        object.$identityHash = hash;
+      }
+      return hash;
     },
     Primitives_objectTypeName: function(object) {
       var interceptor, interceptorConstructor, interceptorConstructorName, $name, dispatchName, objectConstructor, match, decompiledName;
@@ -702,6 +760,9 @@
     },
     toStringWrapper: function() {
       return J.toString$0$(this.dartException);
+    },
+    throwExpression: function(ex) {
+      throw H.wrapException(ex);
     },
     throwConcurrentModificationError: function(collection) {
       throw H.wrapException(new P.ConcurrentModificationError(collection));
@@ -946,6 +1007,10 @@
     throwCyclicInit: function(staticName) {
       throw H.wrapException(new P.CyclicInitializationError(staticName));
     },
+    setRuntimeTypeInfo: function(target, rti) {
+      target.$ti = rti;
+      return target;
+    },
     getRuntimeTypeInfo: function(target) {
       if (target == null)
         return;
@@ -1067,6 +1132,24 @@
     },
     BoundClosure: {
       "^": "TearOffClosure;_self,_target,_receiver,_name",
+      $eq: function(_, other) {
+        if (other == null)
+          return false;
+        if (this === other)
+          return true;
+        if (!(other instanceof H.BoundClosure))
+          return false;
+        return this._self === other._self && this._target === other._target && this._receiver === other._receiver;
+      },
+      get$hashCode: function(_) {
+        var t1, receiverHashCode;
+        t1 = this._receiver;
+        if (t1 == null)
+          receiverHashCode = H.Primitives_objectHashCode(this._self);
+        else
+          receiverHashCode = typeof t1 !== "object" ? J.get$hashCode$(t1) : H.Primitives_objectHashCode(t1);
+        return (receiverHashCode ^ H.Primitives_objectHashCode(this._target)) >>> 0;
+      },
       toString$0: function(_) {
         var receiver = this._receiver;
         if (receiver == null)
@@ -1111,7 +1194,7 @@
   }], ["dart._js_names", "dart:_js_names",, H, {
     "^": "",
     extractKeys: function(victim) {
-      var t1 = victim ? Object.keys(victim) : [];
+      var t1 = H.setRuntimeTypeInfo(victim ? Object.keys(victim) : [], [null]);
       t1.fixed$length = Array;
       return t1;
     }
@@ -1136,6 +1219,9 @@
     }
   }], ["dart.collection", "dart:collection",, P, {
     "^": "",
+    HashMap_HashMap: function(equals, hashCode, isValidKey, $K, $V) {
+      return new P._HashMap(0, null, null, null, null, [$K, $V]);
+    },
     IterableBase_iterableToFullString: function(iterable, leftDelimiter, rightDelimiter) {
       var buffer, t1, t2;
       if (P._isToStringVisiting(iterable))
@@ -1162,6 +1248,114 @@
         if (o === t1[i])
           return true;
       return false;
+    },
+    _HashMap: {
+      "^": "Object;_collection$_length,_strings,_nums,_rest,_keys,$ti",
+      get$length: function(_) {
+        return this._collection$_length;
+      },
+      $index: function(_, key) {
+        var strings, t1, entry, nums;
+        if (typeof key === "string" && key !== "__proto__") {
+          strings = this._strings;
+          if (strings == null)
+            t1 = null;
+          else {
+            entry = strings[key];
+            t1 = entry === strings ? null : entry;
+          }
+          return t1;
+        } else if (typeof key === "number" && (key & 0x3ffffff) === key) {
+          nums = this._nums;
+          if (nums == null)
+            t1 = null;
+          else {
+            entry = nums[key];
+            t1 = entry === nums ? null : entry;
+          }
+          return t1;
+        } else
+          return this._get$1(key);
+      },
+      _get$1: function(key) {
+        var rest, bucket, index;
+        rest = this._rest;
+        if (rest == null)
+          return;
+        bucket = rest[this._computeHashCode$1(key)];
+        index = this._findBucketIndex$2(bucket, key);
+        return index < 0 ? null : bucket[index + 1];
+      },
+      $indexSet: function(_, key, value) {
+        var nums;
+        if ((key & 0x3ffffff) === key) {
+          nums = this._nums;
+          if (nums == null) {
+            nums = P._HashMap__newHashTable();
+            this._nums = nums;
+          }
+          this._addHashTableEntry$3(nums, key, value);
+        } else
+          this._set$2(key, value);
+      },
+      _set$2: function(key, value) {
+        var rest, hash, bucket, index;
+        rest = this._rest;
+        if (rest == null) {
+          rest = P._HashMap__newHashTable();
+          this._rest = rest;
+        }
+        hash = this._computeHashCode$1(key);
+        bucket = rest[hash];
+        if (bucket == null) {
+          P._HashMap__setTableEntry(rest, hash, [key, value]);
+          ++this._collection$_length;
+          this._keys = null;
+        } else {
+          index = this._findBucketIndex$2(bucket, key);
+          if (index >= 0)
+            bucket[index + 1] = value;
+          else {
+            bucket.push(key, value);
+            ++this._collection$_length;
+            this._keys = null;
+          }
+        }
+      },
+      _addHashTableEntry$3: function(table, key, value) {
+        if (table[key] == null) {
+          ++this._collection$_length;
+          this._keys = null;
+        }
+        P._HashMap__setTableEntry(table, key, value);
+      },
+      _computeHashCode$1: function(key) {
+        return J.get$hashCode$(key) & 0x3ffffff;
+      },
+      _findBucketIndex$2: function(bucket, key) {
+        var $length, i;
+        if (bucket == null)
+          return -1;
+        $length = bucket.length;
+        for (i = 0; i < $length; i += 2)
+          if (J.$eq$(bucket[i], key))
+            return i;
+        return -1;
+      },
+      static: {
+        _HashMap__setTableEntry: function(table, key, value) {
+          if (value == null)
+            table[key] = table;
+          else
+            table[key] = value;
+        },
+        _HashMap__newHashTable: function() {
+          var table = Object.create(null);
+          P._HashMap__setTableEntry(table, "<non-identifier-key>", table);
+          delete table["<non-identifier-key>"];
+          return table;
+        }
+      }
     }
   }], ["dart.core", "dart:core",, P, {
     "^": "",
@@ -1180,6 +1374,9 @@
     },
     bool: {
       "^": "Object;",
+      get$hashCode: function(_) {
+        return P.Object.prototype.get$hashCode.call(this, this);
+      },
       toString$0: function(_) {
         return this ? "true" : "false";
       }
@@ -1199,7 +1396,7 @@
       }
     },
     ArgumentError: {
-      "^": "Error;_hasValue,invalidValue,name,message",
+      "^": "Error;_hasValue,invalidValue,name<,message",
       get$_errorName: function() {
         return "Invalid argument";
       },
@@ -1229,7 +1426,21 @@
         return "RangeError";
       },
       get$_errorExplanation: function() {
-        return "";
+        var t1, explanation, t2;
+        t1 = this.start;
+        if (t1 == null) {
+          t1 = this.end;
+          explanation = t1 != null ? ": Not less than or equal to " + H.S(t1) : "";
+        } else {
+          t2 = this.end;
+          if (t2 == null)
+            explanation = ": Not greater than or equal to " + H.S(t1);
+          else if (t2 > t1)
+            explanation = ": Not in range " + H.S(t1) + ".." + H.S(t2) + ", inclusive";
+          else
+            explanation = t2 < t1 ? ": Valid value range is empty" : ": Only valid value is " + H.S(t1);
+        }
+        return explanation;
       },
       static: {
         RangeError$value: function(value, $name, message) {
@@ -1286,11 +1497,14 @@
     },
     "+int": 0,
     List: {
-      "^": "Object;"
+      "^": "Object;$ti"
     },
     "+List": 0,
     Null: {
       "^": "Object;",
+      get$hashCode: function(_) {
+        return P.Object.prototype.get$hashCode.call(this, this);
+      },
       toString$0: function(_) {
         return "null";
       }
@@ -1302,6 +1516,12 @@
     "+num": 0,
     Object: {
       "^": ";",
+      $eq: function(_, other) {
+        return this === other;
+      },
+      get$hashCode: function(_) {
+        return H.Primitives_objectHashCode(this);
+      },
       toString$0: function(_) {
         return H.Primitives_objectToHumanReadableString(this);
       },
@@ -1369,7 +1589,7 @@
       return 1000 * elapsed / iter;
     },
     BenchmarkBase: {
-      "^": "Object;",
+      "^": "Object;name<",
       measure$0: function() {
         V.BenchmarkBase_measureFor(new V.BenchmarkBase_measure_closure(this), 100);
         return V.BenchmarkBase_measureFor(new V.BenchmarkBase_measure_closure0(this), 2000);
@@ -1378,49 +1598,468 @@
     BenchmarkBase_measure_closure: {
       "^": "Closure;$this",
       call$0: function() {
-        this.$this.run$0();
+        this.$this.warmup$0();
       }
     },
     BenchmarkBase_measure_closure0: {
       "^": "Closure;$this",
       call$0: function() {
-        this.$this.run$0();
+        var t1, t2, numLoops;
+        t1 = [];
+        t2 = new A.SimpleLoop([], [], 0, null, null, false, true, 0, 0);
+        t2.setNestingLevel$1(0);
+        t1.push(t2);
+        numLoops = new A.HavlakLoopFinder(this.$this.cfg, new A.LSG(1, t1, t2)).findLoops$0();
+        if (numLoops !== 1522)
+          H.throwExpression("Wrong result - expected <1522>, but was <" + numLoops + ">");
       }
     }
-  }], ["", "../benchmark-files/binary_tree.dart",, T, {
+  }], ["", "../benchmark-files/Havlak.dart",, A, {
     "^": "",
     main: function() {
-      H.printString("BinaryTree(RunTime): " + H.S(new T.BinaryTree("BinaryTree").measure$0()) + " us.");
+      var t1, score;
+      t1 = A.Havlak$();
+      score = t1.measure$0();
+      H.printString(t1.name + "(RunTime): " + H.S(score) + " us.");
     },
-    BinaryTree: {
-      "^": "BenchmarkBase;name",
-      run$0: function() {
-        var depth, iterations, check, i;
-        T.TreeNode_bottomUpTree(21).itemCheck$0();
-        T.TreeNode_bottomUpTree(20);
-        for (depth = 4; depth <= 20; depth += 2) {
-          iterations = C.JSInt_methods.$shl(1, 20 - depth + 4);
-          for (check = 0, i = 1; i <= iterations; ++i)
-            check += T.TreeNode_bottomUpTree(depth).itemCheck$0();
+    buildDiamond: function(cfg, start) {
+      var t1, t2, t3;
+      t1 = start + 1;
+      A.BasicBlockEdge$(cfg, start, t1);
+      t2 = start + 2;
+      A.BasicBlockEdge$(cfg, start, t2);
+      t3 = start + 3;
+      A.BasicBlockEdge$(cfg, t1, t3);
+      A.BasicBlockEdge$(cfg, t2, t3);
+      return t3;
+    },
+    buildStraight: function(cfg, start, n) {
+      var t1, i, t2, t3, t4;
+      for (t1 = cfg.edgeList, i = 0; i < n; ++i) {
+        t2 = start + i;
+        t3 = new A.BasicBlockEdge(null, null);
+        t4 = cfg.createNode$1(t2);
+        t3.from = t4;
+        t2 = cfg.createNode$1(t2 + 1);
+        t3.to = t2;
+        t4.addOutEdge$1(t2);
+        t2.addInEdge$1(t4);
+        t1.push(t3);
+      }
+      return start + n;
+    },
+    buildBaseLoop: function(cfg, from) {
+      var header, diamond1, d11, diamond2, footer, t1, t2, t3, t4;
+      header = A.buildStraight(cfg, from, 1);
+      diamond1 = A.buildDiamond(cfg, header);
+      d11 = A.buildStraight(cfg, diamond1, 1);
+      diamond2 = A.buildDiamond(cfg, d11);
+      footer = A.buildStraight(cfg, diamond2, 1);
+      t1 = new A.BasicBlockEdge(null, null);
+      t2 = cfg.createNode$1(diamond2);
+      t1.from = t2;
+      t3 = cfg.createNode$1(d11);
+      t1.to = t3;
+      t2.addOutEdge$1(t3);
+      t3.addInEdge$1(t2);
+      t2 = cfg.edgeList;
+      t2.push(t1);
+      t1 = new A.BasicBlockEdge(null, null);
+      t3 = cfg.createNode$1(diamond1);
+      t1.from = t3;
+      t4 = cfg.createNode$1(header);
+      t1.to = t4;
+      t3.addOutEdge$1(t4);
+      t4.addInEdge$1(t3);
+      t2.push(t1);
+      t1 = new A.BasicBlockEdge(null, null);
+      t3 = cfg.createNode$1(footer);
+      t1.from = t3;
+      t4 = cfg.createNode$1(from);
+      t1.to = t4;
+      t3.addOutEdge$1(t4);
+      t4.addInEdge$1(t3);
+      t2.push(t1);
+      return A.buildStraight(cfg, footer, 1);
+    },
+    BasicBlock: {
+      "^": "Object;name<,inEdges,outEdges<",
+      toString$0: function(_) {
+        return "BB" + this.name;
+      },
+      getNumPred$0: function() {
+        return this.inEdges.length;
+      },
+      addInEdge$1: function(bb) {
+        return this.inEdges.push(bb);
+      },
+      addOutEdge$1: function(bb) {
+        return this.outEdges.push(bb);
+      }
+    },
+    BasicBlockEdge: {
+      "^": "Object;from,to",
+      BasicBlockEdge$3: function(cfg, fromName, toName) {
+        var t1;
+        this.from = cfg.createNode$1(fromName);
+        t1 = cfg.createNode$1(toName);
+        this.to = t1;
+        this.from.addOutEdge$1(t1);
+        this.to.addInEdge$1(this.from);
+        cfg.edgeList.push(this);
+      },
+      static: {
+        BasicBlockEdge$: function(cfg, fromName, toName) {
+          var t1 = new A.BasicBlockEdge(null, null);
+          t1.BasicBlockEdge$3(cfg, fromName, toName);
+          return t1;
         }
       }
     },
-    TreeNode: {
-      "^": "Object;left,right",
-      itemCheck$0: function() {
-        var t1 = this.left;
-        if (t1 == null)
-          return 1;
-        return 1 + t1.itemCheck$0() + this.right.itemCheck$0();
+    CFG: {
+      "^": "Object;basicBlockMap,edgeList,startNode",
+      createNode$1: function($name) {
+        var t1, node;
+        t1 = this.basicBlockMap;
+        node = t1.$index(0, $name);
+        if (node == null) {
+          node = new A.BasicBlock($name, [], []);
+          $.numBasicBlocks = $.numBasicBlocks + 1;
+          t1.$indexSet(0, $name, node);
+        }
+        if (t1._collection$_length === 1)
+          this.startNode = node;
+        return node;
+      }
+    },
+    SimpleLoop: {
+      "^": "Object;basicBlocks,children,counter,parent,header,isRoot,isReducible,nestingLevel,depthLevel",
+      setNestingLevel$1: function(level) {
+        this.nestingLevel = level;
+        if (level === 0)
+          this.isRoot = true;
+      },
+      checksum$0: function() {
+        var t1, result, t2;
+        t1 = {};
+        result = this.counter;
+        t1.result = result;
+        t2 = this.isRoot ? 1 : 0;
+        result = ((result & 268435455) << 1) + t2;
+        t1.result = result;
+        t2 = this.isReducible ? 1 : 0;
+        result = ((result & 268435455) << 1) + t2;
+        t1.result = result;
+        result = ((result & 268435455) << 1) + this.nestingLevel;
+        t1.result = result;
+        result = ((result & 268435455) << 1) + this.depthLevel;
+        t1.result = result;
+        t2 = this.header;
+        if (t2 != null) {
+          t2 = t2.get$name();
+          if (typeof t2 !== "number")
+            return H.iae(t2);
+          t1.result = ((result & 268435455) << 1) + t2;
+        }
+        C.JSArray_methods.forEach$1(this.basicBlocks, new A.SimpleLoop_checksum_closure(t1));
+        C.JSArray_methods.forEach$1(this.children, new A.SimpleLoop_checksum_closure0(t1));
+        return t1.result;
+      }
+    },
+    SimpleLoop_checksum_closure: {
+      "^": "Closure;_box_0",
+      call$1: function(e) {
+        var t1, t2, t3, result;
+        t1 = this._box_0;
+        t2 = t1.result;
+        t3 = e.get$name();
+        if (typeof t3 !== "number")
+          return H.iae(t3);
+        result = ((t2 & 268435455) << 1) + t3;
+        t1.result = result;
+        return result;
+      }
+    },
+    SimpleLoop_checksum_closure0: {
+      "^": "Closure;_box_0",
+      call$1: function(e) {
+        var t1, result;
+        t1 = this._box_0;
+        result = ((t1.result & 268435455) << 1) + e.checksum$0();
+        t1.result = result;
+        return result;
+      }
+    },
+    LSG: {
+      "^": "Object;loopCounter,loops,root",
+      checksum$0: function() {
+        var t1, t2;
+        t1 = {};
+        t2 = this.loops;
+        t1.result = t2.length;
+        C.JSArray_methods.forEach$1(t2, new A.LSG_checksum_closure(t1));
+        return ((t1.result & 268435455) << 1) + this.root.checksum$0();
+      }
+    },
+    LSG_checksum_closure: {
+      "^": "Closure;_box_0",
+      call$1: function(e) {
+        var t1, result;
+        t1 = this._box_0;
+        result = ((t1.result & 268435455) << 1) + e.checksum$0();
+        t1.result = result;
+        return result;
+      }
+    },
+    UnionFindNode: {
+      "^": "Object;dfsNumber<,parent,bb,loop",
+      findSet$0: function() {
+        var nodeList, node, t1, t2, iter;
+        nodeList = [];
+        for (node = this; t1 = node.parent, node !== t1;) {
+          t2 = t1.parent;
+          if (t1 == null ? t2 != null : t1 !== t2)
+            nodeList.push(node);
+          node = node.parent;
+        }
+        for (iter = 0; iter < nodeList.length; ++iter)
+          nodeList[iter].parent = node.parent;
+        return node;
+      }
+    },
+    HavlakLoopFinder: {
+      "^": "Object;cfg,lsg",
+      DFS$5: function(currentNode, nodes, number, last, current) {
+        var t1, t2, lastid, target, t3;
+        if (current >= nodes.length)
+          return H.ioore(nodes, current);
+        t1 = nodes[current];
+        t1.parent = t1;
+        t1.bb = currentNode;
+        t1.dfsNumber = current;
+        t1 = currentNode.get$name();
+        t2 = number.length;
+        if (t1 >>> 0 !== t1 || t1 >= t2)
+          return H.ioore(number, t1);
+        number[t1] = current;
+        for (lastid = current, target = 0; target < currentNode.get$outEdges().length; ++target) {
+          t1 = currentNode.outEdges;
+          if (target >= t1.length)
+            return H.ioore(t1, target);
+          t3 = t1[target].get$name();
+          if (t3 >>> 0 !== t3 || t3 >= t2)
+            return H.ioore(number, t3);
+          if (number[t3] === -1) {
+            if (target >= t1.length)
+              return H.ioore(t1, target);
+            lastid = this.DFS$5(t1[target], nodes, number, last, lastid + 1);
+          }
+        }
+        t1 = currentNode.name;
+        if (t1 >= t2)
+          return H.ioore(number, t1);
+        t1 = number[t1];
+        if (t1 >>> 0 !== t1 || t1 >= last.length)
+          return H.ioore(last, t1);
+        last[t1] = lastid;
+        return lastid;
+      },
+      findLoops$0: function() {
+        var t1, t2, size, nonBackPreds, backPreds, number, header, types, last, nodes, i, w, nodeW, nv, v, nodePool, vi, t3, workList, n, x, iter, ydash, t4, loop, np, node, t5;
+        t1 = this.cfg;
+        t2 = t1.startNode;
+        if (t2 == null)
+          return 0;
+        size = t1.basicBlockMap._collection$_length;
+        nonBackPreds = new Array(size);
+        backPreds = new Array(size);
+        number = new Array(size);
+        header = new Array(size);
+        types = new Array(size);
+        last = new Array(size);
+        nodes = new Array(size);
+        for (i = 0; i < size; ++i) {
+          nonBackPreds[i] = [];
+          backPreds[i] = [];
+          number[i] = -1;
+          header[i] = 0;
+          types[i] = 1;
+          last[i] = 0;
+          nodes[i] = new A.UnionFindNode(0, null, null, null);
+        }
+        this.DFS$5(t2, nodes, number, last, 0);
+        for (w = 0; w < size; ++w) {
+          nodeW = nodes[w].bb;
+          if (nodeW == null)
+            types[w] = 5;
+          else if (nodeW.getNumPred$0() > 0)
+            for (t1 = nodeW.inEdges, nv = 0; nv < t1.length; ++nv) {
+              t2 = t1[nv].get$name();
+              if (t2 >>> 0 !== t2 || t2 >= size)
+                return H.ioore(number, t2);
+              v = number[t2];
+              if (v !== -1) {
+                if (typeof v !== "number")
+                  return H.iae(v);
+                if (w <= v) {
+                  if (w >= size)
+                    return H.ioore(last, w);
+                  t2 = last[w];
+                  if (typeof t2 !== "number")
+                    return H.iae(t2);
+                  t2 = v <= t2;
+                } else
+                  t2 = false;
+                if (t2)
+                  backPreds[w].push(v);
+                else
+                  nonBackPreds[w].push(v);
+              }
+            }
+        }
+        for (w = size - 1, t1 = this.lsg, t2 = t1.loops; w >= 0; --w) {
+          nodePool = [];
+          nodeW = nodes[w].bb;
+          if (nodeW == null)
+            continue;
+          for (vi = 0; t3 = backPreds[w], vi < t3.length; ++vi) {
+            v = t3[vi];
+            if (v !== w) {
+              if (v >>> 0 !== v || v >= size)
+                return H.ioore(nodes, v);
+              nodePool.push(nodes[v].findSet$0());
+            } else
+              types[w] = 3;
+          }
+          workList = [];
+          for (n = 0; t3 = nodePool.length, n < t3; ++n)
+            workList.push(nodePool[n]);
+          if (t3 !== 0)
+            types[w] = 2;
+          for (; workList.length > 0;) {
+            x = workList.splice(0, 1)[0];
+            t3 = x.get$dfsNumber();
+            if (t3 >= size)
+              return H.ioore(nonBackPreds, t3);
+            if (nonBackPreds[t3].length > 32768)
+              return 0;
+            iter = 0;
+            while (true) {
+              t3 = x.dfsNumber;
+              if (t3 >= size)
+                return H.ioore(nonBackPreds, t3);
+              t3 = nonBackPreds[t3];
+              if (!(iter < t3.length))
+                break;
+              t3 = t3[iter];
+              if (t3 >>> 0 !== t3 || t3 >= size)
+                return H.ioore(nodes, t3);
+              ydash = nodes[t3].findSet$0();
+              t3 = ydash.dfsNumber;
+              if (w <= t3) {
+                if (w >= size)
+                  return H.ioore(last, w);
+                t4 = last[w];
+                if (typeof t4 !== "number")
+                  return H.iae(t4);
+                t4 = t3 <= t4;
+              } else
+                t4 = false;
+              if (!t4) {
+                types[w] = 4;
+                nonBackPreds[w].push(t3);
+              } else if (t3 !== w)
+                if (C.JSArray_methods.indexOf$1(nodePool, ydash) === -1) {
+                  workList.push(ydash);
+                  nodePool.push(ydash);
+                }
+              ++iter;
+            }
+          }
+          if (nodePool.length > 0 || types[w] === 3) {
+            t3 = [];
+            t4 = [];
+            loop = new A.SimpleLoop(t3, t4, t1.loopCounter++, null, null, false, true, 0, 0);
+            t3.push(nodeW);
+            loop.header = nodeW;
+            if (!(types[w] === 4))
+              loop.isReducible = false;
+            nodes[w].loop = loop;
+            for (np = 0; np < nodePool.length; ++np) {
+              node = nodePool[np];
+              t5 = node.dfsNumber;
+              if (t5 >= size)
+                return H.ioore(header, t5);
+              header[t5] = w;
+              node.parent = nodes[w];
+              t5 = node.loop;
+              if (t5 != null) {
+                t5.parent = loop;
+                t4.push(t5);
+              } else
+                t3.push(node.bb);
+            }
+            t2.push(loop);
+          }
+        }
+        return t2.length;
+      }
+    },
+    Havlak: {
+      "^": "BenchmarkBase;cfg,name",
+      warmup$0: function() {
+        var t1, dummyloop, t2, t3, lsg, checksum;
+        for (t1 = this.cfg, dummyloop = 0; dummyloop < 20; ++dummyloop) {
+          t2 = [];
+          t3 = new A.SimpleLoop([], [], 0, null, null, false, true, 0, 0);
+          lsg = new A.LSG(1, t2, t3);
+          t3.isRoot = true;
+          t2.push(t3);
+          new A.HavlakLoopFinder(t1, lsg).findLoops$0();
+          checksum = lsg.checksum$0();
+          if (checksum !== 435630002)
+            throw H.wrapException("Wrong checksum - expected <435630002>, but was <" + H.S(checksum) + ">");
+        }
+      },
+      Havlak$0: function() {
+        var t1, t2, n, parlooptrees, n0, t3, t4, t5, i, j, bottom;
+        t1 = this.cfg;
+        t1.createNode$1(0);
+        A.buildBaseLoop(t1, 0);
+        t1.createNode$1(1);
+        A.BasicBlockEdge$(t1, 0, 2);
+        for (t2 = t1.edgeList, n = 2, parlooptrees = 0; parlooptrees < 10; ++parlooptrees) {
+          n0 = n + 1;
+          t1.createNode$1(n0);
+          t3 = new A.BasicBlockEdge(null, null);
+          t4 = t1.createNode$1(n);
+          t3.from = t4;
+          t5 = t1.createNode$1(n0);
+          t3.to = t5;
+          t4.addOutEdge$1(t5);
+          t5.addInEdge$1(t4);
+          t2.push(t3);
+          for (n = n0, i = 0; i < 2; ++i, n = bottom) {
+            n0 = A.buildStraight(t1, n, 1);
+            for (j = 0; j < 25; ++j)
+              n0 = A.buildBaseLoop(t1, n0);
+            bottom = A.buildStraight(t1, n0, 1);
+            t3 = new A.BasicBlockEdge(null, null);
+            t4 = t1.createNode$1(n0);
+            t3.from = t4;
+            t5 = t1.createNode$1(n);
+            t3.to = t5;
+            t4.addOutEdge$1(t5);
+            t5.addInEdge$1(t4);
+            t2.push(t3);
+          }
+        }
       },
       static: {
-        TreeNode_bottomUpTree: function(depth) {
-          var t1;
-          if (depth > 0) {
-            t1 = depth - 1;
-            return new T.TreeNode(T.TreeNode_bottomUpTree(t1), T.TreeNode_bottomUpTree(t1));
-          }
-          return new T.TreeNode(null, null);
+        Havlak$: function() {
+          var t1 = new A.Havlak(new A.CFG(P.HashMap_HashMap(null, null, null, null, null), [], null), "Havlak");
+          t1.Havlak$0();
+          return t1;
         }
       }
     }
@@ -1469,13 +2108,23 @@
       return receiver + a0;
     return J.getInterceptor$ns(receiver).$add(receiver, a0);
   };
+  J.get$hashCode$ = function(receiver) {
+    return J.getInterceptor(receiver).get$hashCode(receiver);
+  };
+  J.$eq$ = function(receiver, a0) {
+    if (receiver == null)
+      return a0 == null;
+    if (typeof receiver != "object")
+      return a0 != null && receiver === a0;
+    return J.getInterceptor(receiver).$eq(receiver, a0);
+  };
   J.toString$0$ = function(receiver) {
     return J.getInterceptor(receiver).toString$0(receiver);
   };
   // Output contains no constant list.
   var $ = Isolate.$isolateProperties;
   C.Interceptor_methods = J.Interceptor.prototype;
-  C.JSInt_methods = J.JSInt.prototype;
+  C.JSArray_methods = J.JSArray.prototype;
   C.JSNumber_methods = J.JSNumber.prototype;
   C.JSString_methods = J.JSString.prototype;
   C.JS_CONST_u2C = function getTagFallback(o) {
@@ -1488,6 +2137,7 @@
   $.BoundClosure_selfFieldNameCache = null;
   $.BoundClosure_receiverFieldNameCache = null;
   $.Stopwatch__frequency = null;
+  $.numBasicBlocks = 0;
   $ = null;
   init.isHunkLoaded = function(hunkHash) {
     return !!$dart_deferred_initializers$[hunkHash];
@@ -1643,11 +2293,11 @@
   })(function(currentScript) {
     init.currentScript = currentScript;
     if (typeof dartMainRunner === "function")
-      dartMainRunner(T.main, []);
+      dartMainRunner(A.main, []);
     else
-      T.main([]);
+      A.main([]);
   });
   // END invoke [main].
 })();
 
-//# sourceMappingURL=binary_tree.js.map
+//# sourceMappingURL=Havlak.js.map
