@@ -20,7 +20,6 @@
       "./nullable_array",
       "./num_analysis",
       "./sequence",
-      "./sieve",
       "./vector_functor"
     ]
   }

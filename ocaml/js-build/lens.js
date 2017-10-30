@@ -177,7 +177,7 @@ exports.undefined_recursive_module = undefined_recursive_module;
 "use strict";
 
 
-var Caml_array = __webpack_require__(8);
+var Caml_array = __webpack_require__(7);
 
 function app(_f, _args) {
   while(true) {
@@ -2112,6 +2112,127 @@ exports.imul                 = imul;
 "use strict";
 
 
+var Caml_builtin_exceptions = __webpack_require__(0);
+
+function caml_array_sub(x, offset, len) {
+  var result = new Array(len);
+  var j = 0;
+  var i = offset;
+  while(j < len) {
+    result[j] = x[i];
+    j = j + 1 | 0;
+    i = i + 1 | 0;
+  };
+  return result;
+}
+
+function len(_acc, _l) {
+  while(true) {
+    var l = _l;
+    var acc = _acc;
+    if (l) {
+      _l = l[1];
+      _acc = l[0].length + acc | 0;
+      continue ;
+      
+    } else {
+      return acc;
+    }
+  };
+}
+
+function fill(arr, _i, _l) {
+  while(true) {
+    var l = _l;
+    var i = _i;
+    if (l) {
+      var x = l[0];
+      var l$1 = x.length;
+      var k = i;
+      var j = 0;
+      while(j < l$1) {
+        arr[k] = x[j];
+        k = k + 1 | 0;
+        j = j + 1 | 0;
+      };
+      _l = l[1];
+      _i = k;
+      continue ;
+      
+    } else {
+      return /* () */0;
+    }
+  };
+}
+
+function caml_array_concat(l) {
+  var v = len(0, l);
+  var result = new Array(v);
+  fill(result, 0, l);
+  return result;
+}
+
+function caml_array_set(xs, index, newval) {
+  if (index < 0 || index >= xs.length) {
+    throw [
+          Caml_builtin_exceptions.invalid_argument,
+          "index out of bounds"
+        ];
+  } else {
+    xs[index] = newval;
+    return /* () */0;
+  }
+}
+
+function caml_array_get(xs, index) {
+  if (index < 0 || index >= xs.length) {
+    throw [
+          Caml_builtin_exceptions.invalid_argument,
+          "index out of bounds"
+        ];
+  } else {
+    return xs[index];
+  }
+}
+
+function caml_make_vect(len, init) {
+  var b = new Array(len);
+  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){
+    b[i] = init;
+  }
+  return b;
+}
+
+function caml_array_blit(a1, i1, a2, i2, len) {
+  if (i2 <= i1) {
+    for(var j = 0 ,j_finish = len - 1 | 0; j <= j_finish; ++j){
+      a2[j + i2 | 0] = a1[j + i1 | 0];
+    }
+    return /* () */0;
+  } else {
+    for(var j$1 = len - 1 | 0; j$1 >= 0; --j$1){
+      a2[j$1 + i2 | 0] = a1[j$1 + i1 | 0];
+    }
+    return /* () */0;
+  }
+}
+
+exports.caml_array_sub    = caml_array_sub;
+exports.caml_array_concat = caml_array_concat;
+exports.caml_make_vect    = caml_make_vect;
+exports.caml_array_blit   = caml_array_blit;
+exports.caml_array_get    = caml_array_get;
+exports.caml_array_set    = caml_array_set;
+/* No side effect */
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var Curry                   = __webpack_require__(1);
 var Caml_obj                = __webpack_require__(5);
 var Pervasives              = __webpack_require__(2);
@@ -3804,127 +3925,6 @@ exports.merge        = merge;
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Caml_builtin_exceptions = __webpack_require__(0);
-
-function caml_array_sub(x, offset, len) {
-  var result = new Array(len);
-  var j = 0;
-  var i = offset;
-  while(j < len) {
-    result[j] = x[i];
-    j = j + 1 | 0;
-    i = i + 1 | 0;
-  };
-  return result;
-}
-
-function len(_acc, _l) {
-  while(true) {
-    var l = _l;
-    var acc = _acc;
-    if (l) {
-      _l = l[1];
-      _acc = l[0].length + acc | 0;
-      continue ;
-      
-    } else {
-      return acc;
-    }
-  };
-}
-
-function fill(arr, _i, _l) {
-  while(true) {
-    var l = _l;
-    var i = _i;
-    if (l) {
-      var x = l[0];
-      var l$1 = x.length;
-      var k = i;
-      var j = 0;
-      while(j < l$1) {
-        arr[k] = x[j];
-        k = k + 1 | 0;
-        j = j + 1 | 0;
-      };
-      _l = l[1];
-      _i = k;
-      continue ;
-      
-    } else {
-      return /* () */0;
-    }
-  };
-}
-
-function caml_array_concat(l) {
-  var v = len(0, l);
-  var result = new Array(v);
-  fill(result, 0, l);
-  return result;
-}
-
-function caml_array_set(xs, index, newval) {
-  if (index < 0 || index >= xs.length) {
-    throw [
-          Caml_builtin_exceptions.invalid_argument,
-          "index out of bounds"
-        ];
-  } else {
-    xs[index] = newval;
-    return /* () */0;
-  }
-}
-
-function caml_array_get(xs, index) {
-  if (index < 0 || index >= xs.length) {
-    throw [
-          Caml_builtin_exceptions.invalid_argument,
-          "index out of bounds"
-        ];
-  } else {
-    return xs[index];
-  }
-}
-
-function caml_make_vect(len, init) {
-  var b = new Array(len);
-  for(var i = 0 ,i_finish = len - 1 | 0; i <= i_finish; ++i){
-    b[i] = init;
-  }
-  return b;
-}
-
-function caml_array_blit(a1, i1, a2, i2, len) {
-  if (i2 <= i1) {
-    for(var j = 0 ,j_finish = len - 1 | 0; j <= j_finish; ++j){
-      a2[j + i2 | 0] = a1[j + i1 | 0];
-    }
-    return /* () */0;
-  } else {
-    for(var j$1 = len - 1 | 0; j$1 >= 0; --j$1){
-      a2[j$1 + i2 | 0] = a1[j$1 + i1 | 0];
-    }
-    return /* () */0;
-  }
-}
-
-exports.caml_array_sub    = caml_array_sub;
-exports.caml_array_concat = caml_array_concat;
-exports.caml_make_vect    = caml_make_vect;
-exports.caml_array_blit   = caml_array_blit;
-exports.caml_array_get    = caml_array_get;
-exports.caml_array_set    = caml_array_set;
-/* No side effect */
-
-
-/***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4047,7 +4047,7 @@ exports.raiseUriError            = raiseUriError;
 
 
 var Char                    = __webpack_require__(23);
-var List                    = __webpack_require__(7);
+var List                    = __webpack_require__(8);
 var Curry                   = __webpack_require__(1);
 var Caml_obj                = __webpack_require__(5);
 var Caml_int32              = __webpack_require__(6);
@@ -4908,7 +4908,7 @@ exports.output_buffer  = output_buffer;
 "use strict";
 
 
-var List        = __webpack_require__(7);
+var List        = __webpack_require__(8);
 var Bytes       = __webpack_require__(11);
 var Caml_int32  = __webpack_require__(6);
 var Caml_string = __webpack_require__(3);
@@ -5364,7 +5364,7 @@ exports.caml_sys_file_exists    = caml_sys_file_exists;
 
 var Curry                   = __webpack_require__(1);
 var Caml_int32              = __webpack_require__(6);
-var Caml_int64              = __webpack_require__(27);
+var Caml_int64              = __webpack_require__(28);
 var Caml_utils              = __webpack_require__(20);
 var Caml_builtin_exceptions = __webpack_require__(0);
 
@@ -6187,7 +6187,7 @@ exports.not_implemented = not_implemented;
 var Curry              = __webpack_require__(1);
 var Buffer             = __webpack_require__(12);
 var Pervasives         = __webpack_require__(2);
-var CamlinternalFormat = __webpack_require__(30);
+var CamlinternalFormat = __webpack_require__(31);
 
 function kfprintf(k, o, param) {
   return CamlinternalFormat.make_printf((function (o, acc) {
@@ -6974,7 +6974,7 @@ exports.compare   = compare;
 
 var Curry                   = __webpack_require__(1);
 var Js_exn                  = __webpack_require__(10);
-var Caml_array              = __webpack_require__(8);
+var Caml_array              = __webpack_require__(7);
 var Caml_exceptions         = __webpack_require__(9);
 var Caml_builtin_exceptions = __webpack_require__(0);
 
@@ -7413,11 +7413,12 @@ exports.fast_sort     = fast_sort;
 
 
 var Block             = __webpack_require__(4);
-var Lens_util         = __webpack_require__(26);
+var Fixture           = __webpack_require__(26);
+var Lens_util         = __webpack_require__(27);
 var Caml_int32        = __webpack_require__(6);
 var Pervasives        = __webpack_require__(2);
-var Micro_bench_run   = __webpack_require__(28);
-var Micro_bench_types = __webpack_require__(39);
+var Micro_bench_run   = __webpack_require__(29);
+var Micro_bench_types = __webpack_require__(40);
 
 function x_000(param) {
   return param[/* x */0];
@@ -7559,7 +7560,22 @@ var functions = /* :: */[
 
 Micro_bench_types.add(functions);
 
-Micro_bench_run.run(Micro_bench_types.functions(/* () */0));
+var config = Micro_bench_run.Config[/* parse */1](/* () */0);
+
+if (typeof config === "number") {
+  Micro_bench_run.run(/* Some */[/* Some */[config]], Micro_bench_types.functions(/* () */0));
+} else if (config[0] !== 4103979) {
+  Micro_bench_run.run(/* Some */[/* Some */[config]], Micro_bench_types.functions(/* () */0));
+} else {
+  var conf = config[1];
+  Fixture.run_n_times(100, (function () {
+          var newrecord = conf.slice();
+          return Micro_bench_run.run(/* Some */[/* Some */[/* `Run */[
+                          4103979,
+                          (newrecord[/* number_of_different_values */5] = 1000, newrecord)
+                        ]]], Micro_bench_types.functions(/* () */0));
+        }));
+}
 
 exports.x                = x;
 exports.y                = y;
@@ -7583,7 +7599,28 @@ exports.functions        = functions;
 // Generated by BUCKLESCRIPT VERSION 2.0.0, PLEASE EDIT WITH CARE
 
 
-var List  = __webpack_require__(7);
+var Curry = __webpack_require__(1);
+
+function run_n_times(n, f) {
+  for(var _for = 1; _for <= n; ++_for){
+    Curry._1(f, /* () */0);
+  }
+  return /* () */0;
+}
+
+exports.run_n_times = run_n_times;
+/* No side effect */
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// Generated by BUCKLESCRIPT VERSION 2.0.0, PLEASE EDIT WITH CARE
+
+
+var List  = __webpack_require__(8);
 var Curry = __webpack_require__(1);
 
 function modify(l, f, a) {
@@ -7778,7 +7815,7 @@ exports.Infix    = Infix;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8385,28 +8422,28 @@ exports.get64         = get64;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 // Generated by BUCKLESCRIPT VERSION 2.0.0, PLEASE EDIT WITH CARE
 
 
-var Arg        = __webpack_require__(29);
-var $$Set      = __webpack_require__(33);
+var Arg        = __webpack_require__(30);
+var $$Set      = __webpack_require__(34);
 var Sys        = __webpack_require__(22);
-var List       = __webpack_require__(7);
+var List       = __webpack_require__(8);
 var $$Array    = __webpack_require__(24);
 var Block      = __webpack_require__(4);
 var Curry      = __webpack_require__(1);
 var Js_exn     = __webpack_require__(10);
 var Printf     = __webpack_require__(18);
 var $$String   = __webpack_require__(13);
-var Caml_gc    = __webpack_require__(34);
+var Caml_gc    = __webpack_require__(35);
 var Caml_obj   = __webpack_require__(5);
 var Caml_sys   = __webpack_require__(15);
-var Printexc   = __webpack_require__(35);
-var Caml_array = __webpack_require__(8);
+var Printexc   = __webpack_require__(36);
+var Caml_array = __webpack_require__(7);
 var Caml_int32 = __webpack_require__(6);
 var Pervasives = __webpack_require__(2);
 
@@ -8855,19 +8892,19 @@ function parse() {
             return /* () */0;
           }
         }), doc);
-  var command = count[0] ? /* Count */-577719121 : (
-      list[0] || raw_list[0] ? /* `List */[
-          848054398,
-          raw_list[0]
-        ] : /* `Run */[
-          4103979,
-          create(verbosity[0], no_compactions[0], time_quota[0], sampling_type[0], stabilize_gc_between_runs[0], number_of_different_values[0], /* Some */[maximal_cost[0]], /* Some */[selection[0]], test_only[0], output_file[0], /* () */0)
-        ]
-    );
-  return /* tuple */[
-          output_file[0],
-          command
-        ];
+  if (count[0]) {
+    return /* Count */-577719121;
+  } else if (list[0] || raw_list[0]) {
+    return /* `List */[
+            848054398,
+            raw_list[0]
+          ];
+  } else {
+    return /* `Run */[
+            4103979,
+            create(verbosity[0], no_compactions[0], time_quota[0], sampling_type[0], stabilize_gc_between_runs[0], number_of_different_values[0], /* Some */[maximal_cost[0]], /* Some */[selection[0]], test_only[0], output_file[0], /* () */0)
+          ];
+  }
 }
 
 var Config = /* module */[
@@ -9487,69 +9524,71 @@ function with_output(funct, output_file) {
   }
 }
 
-function run(functions) {
-  var match = parse(/* () */0);
-  var match$1 = match[1];
-  var output_file = match[0];
-  if (typeof match$1 === "number") {
-    var f = function (output) {
-      return Curry._1(Printf.fprintf(output, /* Format */[
-                      /* Int */Block.__(4, [
-                          /* Int_i */3,
-                          /* No_padding */0,
-                          /* No_precision */0,
-                          /* End_of_format */0
-                        ]),
-                      "%i"
-                    ]), List.fold_left((function (acc, param) {
-                        var funs = param[1];
-                        switch (funs.tag | 0) {
-                          case 0 : 
-                          case 1 : 
-                              return acc + 1 | 0;
-                          case 2 : 
-                          case 3 : 
-                              return acc + List.length(funs[0][0]) | 0;
-                          
-                        }
-                      }), 0, functions));
-    };
-    return with_output(f, output_file);
-  } else if (match$1[0] >= 848054398) {
-    var raw = match$1[1];
-    var f$1 = function (output) {
-      if (raw) {
-        return List.iter((function (param) {
-                      return Curry._1(Printf.fprintf(output, /* Format */[
-                                      /* String */Block.__(2, [
-                                          /* No_padding */0,
-                                          /* Char_literal */Block.__(12, [
-                                              /* "\n" */10,
-                                              /* End_of_format */0
-                                            ])
-                                        ]),
-                                      "%s\n"
-                                    ]), param[0]);
-                    }), functions);
-      } else {
-        Printf.fprintf(output, /* Format */[
-              /* String_literal */Block.__(11, [
-                  "benchmarks:\n",
-                  /* End_of_format */0
-                ]),
-              "benchmarks:\n"
-            ]);
-        return list(output, functions);
-      }
-    };
-    return with_output(f$1, output_file);
+function run($staropt$star, functions) {
+  var conf = $staropt$star ? $staropt$star[0] : /* Some */[parse(/* () */0)];
+  if (conf) {
+    var match = conf[0];
+    if (typeof match === "number") {
+      var f = function (output) {
+        return Curry._1(Printf.fprintf(output, /* Format */[
+                        /* Int */Block.__(4, [
+                            /* Int_i */3,
+                            /* No_padding */0,
+                            /* No_precision */0,
+                            /* End_of_format */0
+                          ]),
+                        "%i"
+                      ]), List.fold_left((function (acc, param) {
+                          var funs = param[1];
+                          switch (funs.tag | 0) {
+                            case 0 : 
+                            case 1 : 
+                                return acc + 1 | 0;
+                            case 2 : 
+                            case 3 : 
+                                return acc + List.length(funs[0][0]) | 0;
+                            
+                          }
+                        }), 0, functions));
+      };
+      return with_output(f, /* None */0);
+    } else if (match[0] >= 848054398) {
+      var raw = match[1];
+      var f$1 = function (output) {
+        if (raw) {
+          return List.iter((function (param) {
+                        return Curry._1(Printf.fprintf(output, /* Format */[
+                                        /* String */Block.__(2, [
+                                            /* No_padding */0,
+                                            /* Char_literal */Block.__(12, [
+                                                /* "\n" */10,
+                                                /* End_of_format */0
+                                              ])
+                                          ]),
+                                        "%s\n"
+                                      ]), param[0]);
+                      }), functions);
+        } else {
+          Printf.fprintf(output, /* Format */[
+                /* String_literal */Block.__(11, [
+                    "benchmarks:\n",
+                    /* End_of_format */0
+                  ]),
+                "benchmarks:\n"
+              ]);
+          return list(output, functions);
+        }
+      };
+      return with_output(f$1, /* None */0);
+    } else {
+      var newrecord = match[1].slice();
+      var results = run_all((newrecord[/* verbosity */0] = /* High */803693442, newrecord[/* maximal_cost */6] = /* Longer */2, newrecord), functions);
+      return List.iter((function (param) {
+                    return output$1(Pervasives.stdout, param);
+                  }), results);
+    }
   } else {
-    var newrecord = match$1[1].slice();
-    var results = run_all((newrecord[/* verbosity */0] = /* High */803693442, newrecord[/* maximal_cost */6] = /* Longer */2, newrecord), functions);
-    var output$2 = output_file ? Pervasives.open_out(output_file[0]) : Pervasives.stdout;
-    return List.iter((function (param) {
-                  return output$1(output$2, param);
-                }), results);
+    return Pervasives.failwith("error");
   }
 }
 
@@ -9574,14 +9613,14 @@ exports.run                   = run;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Sys                     = __webpack_require__(22);
-var List                    = __webpack_require__(7);
+var List                    = __webpack_require__(8);
 var Block                   = __webpack_require__(4);
 var Bytes                   = __webpack_require__(11);
 var Curry                   = __webpack_require__(1);
@@ -9590,7 +9629,7 @@ var Js_exn                  = __webpack_require__(10);
 var Printf                  = __webpack_require__(18);
 var $$String                = __webpack_require__(13);
 var Caml_obj                = __webpack_require__(5);
-var Caml_array              = __webpack_require__(8);
+var Caml_array              = __webpack_require__(7);
 var Pervasives              = __webpack_require__(2);
 var Caml_format             = __webpack_require__(16);
 var Caml_string             = __webpack_require__(3);
@@ -10331,7 +10370,7 @@ exports.current            = current;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10346,8 +10385,8 @@ var Js_exn                   = __webpack_require__(10);
 var $$String                 = __webpack_require__(13);
 var Caml_io                  = __webpack_require__(14);
 var Caml_obj                 = __webpack_require__(5);
-var Caml_bytes               = __webpack_require__(31);
-var Caml_float               = __webpack_require__(32);
+var Caml_bytes               = __webpack_require__(32);
+var Caml_float               = __webpack_require__(33);
 var Caml_int32               = __webpack_require__(6);
 var Pervasives               = __webpack_require__(2);
 var Caml_format              = __webpack_require__(16);
@@ -16837,7 +16876,7 @@ exports.recast                         = recast;
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16861,7 +16900,7 @@ exports.get = get;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17037,13 +17076,13 @@ exports.caml_log10_float         = caml_log10_float;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var List                    = __webpack_require__(7);
+var List                    = __webpack_require__(8);
 var Curry                   = __webpack_require__(1);
 var Caml_builtin_exceptions = __webpack_require__(0);
 
@@ -17840,7 +17879,7 @@ exports.Make = Make;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17942,13 +17981,13 @@ exports.caml_final_release  = caml_final_release;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Obj                     = __webpack_require__(36);
+var Obj                     = __webpack_require__(37);
 var $$Array                 = __webpack_require__(24);
 var Block                   = __webpack_require__(4);
 var Curry                   = __webpack_require__(1);
@@ -17956,9 +17995,9 @@ var Buffer                  = __webpack_require__(12);
 var Js_exn                  = __webpack_require__(10);
 var Printf                  = __webpack_require__(18);
 var Caml_io                 = __webpack_require__(14);
-var Caml_array              = __webpack_require__(8);
+var Caml_array              = __webpack_require__(7);
 var Pervasives              = __webpack_require__(2);
-var Caml_backtrace          = __webpack_require__(38);
+var Caml_backtrace          = __webpack_require__(39);
 var Caml_builtin_exceptions = __webpack_require__(0);
 
 var printers = [/* [] */0];
@@ -18482,14 +18521,14 @@ exports.exn_slot_name                  = exn_slot_name;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Marshal                 = __webpack_require__(37);
-var Caml_array              = __webpack_require__(8);
+var Marshal                 = __webpack_require__(38);
+var Caml_array              = __webpack_require__(7);
 var Caml_missing_polyfill   = __webpack_require__(17);
 var Caml_builtin_exceptions = __webpack_require__(0);
 
@@ -18635,7 +18674,7 @@ exports.unmarshal                          = unmarshal;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18716,7 +18755,7 @@ exports.total_size   = total_size;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18736,7 +18775,7 @@ exports.caml_convert_raw_backtrace_slot = caml_convert_raw_backtrace_slot;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
