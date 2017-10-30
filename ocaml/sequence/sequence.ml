@@ -67,12 +67,17 @@ let bench_flat_map_fold =
   ["sequence", flat_map_fold; "baseline", flat_map_fold_base],
   id,
   same_as flat_map_fold_base,
-  [M.Range (10, 100), M.Short
-  ;M.Range (100_000, 1_000_000), M.Short]
+  [M.Range (10, 1000), M.Short]
 )
 
 let () =
   M.add [ bench_map_fold
         ; bench_flat_map_fold
         ];
-  Micro_bench_run.run (Micro_bench_types.functions ())
+  let config = Micro_bench_run.Config.parse () in
+  match config with
+  | `Run conf ->
+      Fixture.run_n_times 1 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ())
+      ~conf:(Some (`Run {conf with Micro_bench_run.Config.number_of_different_values=100})))
+  | _ ->
+      Micro_bench_run.run (Micro_bench_types.functions ()) ~conf:(Some config)

@@ -180,7 +180,7 @@ let walk density =
     ],
        prepare_walk density,
        check_walk density,
-       [Range (100, 100000), Short])
+       [Range (100, 3000), Short])
 
 let functions =
   let densities = [1.; 0.3; 0.01] in
@@ -190,4 +190,10 @@ let functions =
 
 let () =
   add functions;
-  Micro_bench_run.run (Micro_bench_types.functions ())
+  let config = Micro_bench_run.Config.parse () in
+  match config with
+  | `Run conf ->
+      Fixture.run_n_times 1 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ())
+      ~conf:(Some (`Run {conf with Micro_bench_run.Config.number_of_different_values=10})))
+  | _ ->
+      Micro_bench_run.run (Micro_bench_types.functions ()) ~conf:(Some config)

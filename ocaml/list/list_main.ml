@@ -131,9 +131,7 @@ open Micro_bench_types
 
 
 let interval_range =
-  [ Range (0, 10_000), Short;
-    Range (100_000, 1_000_000), Long;
-    Range (10_000_000, 100_000_000), Longer ]
+  [ Range (0, 5_000), Short ]
 
 let check_interval n l =
   let rec aux = function
@@ -270,4 +268,10 @@ let functions =
 
 let () =
   add functions;
-  Micro_bench_run.run (Micro_bench_types.functions ())
+  let config = Micro_bench_run.Config.parse () in
+  match config with
+  | `Run conf ->
+      Fixture.run_n_times 1 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ())
+      ~conf:(Some (`Run {conf with Micro_bench_run.Config.number_of_different_values=1000;})))
+  | _ ->
+      Micro_bench_run.run (Micro_bench_types.functions ()) ~conf:(Some config)

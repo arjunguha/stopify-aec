@@ -41,6 +41,12 @@ let () =
       (fun i res -> Ok),
       [ Any, Short ])
   ];
-  Micro_bench_run.run (functions ())
+  let config = Micro_bench_run.Config.parse () in
+  match config with
+  | `Run conf ->
+      Fixture.run_n_times 3 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ())
+      ~conf:(Some (`Run {conf with Micro_bench_run.Config.number_of_different_values=5000})))
+  | _ ->
+      Micro_bench_run.run (Micro_bench_types.functions ()) ~conf:(Some config)
 
 (* TODO add the other ones *)

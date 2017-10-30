@@ -111,4 +111,4 @@ let save_result () =
 let () =
   if Array.length Sys.argv > 1 && Sys.argv.(1) = "make-result"
   then save_result ();
-  Micro_bench_run.run (Micro_bench_types.functions ())
+  Fixture.run_n_times 3 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ()))

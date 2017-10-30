@@ -894,4 +894,4 @@ let functions =
 
 let () =
   add functions;
-  Micro_bench_run.run (Micro_bench_types.functions ())
+  Fixture.run_n_times 20 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ()))
