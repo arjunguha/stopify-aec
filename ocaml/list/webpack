@@ -1,0 +1,1 @@
+webpack lib/js/$1/list_main.js js-build/list_main.js

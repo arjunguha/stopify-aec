@@ -1,0 +1,1 @@
+webpack lib/js/$1/format_main.js js-build/format_main.js

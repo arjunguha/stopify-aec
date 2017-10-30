@@ -4,10 +4,24 @@
   {
     "dir": ".",
     "subdirs": [
-      "./benchmark-files"
-    ],
-    "files": [
-      "./fixture.ml"
+      "./benchmark-files",
+      "./almabench",
+      "./bdd",
+      "./boyer",
+      "./fft",
+      "./fibonnaci",
+      "./format",
+      "./hamming",
+      "./kahan_sum",
+      "./kb",
+      "./lens",
+      "./list",
+      "./nucleic",
+      "./nullable_array",
+      "./num_analysis",
+      "./sequence",
+      "./sieve",
+      "./vector_functor"
     ]
   }
 }

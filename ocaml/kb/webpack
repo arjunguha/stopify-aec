@@ -1,0 +1,1 @@
+webpack lib/js/$1/kbmain.js js-build/$1.js

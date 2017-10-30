@@ -1,19 +1,7 @@
+DIRS = almabench bdd boyer fft fibonnaci format hamming kahan_sum kb lens list nucleic nullable_array num_analysis sequence sieve vector_functor
 SOURCES = $(wildcard benchmark-files/*)
 OUTPUT = $(SOURCES:benchmark-files/%.ml=js-build/%.js)
 
-all: $(OUTPUT)
-
-js-build:
-	mkdir -p js-build/
-
-lib/js/benchmark-files/%.js: benchmark-files/%.ml
+all:
 	bsb
-
-js-build:
-	mkdir -p js-build/
-
-js-build/%.js: lib/js/benchmark-files/%.js js-build | js-build
-	webpack $< $@
-
-clean:
-	rm -rf lib js-build
+	$(foreach dir,$(DIRS),$(dir)/webpack $(dir);)
