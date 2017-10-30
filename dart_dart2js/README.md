@@ -1,5 +1,6 @@
 ## Benchmarks
 ### Ton 80
+Accessed 10/30
 - [X] Havlak (stack overflow)
 - [X] DeltaBlue
 - [X] FluidMotion
@@ -7,6 +8,7 @@
 - [X] Richards
 
 ### Language shootout
+Accessed CVS repository 10/30
 - [X] binarytrees
 - [X] fannkuchredux
 - [X] fasta
