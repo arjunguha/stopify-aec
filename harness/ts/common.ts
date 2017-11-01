@@ -39,6 +39,13 @@ function unna<T extends string | number>(x: T): T | undefined {
   }
 }
 
+export function mayNull(x: any) {
+  if (x === undefined) {
+    return `NA`;
+  }
+  return `${x}`;
+}
+
 export function parseBenchmarkRow(row: any): Benchmark {
   return {
     rowId: row.rowid,

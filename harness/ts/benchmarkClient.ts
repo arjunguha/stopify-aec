@@ -53,7 +53,17 @@ function runBenchmark(b: common.Benchmark): Promise<boolean> {
           headers: headers,
           body: JSON.stringify({
             output: data,
-            rowId: b.rowId
+            rowId: b.rowId,
+            lang: b.lang,
+            bench: b.bench,
+            transform: b.transform,
+            newMethod: b.newMethod,
+            esMode: b.esMode,
+            jsArgs: b.jsArgs,
+            estimator: b.estimator,
+            timePerElapsed: b.timePerElapsed,
+            yieldInterval: b.yieldInterval,
+            resampleInterval: b.resampleInterval,
           })
         })).then(resp => {
           cleanup();

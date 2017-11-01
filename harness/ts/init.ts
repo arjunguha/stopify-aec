@@ -4,6 +4,7 @@ import { spawnSync } from 'child_process';
 import  * as csvStringify  from 'csv-stringify';
 import * as Database from 'better-sqlite3';
 import * as glob from 'glob';
+import { mayNull } from './common';
 
 const edge = 'MicrosoftEdge';
 
@@ -26,20 +27,30 @@ db.exec(`CREATE TABLE IF NOT EXISTS timing
    running_time INTEGER,
    num_yields INTEGER);`);
 
+db.exec(`CREATE TABLE IF NOT EXISTS failures
+  (lang TEXT NOT NULL,
+   bench TEXT NOT NULL,
+   platform TEXT NOT NULL,
+   transform TEXT NOT NULL,
+   new_method TEXT NOT NULL,
+   es_mode TEXT NOT NULL,
+   js_args TEXT NOT NULL,
+   estimator TEXT NOT NULL,
+   time_per_elapsed TEXT NOT NULL,
+   yield_interval TEXT NOT NULL,
+   resample_interval TEXT NOT NULL);`);
+
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS timing_index ON timing
   (ix,lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
+   time_per_elapsed,yield_interval,resample_interval);`);
+db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS failure_index ON failures
+  (lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
    time_per_elapsed,yield_interval,resample_interval);`);
 
 // 3 more needed: Java, Pyret, JavaScript
 const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js',
   'scala', 'c++', 'scheme', 'java', 'microbenches' ];
 
-function mayNull(x: any) {
-  if (x === undefined) {
-    return `NA`;
-  }
-  return `${x}`;
-}
 function initTiming(i: number,
   lang: string,
   bench: string,

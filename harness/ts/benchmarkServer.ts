@@ -61,10 +61,31 @@ function serve(db: Database, port: number) {
   app.post('/done', bodyParser.json(), (req, res) => {
     const ua = req.headers['user-agent'];
     const platform = getPlatform(<string>ua)!;
-    const { output, rowId } = req.body;
+    const {
+      output,
+      rowId,
+      lang,
+      bench,
+      transform,
+      newMethod,
+      esMode,
+      jsArgs,
+      estimator,
+      timePerElapsed,
+      yieldInterval,
+      resampleInterval
+    } = req.body;
     const result = common.parseBenchmarkOutput(output);
     if (typeof result === 'undefined') {
       console.error(`Could not parse benchmark output`);
+      db.prepare(`INSERT OR IGNORE INTO failures (lang, bench, platform, transform,
+    new_method, es_mode, js_args, estimator, time_per_elapsed, yield_interval, resample_interval) VALUES
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .run(lang, bench, platform, common.mayNull(transform),
+          common.mayNull(newMethod), common.mayNull(esMode),
+          common.mayNull(jsArgs), common.mayNull(estimator),
+          common.mayNull(timePerElapsed), common.mayNull(yieldInterval),
+          common.mayNull(resampleInterval));
       res.sendStatus(404);
       return;
     }
