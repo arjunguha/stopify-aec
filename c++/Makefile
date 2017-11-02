@@ -7,19 +7,19 @@ CFLAGS = -O3 -lm
 CXXFLAGS = $(CFLAGS) -std=c++11
 ZLIB = libz.a
 
-EXT = js
+EXT = .js
 OUTDIR = js-build
 
 BDIR = benchmark-files
 CSRCS = $(wildcard $(BDIR)/*.c)
 CPPSRCS = $(wildcard $(BDIR)/*.cpp)
-NATIVE_COBJS = $(patsubst $(BDIR)/%.c,native-build/%.o,$(CSRCS))
-NATIVE_CPPOBJS = $(patsubst $(BDIR)/%.cpp,native-build/%.o,$(CPPSRCS))
+NATIVE_COBJS = $(patsubst $(BDIR)/%.c,native-build/%,$(CSRCS))
+NATIVE_CPPOBJS = $(patsubst $(BDIR)/%.cpp,native-build/%,$(CPPSRCS))
 JS_COBJS = $(patsubst $(BDIR)/%.c,js-build/%.js,$(CSRCS))
 JS_CPPOBJS = $(patsubst $(BDIR)/%.cpp,js-build/%.js,$(CPPSRCS))
 
 cpp: OUTDIR = native-build
-cpp: EXT = o
+cpp: EXT =
 cpp: EMMAKE =
 cpp: EMCONFIG =
 cpp: EMCCFLAGS =
@@ -36,16 +36,16 @@ cpp: $(NATIVE_COBJS) $(NATIVE_CPPOBJS) zlib | native-build
 zlib:
 	cd benchmark-files/zlib && $(EMCONFIG) ./configure --64
 	$(EMMAKE) make -C benchmark-files/zlib clean all
-	cd benchmark-files/zlib && $(CC) $(EMCCFLAGS) $(CFLAGS) benchmark.c $(ZLIB) -o ../../$(OUTDIR)/zlib.$(EXT)
+	cd benchmark-files/zlib && $(CC) $(EMCCFLAGS) $(CFLAGS) benchmark.c $(ZLIB) -o ../../$(OUTDIR)/zlib$(EXT)
 
 js-build/%.js: $(BDIR)/%.cpp | js-build
 	$(CXX) $(EMCCFLAGS) $(CXXFLAGS) $^ -o $@
 js-build/%.js: $(BDIR)/%.c | js-build
 	$(CC) $(EMCCFLAGS) $(CFLAGS) $^ -o $@
 
-native-build/%.o: $(BDIR)/%.cpp | native-build
+native-build/%: $(BDIR)/%.cpp | native-build
 	$(CXX) $(CXXFLAGS) $^ -o $@
-native-build/%.o: $(BDIR)/%.c | native-build
+native-build/%: $(BDIR)/%.c | native-build
 	$(CC) $(CFLAGS) $^ -o $@
 
 js-build:
