@@ -1,0 +1,23 @@
+{
+  "name": "native-timing",
+  "version": "1.0.0",
+  "description": "timing script",
+  "main": "time.js",
+  "scripts": {
+    "build": "tsc time.ts",
+    "test": "echo \"Error: no bench specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plasma-umass/stopify-benchmarks.git"
+  },
+  "author": "Sam Baxter",
+  "license": "BSD3",
+  "bugs": {
+    "url": "https://github.com/plasma-umass/stopify-benchmarks/issues"
+  },
+  "homepage": "https://github.com/plasma-umass/stopify-benchmarks#readme",
+  "dependencies": {
+    "child_process": "^1.0.2"
+  }
+}
