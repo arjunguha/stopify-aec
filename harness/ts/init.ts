@@ -172,6 +172,8 @@ function benchmarksFor(lang: string, bench: string) {
       continue;
     }
 
+    initTiming(i, lang, bench, 'native');
+
     // ChromeBook configuration
     initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
 
