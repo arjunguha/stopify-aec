@@ -5,6 +5,7 @@ EMMAKE = emmake
 EMCCFLAGS = -s TOTAL_MEMORY=1677721600 -s NO_DYNAMIC_EXECUTION=1 --memory-init-file 0
 CFLAGS = -O3 -lm
 CXXFLAGS = $(CFLAGS) -std=c++11
+ZLIB = libz.a
 
 EXT = js
 OUTDIR = js-build
@@ -29,12 +30,13 @@ js: $(JS_COBJS) $(JS_CPPOBJS) zlib | js-build
 
 cpp: CC = clang
 cpp: CXX = clang++
+cpp: ZLIB = -lz
 cpp: $(NATIVE_COBJS) $(NATIVE_CPPOBJS) zlib | native-build
 
 zlib:
 	cd benchmark-files/zlib && $(EMCONFIG) ./configure --64
 	$(EMMAKE) make -C benchmark-files/zlib clean all
-	cd benchmark-files/zlib && $(CC) $(EMCCFLAGS) $(CFLAGS) benchmark.c -lz -o ../../$(OUTDIR)/zlib.$(EXT)
+	cd benchmark-files/zlib && $(CC) $(EMCCFLAGS) $(CFLAGS) benchmark.c $(ZLIB) -o ../../$(OUTDIR)/zlib.$(EXT)
 
 js-build/%.js: $(BDIR)/%.cpp | js-build
 	$(CXX) $(EMCCFLAGS) $(CXXFLAGS) $^ -o $@
