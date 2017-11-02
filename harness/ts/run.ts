@@ -8,8 +8,9 @@ import * as glob from 'glob';
 import * as common from './common';
 const db = new Database('results.sqlite');
 
-function runBenchmarks() {
-  const benchmarks = common.unfinishedBenchmarks(db);
+function runBenchmarks(query: string | undefined) {
+  const filter = query === undefined ? '' : `AND ${query}`;
+  const benchmarks = common.unfinishedBenchmarks(db, filter);
   for (const benchmark of benchmarks) {
     const result = runBenchmark(benchmark);
     if (result) {
@@ -20,12 +21,7 @@ function runBenchmarks() {
   }
 }
 
-export function runBenchmark(benchmark: common.Benchmark):
-  { runningTime: number, numYields?: number } | undefined {
-  const { lang, bench, platform, transform, newMethod, esMode, jsArgs, estimator,
-          timePerElapsed, yieldInterval, resampleInterval } = benchmark;
-
-  if (platform === 'native') {
+function runNative(lang: string, bench: string): { runningTime: number } | undefined {
     if (lang === 'python_pyjs') {
       const filename = path.resolve(__dirname, `../../${lang}/${bench}/main.py`);
       const runningTime = time('python', filename);
@@ -37,8 +33,24 @@ export function runBenchmark(benchmark: common.Benchmark):
       }
     }
     else {
-      return undefined;
+      const filename = path.resolve(__dirname, `../../${lang}/native-build/${bench}`);
+      const runningTime = time(filename);
+      if (runningTime) {
+        return { runningTime };
+      }
+      else {
+        return undefined;
+      }
     }
+}
+
+export function runBenchmark(benchmark: common.Benchmark):
+  { runningTime: number, numYields?: number } | undefined {
+  const { lang, bench, platform, transform, newMethod, esMode, jsArgs, estimator,
+          timePerElapsed, yieldInterval, resampleInterval } = benchmark;
+
+  if (platform === 'native') {
+    return runNative(lang, bench);
   }
   else {
     if (bench === 'gcbench' || bench == 'schulze') {
@@ -116,4 +128,4 @@ function time(command: string, ...args: string[]): number | undefined {
   return  (end - start);
 }
 
-runBenchmarks();
+runBenchmarks(process.argv.slice(2).join(' '));
