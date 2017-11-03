@@ -1484,7 +1484,7 @@ $c_Lspectralnorm$.prototype.init___ = (function() {
   return this
 });
 $c_Lspectralnorm$.prototype.main__AT__V = (function(args) {
-  var array = [new $c_LSpectralNorm().init___I(5500).approximate__D()];
+  var array = [new $c_LSpectralNorm().init___I(2500).approximate__D()];
   var jsx$3 = $m_s_Console$();
   var this$2 = new $c_sci_StringOps().init___T("%.09f\n");
   var jsx$2 = $m_sjsr_RuntimeString$();

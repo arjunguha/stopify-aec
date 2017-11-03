@@ -7,7 +7,7 @@
 
 object spectralnorm {
   def main(args: Array[String]) = {
-    val n = 5500
+    val n = 2500
     printf("%.09f\n", (new SpectralNorm(n)).approximate())
   }
 }

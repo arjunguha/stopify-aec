@@ -15,7 +15,7 @@ object mandelbrot {
 	val max = 50
 
 	def main(args: Array[String]) {
-		size = /*args(0).toInt*/ 16000
+		size = /*args(0).toInt*/ 4000
 		bytesPerRow = (size+7)/8 // ceiling of (size / 8)
 
 		println("P4\n" + size + " " + size)

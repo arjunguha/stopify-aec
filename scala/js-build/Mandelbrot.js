@@ -1413,7 +1413,7 @@ $c_Lmandelbrot$.prototype.init___ = (function() {
   return this
 });
 $c_Lmandelbrot$.prototype.main__AT__V = (function(args) {
-  this.size$1 = 16000;
+  this.size$1 = 4000;
   this.bytesPerRow$1 = ((((7 + this.size$1) | 0) / 8) | 0);
   var x = ((("P4\n" + this.size$1) + " ") + this.size$1);
   var this$2 = $m_s_Console$();
