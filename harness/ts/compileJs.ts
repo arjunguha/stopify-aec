@@ -18,13 +18,7 @@ export function compileBenchmark(benchmark: common.Benchmark) {
   const { lang, bench, platform, transform, newMethod, esMode, jsArgs } = benchmark;
 
   if (platform === 'native') {
-    if (lang === 'python_pyjs') {
-      return; // no compile step for Python
-    }
-    else {
-      assert.fail(`do not know how to compile native benchmark for ${lang}`);
-      return;
-    }
+    return; // no compile step for natives
   }
 
   const benchmarkFilename = common.benchmarkSourceFilename(benchmark);
