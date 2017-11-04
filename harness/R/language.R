@@ -83,7 +83,7 @@ save_by_language <- function(lang) {
     stat_ecdf() +
     mytheme() +
     ylab("Percentage of Benchmarks")
-  ggsave(paste0(lang, ".pdf"), plot, width=4, height=3, units=c("in"))
+  ggsave(paste0("slowdown-", lang, ".pdf"), plot, width=4, height=3, units=c("in"))
 }
 
 save_by_language("python_pyjs") # 1
