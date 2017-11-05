@@ -28,7 +28,7 @@ function getBenchmarks(db: Database, platform : common.Platform,
   queryParam: string): Benchmark[] {
     const filter = decodeURIComponent(queryParam);
     return db.prepare(`SELECT rowid,* FROM timing WHERE platform = ? AND
-                     running_time IS NULL AND ix < 3 ` + (filter === '' ? '' : `AND ${filter}`))
+                     running_time IS NULL ` + (filter === '' ? '' : `AND ${filter}`))
       .all(platform)
       .map(common.parseBenchmarkRow);
   }
@@ -50,6 +50,7 @@ function serve(db: Database, port: number) {
     const { urlParams } = req.body;
     const ua = req.headers['user-agent'];
     const platform = getPlatform(<string>ua);
+    console.log(ua, platform)
     if (typeof platform === 'undefined') {
       console.error(`Cannot serve ${ua}`);
       res.sendStatus(404);
@@ -98,4 +99,4 @@ function serve(db: Database, port: number) {
   app.listen(port);
 }
 
-serve(new Database('results.sqlite'), 8080);
+serve(new Database('results.sqlite'), 4997);

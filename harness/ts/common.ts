@@ -69,7 +69,7 @@ export function parseBenchmarkRow(row: any): Benchmark {
  * Produces all benchmarks that still need to run.
  */
 export function unfinishedBenchmarks(db: Database, filter?: string): Benchmark[] {
-  return db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL AND ix < 3 ${filter || ''}`)
+  return db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL ${filter || ''}`)
     .all()
     .map(parseBenchmarkRow);
 }
