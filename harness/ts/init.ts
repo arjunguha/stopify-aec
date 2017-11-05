@@ -156,12 +156,14 @@ function benchmarksFor(lang: string, bench: string) {
   }
 
   for (let i = 0; i < 10; i++) {
+    /* Disable scala velocity benchmarks.
     if (lang === 'scala') {
       for (const resampleInterval of [ 100, 250, 500, 750, 1000 ]) {
         initTiming(i, lang, bench, 'chrome', 'lazy', 'direct', 'sane', 'simple', 'velocity',
           undefined, 100, resampleInterval);
       }
     }
+     */
 
     for (const browser of browsers) {
       initTiming(i, lang, bench, browser, 'original');
@@ -177,12 +179,10 @@ function benchmarksFor(lang: string, bench: string) {
     // ChromeBook configuration
     initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
 
-    initTiming(i, lang, bench, 'safari', 'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined, 100);
-    for (const transform of [ 'lazy', 'retval' ]) {
-      initTiming(i, lang, bench, 'chrome',  transform, 'wrapper', 'sane', 'simple', 'reservoir', undefined,  100);
-      initTiming(i, lang, bench, 'firefox', transform, 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
-      initTiming(i, lang, bench, edge,      transform, 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
-    }
+    initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined, 100);
+    initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined,  100);
+    initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
+    initTiming(i, lang, bench, edge,      'retval', 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
   }
 
 }
