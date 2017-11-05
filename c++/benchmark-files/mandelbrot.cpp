@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    FILE* out = (argc == 3) ? fopen(argv[2], "wb") : stdout;
+    FILE* out = stdout;
     fprintf(out, "P4\n%u %u\n", width, height);
 
     if (out != stdout)

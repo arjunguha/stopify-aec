@@ -579,7 +579,6 @@ void create_utlity_maps() {
 
 int main (int argc, char * const argv[]) {
    num_to_find = 2098;
-   if (argc > 1) sscanf(argv[1],"%d", &num_to_find);
 
    create_piece_maps();
    create_utlity_maps();
