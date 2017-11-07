@@ -129,10 +129,11 @@ export function benchmarkRunOpts(benchmark: Benchmark): string[] {
 }
 
 export function parseBenchmarkOutput(stdout: string) {
-  const output = String(stdout).split('\n');
-  const lastLine = output[output.length - 2].split(',');
+  const output = String(stdout).split('\n').filter(l => l.length > 0);
+  const lastLine = output[output.length - 1].split(',');
   const runningTime = Number(lastLine[0]);
-  const numYields = Number(lastLine[1]);
+  // Pyret outputs NA for numYields in all cases
+  const numYields = lastLine[1] === 'NA' ? 0 : Number(lastLine[1])
   if (runningTime >= 0 && numYields >= 0) {
     return { runningTime, numYields };
   }
