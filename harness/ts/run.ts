@@ -46,8 +46,7 @@ function runNative(lang: string, bench: string): { runningTime: number } | undef
 
 export function runBenchmark(benchmark: common.Benchmark):
   { runningTime: number, numYields?: number } | undefined {
-  const { lang, bench, platform, transform, newMethod, esMode, jsArgs, estimator,
-          timePerElapsed, yieldInterval, resampleInterval } = benchmark;
+  const { lang, bench, platform } = benchmark;
 
   if (platform === 'native') {
     return runNative(lang, bench);
@@ -63,19 +62,7 @@ export function runBenchmark(benchmark: common.Benchmark):
       return undefined;
     }
 
-    const args = [ '--env', platform, '-t', transform!];
-    if (estimator) {
-      args.push('--estimator', estimator!);
-    }
-    if (timePerElapsed) {
-      args.push ('--time-per-elapsed', String(timePerElapsed));
-    }
-    if (yieldInterval) {
-      args.push('-y', String(yieldInterval));
-    }
-    if (resampleInterval) {
-      args.push('-r', String(resampleInterval));
-    }
+    const args = common.benchmarkRunOpts(benchmark);
 
     // TODO(arjun): These should not be hardcoded
     if (platform === 'MicrosoftEdge') {
