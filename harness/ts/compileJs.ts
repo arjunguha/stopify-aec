@@ -17,8 +17,21 @@ export function compileBenchmark(benchmark: common.Benchmark) {
   // These are the compile-time settings
   const { lang, bench, platform, transform, newMethod, esMode, jsArgs } = benchmark;
 
+  if (lang === 'pyret') {
+    const benchmarkFilename = common.pyretSourceFilename(benchmark);
+    const compiledFilename =
+      `./benchmarks/tmp/${common.benchmarkCompiledFilename(benchmark)}`
+
+    spawnSync('cp', [benchmarkFilename, compiledFilename], {
+      stdio: 'inherit',
+      cwd: path.resolve(__dirname, '../../..')
+    })
+    return
+  }
+
   if (platform === 'native') {
-    return; // no compile step for natives
+    // no compile step for natives
+    return;
   }
 
   const benchmarkFilename = common.benchmarkSourceFilename(benchmark);

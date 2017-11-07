@@ -79,15 +79,37 @@ export function benchmarkSourceFilename(benchmark: Benchmark) {
   return `./benchmarks/${lang}/js-build/${bench}.js`;
 }
 
+export function pyretSourceFilename(benchmark: Benchmark) {
+  const { lang, bench, transform } = benchmark
+
+  let suffix;
+
+  if (transform === 'native') {
+    suffix = 'jarr'
+  }
+  else if (transform === 'original') {
+    suffix = 'v.jarr'
+  }
+  else {
+    suffix = 'vs.jarr'
+  }
+
+  return `./benchmarks/pyret/js-build/${bench}.${suffix}`
+}
+
 export function benchmarkCompiledFilename(benchmark: Benchmark) {
   // These are the compile-time settings
-  const { lang, bench, platform, transform, newMethod, esMode, jsArgs } = benchmark;
+  const { lang, bench, transform, newMethod, esMode, jsArgs } = benchmark;
   return `${lang}-${bench}-${transform}-${newMethod}-${esMode}-${jsArgs}.js`;
 }
 
 export function benchmarkRunOpts(benchmark: Benchmark): string[] {
   const { lang, bench, platform, transform, newMethod, esMode, estimator,
     timePerElapsed, yieldInterval, resampleInterval, jsArgs } = benchmark;
+
+  if (lang === 'pyret') {
+    return  ['--env', platform];
+  }
 
   const args = [ '--env', platform, '-t', transform!];
   if (estimator) {

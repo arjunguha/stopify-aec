@@ -150,9 +150,29 @@ function timeEstimatorComparisonBenchmarks() {
 
 const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' ];
 
+function pyretBenchmark(name: string) {
+  // Benchmark harness for pyret.
+  if (name === 'benchmark-base') {
+    return
+  }
+
+  for (let i = 0; i < 10; i++) {
+    for (const b of browsers) {
+      initTiming(i, 'pyret', name, b, 'native')
+      initTiming(i, 'pyret', name, b, 'original')
+      initTiming(i, 'pyret', name, b, 'lazy')
+    }
+  }
+}
+
 function benchmarksFor(lang: string, bench: string) {
   if (lang === 'python_pyjs') {
     pythonBenchmark(bench);
+  }
+
+  if (lang === 'pyret') {
+    pyretBenchmark(bench)
+    return
   }
 
   for (let i = 0; i < 10; i++) {
@@ -194,10 +214,23 @@ function createTimingTable() {
   for (const path of benchmarkFiles) {
     const m = /^.*\/([^/]*)\/js-build\/([^.]*)\.js$/.exec(path);
     if (m === null) {
-      console.error(`Could not parse filename ${path}`);
+      console.error(`could not parse filename ${path}`);
       continue;
     }
     const lang = m[1];
+    const bench = m[2];
+    benchmarksFor(lang, bench);
+  }
+
+  // Pyret benchmarks
+  const pyretBench = glob.sync(path.resolve(__dirname, '../../pyret/*.arr'))
+  for (const path of pyretBench) {
+    const m = /^.*\/([^/]*)\/([^.]*)\.arr/.exec(path);
+    if (m === null) {
+      console.error(`could not parse filename ${path}`);
+      continue;
+    }
+    const lang = 'pyret'
     const bench = m[2];
     benchmarksFor(lang, bench);
   }
