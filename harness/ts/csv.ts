@@ -63,7 +63,8 @@ for (const row of varianceRows) {
     fs.appendFileSync(varianceFd, `${na(row.resample_interval)},`);
     fs.appendFileSync(varianceFd, `${ix},`);
     fs.appendFileSync(varianceFd, `${latency},`);
-    fs.appendFileSync(varianceFd, `${row.running_time}\n`);
+    fs.appendFileSync(varianceFd, `${row.running_time},`);
+    fs.appendFileSync(varianceFd, `${row.num_yields}\n`);
   });
 }
 

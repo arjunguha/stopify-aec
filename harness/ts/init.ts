@@ -38,7 +38,9 @@ db.exec(`CREATE TABLE IF NOT EXISTS variance
    time_per_elapsed TEXT NOT NULL,
    yield_interval TEXT NOT NULL,
    resample_interval TEXT NOT NULL,
-   variance TEXT);`);
+   variance TEXT,
+   running_time INTEGER,
+   num_yields INTEGER);`);
 
 db.exec(`CREATE TABLE IF NOT EXISTS failures
   (lang TEXT NOT NULL,
