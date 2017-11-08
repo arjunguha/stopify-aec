@@ -140,7 +140,7 @@ export function parseBenchmarkVariance(row: any): VarianceBench {
 function getTimingBenchmarks(db: Database, platform: Platform|undefined,
   queryParam: string): Benchmark[] {
     const filter = decodeURIComponent(queryParam);
-    return db.prepare(`SELECT rowid,* FROM timing WHERE ${platform ? `platform="${platform}" AND` : '' }
+    return db.prepare(`SELECT rowid,* FROM timing WHERE ${platform ? 'platform="' + platform + '" AND' : '' }
                      running_time IS NULL ` + (filter === '' ? '' : `AND ${filter}` + ';'))
       .all()
       .map(parseBenchmarkTiming);
@@ -149,7 +149,7 @@ function getTimingBenchmarks(db: Database, platform: Platform|undefined,
 function getVarianceBenchmarks(db: Database, platform: Platform|undefined,
   queryParam: string): VarianceBench[] {
     const filter = decodeURIComponent(queryParam);
-    return db.prepare(`SELECT rowid,* FROM variance WHERE ${platform ? `platform="${platform}" AND` : '' }
+    return db.prepare(`SELECT rowid,* FROM variance WHERE ${platform ? 'platform="' + platform + '" AND' : '' }
                      variance IS NULL ` + (filter === '' ? '' : `AND ${filter}` + ';'))
       .all()
       .map(parseBenchmarkVariance);

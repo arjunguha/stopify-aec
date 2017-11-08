@@ -9,7 +9,7 @@ import * as common from './common';
 const db = new Database('results.sqlite');
 
 function runBenchmarks(query: string | undefined) {
-  const filter = query === undefined ? '' : `AND ${query}`;
+  const filter = query === undefined || query === '' ? '' : `AND ${query}`;
   const benchmarks = common.unfinishedBenchmarks(db, undefined, filter);
   for (const benchmark of benchmarks) {
     const result = runBenchmark(benchmark);
