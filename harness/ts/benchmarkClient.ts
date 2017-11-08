@@ -22,7 +22,7 @@ export function benchmarkUrl(args: string[]) {
   return encodeURIComponent(JSON.stringify(opts));
 }
 
-function runBenchmark(b: common.Benchmark): Promise<boolean> {
+function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boolean> {
   const url = '/benchmark.html#' +
    benchmarkUrl([
      ...common.benchmarkRunOpts(b),
@@ -103,7 +103,7 @@ function runBenchmark(b: common.Benchmark): Promise<boolean> {
   });
 }
 
-function runAllBenchmarks(benchmarks: common.Benchmark[]): Promise<boolean> {
+function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[]): Promise<boolean> {
   const progress = <HTMLDivElement>document.getElementById('progress');
   const progressText = <HTMLDivElement>document.getElementById('progressText');
   const n = benchmarks.length;

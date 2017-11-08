@@ -14,19 +14,25 @@ function runBenchmarks(query: string | undefined) {
   for (const benchmark of benchmarks) {
     const result = runBenchmark(benchmark);
     if (result) {
-      db.prepare(`UPDATE timing SET running_time = ?, num_yields = ?
+      if (result.type === 'variance') {
+        db.prepare(`UPDATE variance SET variance = ?, running_time = ?, num_yields = ?
+                  WHERE rowid = ?`).run(result.variance, result.runningTime,
+                    result.numYields, benchmark.rowId).changes;
+      } else {
+        db.prepare(`UPDATE timing SET running_time = ?, num_yields = ?
                   WHERE rowid = ?`).run(
-          result.runningTime, result.numYields, benchmark.rowId).changes;
+                    result.runningTime, result.numYields, benchmark.rowId).changes;
+      }
     }
   }
 }
 
-function runNative(lang: string, bench: string): { runningTime: number } | undefined {
+function runNative(lang: string, bench: string): { type: 'timing', runningTime: number, numYields: number } | undefined {
     if (lang === 'python_pyjs') {
       const filename = path.resolve(__dirname, `../../${lang}/${bench}/main.py`);
       const runningTime = time('python', filename);
       if (runningTime) {
-        return { runningTime };
+        return { type: 'timing', runningTime, numYields: 0 };
       }
       else {
         return undefined;
@@ -36,7 +42,7 @@ function runNative(lang: string, bench: string): { runningTime: number } | undef
       const filename = path.resolve(__dirname, `../../${lang}/native-build/${bench}`);
       const runningTime = time(filename);
       if (runningTime) {
-        return { runningTime };
+        return { type: 'timing',runningTime, numYields: 0 };
       }
       else {
         return undefined;
@@ -44,8 +50,7 @@ function runNative(lang: string, bench: string): { runningTime: number } | undef
     }
 }
 
-export function runBenchmark(benchmark: common.Benchmark):
-  { runningTime: number, numYields?: number } | undefined {
+export function runBenchmark(benchmark: common.Benchmark|common.VarianceBench): common.BenchmarkOutput | undefined {
   const { lang, bench, platform } = benchmark;
 
   if (platform === 'native') {
@@ -81,18 +86,7 @@ export function runBenchmark(benchmark: common.Benchmark):
         stdio: [ 'none', 'inherit', 'pipe' ],
         cwd: path.resolve(__dirname, '../../..')
       });
-      const output = String(proc.stdout).split('\n');
-      const lastLine = output[output.length - 2].split(',');
-      const runningTime = Number(lastLine[0]);
-      const numYields = Number(lastLine[1]);
-      if (runningTime >= 0 && numYields >= 0) {
-        return { runningTime, numYields };
-      }
-      else {
-      console.error(`unexpected result from ./bin/browser ${args.join(' ')}`);
-      console.error(output.join('\n'));
-        return undefined;
-      }
+      return common.parseBenchmarkOutput(String(proc.stdout));
     }
     catch (exn) {
       console.error(`Exception running ./bin/browser ${args.join(' ')}`);
