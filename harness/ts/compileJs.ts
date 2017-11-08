@@ -13,7 +13,10 @@ function compileBenchmarks() {
   common.unfinishedBenchmarks(db).forEach(compileBenchmark);
 }
 
-export function compileBenchmark(benchmark: common.Benchmark) {
+export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBench) {
+  if (benchmark.type === 'variance') {
+    return;
+  }
   // These are the compile-time settings
   const { lang, bench, platform, transform, newMethod, esMode, jsArgs } = benchmark;
 

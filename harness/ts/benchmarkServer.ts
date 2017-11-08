@@ -4,7 +4,7 @@ import * as bodyParser from 'body-parser';
 const detectBrowser = require('detect-browser'); // NOTE(arjun): no @types
 import * as path from 'path';
 import * as common from './common';
-import { Platform, Benchmark, VarianceBench } from './common';
+import { Platform, Benchmark, VarianceBench, unfinishedBenchmarks } from './common';
 import { parseRuntimeOpts } from '../../../built/src/cli-parse';
 
 function getPlatform(ua: string): Platform | undefined {
@@ -24,30 +24,8 @@ function getPlatform(ua: string): Platform | undefined {
   }
 }
 
-function getTimingBenchmarks(db: Database, platform : common.Platform,
-  queryParam: string): Benchmark[] {
-    const filter = decodeURIComponent(queryParam);
-    return db.prepare(`SELECT rowid,* FROM timing WHERE platform = ? AND
-                     running_time IS NULL ` + (filter === '' ? '' : `AND ${filter}` + ';'))
-      .all(platform)
-      .map(common.parseBenchmarkTiming);
-  }
-
-function getVarianceBenchmarks(db: Database, platform : common.Platform,
-  queryParam: string): VarianceBench[] {
-    const filter = decodeURIComponent(queryParam);
-    return db.prepare(`SELECT rowid,* FROM variance WHERE platform = ? AND
-                     variance IS NULL ` + (filter === '' ? '' : `AND ${filter}` + ';'))
-      .all(platform)
-      .map(common.parseBenchmarkVariance);
-  }
-
 function getBenchmarks(db: Database, platform: common.Platform, queryParam: string) {
-
-  return [
-    ...getTimingBenchmarks(db, platform, queryParam),
-    ...getVarianceBenchmarks(db, platform, queryParam),
-  ];
+  return unfinishedBenchmarks(db, platform, queryParam);
 }
 
 function serve(db: Database, port: number) {

@@ -91,7 +91,7 @@ export function initVariance(db: Database,
 }
 
 export function parseBenchmarkRow(row: any): Benchmark | VarianceBench {
-  if (unna(row.running_time)) {
+  if (row.type === 'timing') {
     return parseBenchmarkTiming(row);
   } else {
     return parseBenchmarkVariance(row);
@@ -136,15 +136,32 @@ export function parseBenchmarkVariance(row: any): VarianceBench {
     variance: unna(row.variance),
   };
 }
+
+function getTimingBenchmarks(db: Database, platform: Platform|undefined,
+  queryParam: string): Benchmark[] {
+    const filter = decodeURIComponent(queryParam);
+    return db.prepare(`SELECT rowid,* FROM timing WHERE ${platform ? `platform="${platform}" AND` : '' }
+                     running_time IS NULL ` + (filter === '' ? '' : `AND ${filter}` + ';'))
+      .all()
+      .map(parseBenchmarkTiming);
+  }
+
+function getVarianceBenchmarks(db: Database, platform: Platform|undefined,
+  queryParam: string): VarianceBench[] {
+    const filter = decodeURIComponent(queryParam);
+    return db.prepare(`SELECT rowid,* FROM variance WHERE ${platform ? `platform="${platform}" AND` : '' }
+                     variance IS NULL ` + (filter === '' ? '' : `AND ${filter}` + ';'))
+      .all()
+      .map(parseBenchmarkVariance);
+  }
 /**
  * Produces all benchmarks that still need to run.
  */
-export function unfinishedBenchmarks(db: Database, filter?: string): (Benchmark|VarianceBench)[] {
-  return db.prepare(`SELECT rowid,* FROM timing WHERE running_time IS NULL ${filter || ''}
-    UNION
-    SELECT rowid, * FROM variance WHERE variance IS NULL;`)
-    .all()
-    .map(parseBenchmarkRow);
+export function unfinishedBenchmarks(db: Database, platform?: Platform, filter?: string): (Benchmark|VarianceBench)[] {
+  return [
+    ...getTimingBenchmarks(db, platform, filter || ''),
+    ...getVarianceBenchmarks(db, platform, filter || ''),
+  ];
 }
 
 export function benchmarkSourceFilename(benchmark: Common) {

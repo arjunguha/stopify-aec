@@ -10,7 +10,7 @@ const db = new Database('results.sqlite');
 
 function runBenchmarks(query: string | undefined) {
   const filter = query === undefined ? '' : `AND ${query}`;
-  const benchmarks = common.unfinishedBenchmarks(db, filter);
+  const benchmarks = common.unfinishedBenchmarks(db, undefined, filter);
   for (const benchmark of benchmarks) {
     const result = runBenchmark(benchmark);
     if (result) {
