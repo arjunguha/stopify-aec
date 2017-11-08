@@ -240,7 +240,7 @@ function takeWhile<T>(f: (elt: T) => boolean, arr: T[]): T[] {
 }
 
 function parseRunningTimes(output: string[]): any {
-  const lastLine = output[output.length - 2].split(',');
+  const lastLine = output[output.length - 1].split(',');
   const runningTime = Number(lastLine[0]);
   // Pyret outputs NA for numYields in all cases
   const numYields = lastLine[1] === 'NA' ? 0 : Number(lastLine[1])
@@ -255,10 +255,10 @@ function parseRunningTimes(output: string[]): any {
 }
 
 export function parseBenchmarkOutput(stdout: string): BenchmarkOutput | undefined {
-  let output = String(stdout).split('\n');
+  let output = String(stdout).split('\n').filter(line => line.length> 0);
   output = dropWhile(line => line !== "BEGIN STOPIFY BENCHMARK RESULTS",
     output);
-  if (output.length < 3) {
+  if (output.length < 2) {
     console.error(`unexpected result from benchmark`);
     console.error(output.join('\n'));
     return undefined;
