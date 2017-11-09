@@ -1,7 +1,7 @@
 import * as common from './common';
 import { parseRuntimeOpts } from '../../../built/src/cli-parse';
 
-const benchmarkTimeout = 600; //seconds
+const benchmarkTimeout = 800; //seconds
 const checkInterval = 5; // seconds
 
 const label = <HTMLDivElement>document.getElementById('label');
@@ -78,7 +78,7 @@ function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boole
 
       elapsedTime += checkInterval;
       if (elapsedTime > benchmarkTimeout) {
-        console.log(`Benchmark was taking too long`);
+        log(`${bStr} was taking too long`);
         cleanup();
         reject(`timeout`);
       }
@@ -123,6 +123,7 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
       })
       .catch(() => {
         failed++;
+        log(`${benchmarks[i]} failed`)
       })
       .then(() => helper(i + 1));
   }
