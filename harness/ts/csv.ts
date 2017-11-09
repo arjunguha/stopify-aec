@@ -47,7 +47,7 @@ for (const row of rows) {
 fs.appendFileSync(<any>varianceFd,
   'Language,Benchmark,Platform,Transform,NewMethod,EsMode,JsArgs,Estimator,');
 fs.appendFileSync(<any>varianceFd,
-  'TimePerElapsed,YieldInterval,ResampleInterval,Index,Variance,RunningTime\n');
+  'TimePerElapsed,YieldInterval,ResampleInterval,Index,Variance,RunningTime,NumYields\n');
 for (const row of varianceRows) {
   const variance = na(row.variance);
   const lines = variance.split('\n');
