@@ -176,14 +176,14 @@ const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' 
 function pyretBenchmark(name: string) {
   // Benchmark harness for pyret.
   if (name === 'benchmark-base') {
-    return
+    return;
   }
 
   for (let i = 0; i < 10; i++) {
     for (const b of browsers) {
-      initTiming(i, 'pyret', name, b, 'native')
-      initTiming(i, 'pyret', name, b, 'original')
-      initTiming(i, 'pyret', name, b, 'lazy')
+      initTiming(i, 'pyret', name, b, 'native');
+      initTiming(i, 'pyret', name, b, 'original');
+      initTiming(i, 'pyret', name, b, 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
     }
   }
 }
