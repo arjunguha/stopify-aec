@@ -22,6 +22,10 @@ export function benchmarkUrl(args: string[]) {
   return encodeURIComponent(JSON.stringify(opts));
 }
 
+function getName(b: common.Benchmark | common.VarianceBench) {
+  return `${b.lang}-${b.bench}-${b.transform}-${b.esMode}-${b.newMethod}-${b.estimator}-${b.yieldInterval}`;
+}
+
 function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boolean> {
   const url = '/benchmark.html#' +
    benchmarkUrl([
@@ -32,7 +36,7 @@ function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boole
   iframe.src = url;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
-  const bStr = `${b.lang}-${b.bench}-${b.transform}-${b.esMode}-${b.newMethod}-${b.estimator}-${b.yieldInterval}`;
+  const bStr = getName(b)
   label.innerText = bStr;
 
   return new Promise<boolean>((resolve, reject) => {
@@ -123,7 +127,7 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
       })
       .catch(() => {
         failed++;
-        log(`${benchmarks[i]} failed`)
+        log(`${getName(benchmarks[i])} failed`)
       })
       .then(() => helper(i + 1));
   }
