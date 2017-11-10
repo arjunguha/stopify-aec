@@ -5,6 +5,7 @@ OUTPUT = $(SOURCES:benchmark-files/%.ml=js-build/%.js)
 all: $(OUTPUT)
 	bsb
 	$(foreach dir,$(DIRS),cp lib/js/$(dir)/*.js js-build;)
+	cp lib/js/*.js .
 
 js-build:
 	mkdir -p js-build/
