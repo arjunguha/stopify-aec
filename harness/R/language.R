@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
-suppressMessages(library(tidyverse))
+library(tidyverse)
+library(GoFKernel)
 library(stringr)
 library(extrafont)
 library(fontcm)
@@ -12,8 +13,6 @@ mytheme <- function() {
            theme(
              panel.background = element_rect(size = 0.9),
              text = element_text(family="serif", size=16),
-             #panel.grid.major = element_blank(),
-             #panel.grid.minor = element_blank(),
              panel.grid.major = element_line(colour="gray", size=0.1),
              panel.grid.minor =
                element_line(colour="gray", size=0.1, linetype='dotted'),
@@ -40,11 +39,20 @@ original_avgtimes <- original %>%
   summarise(AvgOriginalTime = mean(RunningTime)) %>%
   ungroup()
 
+selector <- tribble(
+  ~Platform, ~Transform, ~NewMethod, ~EsMode,
+  "firefox", "lazy", "direct", "sane",
+  "chrome", "lazy", "wrapper", "sane",
+  "MicrosoftEdge", "retval", "direct", "sane",
+  "safari", "lazy", "direct", "sane",
+  "ChromeBook", "lazy", "wrapper", "sane")
+
 slowdowns <- all_data %>%
-  filter(Transform != "original") %>%
+  filter(Transform != "original" & Transform != "native") %>%
   filter(Estimator == "reservoir") %>%
   filter(YieldInterval == 100) %>%
   inner_join(original_avgtimes) %>%
+  inner_join(selector) %>%
   mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
   select(Benchmark,Platform,Language,Slowdown) %>%  
   mutate(N = 1) %>%
@@ -71,15 +79,19 @@ by_platform <- function(platform) {
   
 }
 
-by_language <- function(lang) {
-  slowdowns <- slowdowns %>%
-    filter(Language == lang) %>%
-  return(slowdowns)
+platform_ecdf <-function(lang,platform) {
+  f <- ecdf((slowdowns %>% filter(Language == lang & Platform == platform))$Slowdown)
+  g <- inverse(f, lower=0, upper=100)
+  cat(paste0("\\newcommand{\\", gsub("_", "", lang), platform,"95}{", round(g(.95), digits = 1),"x}\n"))
 }
 
 save_by_language <- function(lang) {
-  plot <- ggplot(slowdowns %>% filter(Language==lang), 
-                 aes(x=Slowdown,color=Platform)) + 
+  df <- slowdowns %>% filter(Language==lang)
+  # platform_ecdf(lang, "firefox")
+  # platform_ecdf(lang, "chrome")
+  # platform_ecdf(lang, "safari")
+  # platform_ecdf(lang, "MicrosoftEdge")
+  plot <- ggplot(df, aes(x=Slowdown,color=Platform)) +
     stat_ecdf() +
     mytheme() +
     ylab("Percentage of Benchmarks")
