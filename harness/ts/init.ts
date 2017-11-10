@@ -188,9 +188,25 @@ function pyretBenchmark(name: string) {
   }
 }
 
+const pythonOverviewBenchmarks = [
+  'anagram',
+  'b',
+  'binary_trees',
+  'deltablue',
+  'fib',
+  'nbody',
+  'pystone',
+  'raytrace_simple',
+  'richards',
+  'spectral_norm'
+];
+
+
 function benchmarksFor(lang: string, bench: string) {
-  if (lang === 'python_pyjs') {
+  // These are the benchmarks we use in Section 2.
+  if (lang === 'python_pyjs' && pythonOverviewBenchmarks.includes(bench)) {
     pythonBenchmark(bench);
+    // We allow the other settings to run too.
   }
 
   if (lang === 'pyret') {
