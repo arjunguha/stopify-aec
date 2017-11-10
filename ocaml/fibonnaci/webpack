@@ -1,1 +1,0 @@
-webpack lib/js/$1/fib.js js-build/$1.js

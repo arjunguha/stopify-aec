@@ -1,7 +1,206 @@
+module type Nullable_array_interface = sig
+type 'a t
+
+val length : 'a t -> int
+
+val make : int -> 'a t
+
+val set : 'a t -> int -> 'a -> unit
+
+val get : 'a t -> int -> 'a option
+
+val get_k : 'a t -> int -> (unit -> 'b) -> ('a -> 'b) -> 'b
+
+val iteri_sparse : f:(int -> 'a -> unit) -> 'a t -> unit
+end
+
+module Nullable_array_marker = struct
+type elt =
+  | Constant
+  | Allocated of int
+
+type 'a t = elt array
+
+exception Null
+
+let null : elt = Obj.magic Null
+
+let empty_array : 'a t = Array.make 1 null
+
+let make (n:int) : 'a t =
+  (* The array contains n+1 elements: the first one is used to store the null as a reference *)
+  Array.make (n+1) null
+
+let length a = Array.length a - 1
+
+let set (a:'a t) (n:int) (v:'a) : unit =
+  Array.set a (n+1) (Obj.magic v : elt)
+    [@@inline]
+
+let clear (a:'a t) (n:int) : unit =
+  Array.set a (n+1) (Array.unsafe_get a 0)
+
+let unsafe_set (a:'a t) (n:int) (v:'a) : unit =
+  Array.unsafe_set a (n+1) (Obj.magic v : elt)
+    [@@inline]
+
+let get (a:'a t) (n:int) : 'a option =
+  let elt = Array.get a (n+1) in
+  let null = Array.unsafe_get a 0 in
+  if elt == null then
+    None
+  else
+    Some (Obj.magic elt:'a)
+      [@@inline]
+
+let unsafe_get (a:'a t) (n:int) : 'a option =
+  let elt = Array.unsafe_get a (n+1) in
+  let null = Array.unsafe_get a 0 in
+  if elt == null then
+    None
+  else
+    Some (Obj.magic elt:'a)
+      [@@inline]
+
+let unsafe_get_some (a:'a t) (n:int) : 'a =
+  let elt = Array.unsafe_get a (n+1) in
+  (Obj.magic elt:'a)
+    [@@inline]
+
+let get_k (a:'a t) (n:int) (k_none:(unit -> 'b)) (k_some:('a -> 'b)) : 'b =
+  let elt = Array.get a (n+1) in
+  let null = Array.unsafe_get a 0 in
+  if elt == null then
+    k_none ()
+  else
+    k_some (Obj.magic elt:'a)
+      [@@inline]
+
+let unsafe_get_k (a:'a t) (n:int) (k_none:(unit -> 'b)) (k_some:('a -> 'b)) : 'b =
+  let elt = Array.unsafe_get a (n+1) in
+  let null = Array.unsafe_get a 0 in
+  if elt == null then
+    k_none ()
+  else
+    k_some (Obj.magic elt:'a)
+      [@@inline]
+
+let iteri_sparse ~(f:int -> 'a -> unit) (a:'a t) : unit =
+  let null = Array.unsafe_get a 0 in
+  for i = 1 to Array.length a - 1 do
+    let elt = Array.unsafe_get a i in
+    if elt != null then f (i-1) (Obj.magic elt:'a)
+  done
+
+let realloc (src:'a t) (n:int) =
+  let null = Array.unsafe_get src 0 in
+  let result = Array.make n null in
+  let copy_lenght = min (Array.length src) (Array.length result) - 1 in
+  Array.blit src 1 result 1 copy_lenght;
+  result
+end
+
+module Option_array = struct
+type 'a t = 'a option array
+
+let length a = Array.length a
+
+let make n = Array.make n None
+
+let set (a:'a t) n (v:'a) = Array.set a n (Some v)
+
+let get (a:'a t) n : 'a option = Array.get a n
+
+let get_k (a:'a t) n none some =
+  match Array.get a n with
+  | None -> none ()
+  | Some v -> some v
+
+let iteri_sparse ~f a =
+  Array.iteri (fun i v ->
+      match v with
+      | None -> ()
+      | Some v -> f i v)
+    a
+end
+
+module Nullable_array_closure = struct
+(* This type tells the compiler that it is not a float, but can
+   contain heap allocated values.
+
+   Note that the correctness of this must be reasserted for each
+   version of the compiler as new versions could specialise the array
+   type further to its content. *)
+type elt =
+  | Constant
+  | Allocated of int
+
+type 'a t = elt array
+
+(* A function is used to mark the empty fields. This is built as
+   function returning an exception to ensure that no other function
+   could be shared with this one. This ensures that the physical
+   equality is meaningfull: No other value can be made physically
+   equal to that one.
+
+   This is a function instead of directly using the exception to
+   ensure that marshalling behaves correctly: This won't work if we
+   are marshalling between incompatible binaries, but sharing will
+   be preserved otherwise.
+
+   Not that this property also prevents this type from being correctly
+   unmarshaled.
+
+   There would be solutions by storing the null in the array as a
+   reminder. *)
+exception Null
+
+let null : elt =
+  Array.unsafe_get (Obj.magic (fun _ -> Null):elt array) 0
+
+(* let null : elt = (Obj.magic (fun _ -> Null)) *)
+
+let make (n:int) : 'a t =
+  (* Null is not a floating point value, the array won't be allocated
+     as a float array *)
+  let a = Array.make n null in
+  (* We mark the array with the closure tag such that the no naked
+     pointer variant correctly recognize it as an out of heap pointer *)
+  Obj.set_tag (Obj.repr a) Obj.closure_tag;
+  a
+
+let length a = Array.length a
+
+let set (a:'a t) (n:int) (v:'a) : unit =
+  Array.set a n (Obj.magic v : elt)
+    [@@inline]
+
+let get (a:'a t) (n:int) : 'a option =
+  let elt = Array.get a n in
+  if elt == null then
+    None
+  else
+    Some (Obj.magic elt:'a)
+      [@@inline]
+
+let get_k (a:'a t) (n:int) (k_none:(unit -> 'b)) (k_some:('a -> 'b)) : 'b =
+  let elt = Array.get a n in
+  if elt == null then
+    k_none ()
+  else
+    k_some (Obj.magic elt:'a)
+      [@@inline]
+
+let iteri_sparse ~(f:int -> 'a -> unit) (a:'a t) : unit =
+  for i = 0 to Array.length a - 1 do
+    let elt = Array.unsafe_get a i in
+    if elt != null then f i (Obj.magic elt:'a)
+  done
+end
 
 open Micro_bench_types
 
-module type M = module type of Nullable_array_interface
+module type M = Nullable_array_interface
 
 type 'a prepared_array =
   { option_array : 'a Option_array.t;

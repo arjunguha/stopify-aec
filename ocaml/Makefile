@@ -4,7 +4,7 @@ OUTPUT = $(SOURCES:benchmark-files/%.ml=js-build/%.js)
 
 all: $(OUTPUT)
 	bsb
-	$(foreach dir,$(DIRS),$(dir)/webpack $(dir);)
+	$(foreach dir,$(DIRS),cp lib/js/$(dir)/*.js js-build;)
 
 js-build:
 	mkdir -p js-build/
@@ -13,7 +13,7 @@ lib/js/benchmark-files/%.js: benchmark-files/%.ml
 	bsb
 
 js-build/%.js: lib/js/benchmark-files/%.js js-build | js-build
-	webpack $< $@
+	cp $< $@
 
 clean:
 	rm -rf lib/ js-build/
