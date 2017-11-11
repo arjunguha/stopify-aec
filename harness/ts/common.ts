@@ -221,7 +221,7 @@ export function benchmarkRunOpts(benchmark: Benchmark | VarianceBench): string[]
   return args;
 }
 
-function dropWhile<T>(f: (elt: T) => boolean, arr: T[]): T[] {
+export function dropWhile<T>(f: (elt: T) => boolean, arr: T[]): T[] {
   for (let i = 0; i < arr.length; i++) {
     if (f(arr[i]) === false) {
       return arr.slice(i);
@@ -255,9 +255,7 @@ function parseRunningTimes(output: string[]): any {
 }
 
 export function parseBenchmarkOutput(stdout: string): BenchmarkOutput | undefined {
-  let output = String(stdout).split('\n').filter(line => line.length> 0);
-  output = dropWhile(line => line !== "BEGIN STOPIFY BENCHMARK RESULTS",
-    output);
+  let output = String(stdout).split('\n')
   if (output.length < 2) {
     console.error(`unexpected result from benchmark`);
     console.error(output.join('\n'));

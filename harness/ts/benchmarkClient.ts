@@ -52,11 +52,18 @@ function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boole
     function checkDone() {
       if (iframe.contentDocument.title === 'done') {
         const data = (<HTMLTextAreaElement>iframe.contentDocument.getElementById('data')).value;
+
+        const output = common.dropWhile(
+          line => line !== "BEGIN STOPIFY BENCHMARK RESULTS",
+          String(data)
+            .split('\n')
+            .filter(line => line.length> 0)).join("\n")
+
         fetch(new Request('/done', {
           method: 'post',
           headers: headers,
           body: JSON.stringify({
-            output: data,
+            output: output,
             rowId: b.rowId,
             lang: b.lang,
             bench: b.bench,
@@ -120,7 +127,7 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
     progressText.innerText = `Completed ${completed} of ${n} benchmarks (${failed} failures)`;
     if (i === n) {
       return Promise.resolve(true);
-    } 
+    }
     return runBenchmark(benchmarks[i])
       .then(() => {
         completed++;
