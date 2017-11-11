@@ -10,7 +10,7 @@
 
 object binarytrees {
   def main(args: Array[String]) = {
-    val n = 21
+    val n = 19
     val minDepth = 4
     val maxDepth = n max (minDepth+2)
 

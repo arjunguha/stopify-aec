@@ -1208,11 +1208,11 @@ $c_Lbinarytrees$.prototype.print$1__p1__T__I__I__V = (function(name, depth, chec
   this$3.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x + "\n"))
 });
 $c_Lbinarytrees$.prototype.main__AT__V = (function(args) {
-  this.print$1__p1__T__I__I__V("stretch tree", 22, $m_LTree$().apply__I__LTree(22).isum__I());
-  var longLivedTree = $m_LTree$().apply__I__LTree(21);
+  this.print$1__p1__T__I__I__V("stretch tree", 20, $m_LTree$().apply__I__LTree(20).isum__I());
+  var longLivedTree = $m_LTree$().apply__I__LTree(19);
   var depth = 4;
-  while ((depth <= 21)) {
-    var iterations = (1 << ((25 - depth) | 0));
+  while ((depth <= 19)) {
+    var iterations = (1 << ((23 - depth) | 0));
     var i = 0;
     var sum = 0;
     while ((i < iterations)) {
@@ -1222,7 +1222,7 @@ $c_Lbinarytrees$.prototype.main__AT__V = (function(args) {
     this.print$1__p1__T__I__I__V((iterations + "\t trees"), depth, sum);
     depth = ((2 + depth) | 0)
   };
-  this.print$1__p1__T__I__I__V("long lived tree", 21, longLivedTree.isum__I())
+  this.print$1__p1__T__I__I__V("long lived tree", 19, longLivedTree.isum__I())
 });
 var $d_Lbinarytrees$ = new $TypeData().initClass({
   Lbinarytrees$: 0

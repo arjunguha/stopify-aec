@@ -9,7 +9,7 @@ import math._
 import scala.scalajs.js.JSApp
 object NBody extends JSApp {
   def main() = {
-    var n = 50000000
+    var n = 10000000
 
     printf("%.9f\n", JovianSystem.energy )
     while (n > 0) { JovianSystem.advance(0.01); n -= 1 }
