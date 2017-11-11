@@ -1215,7 +1215,7 @@ $c_Lfannkuchredux$.prototype.fannkuch__I__I = (function(n) {
   return flips
 });
 $c_Lfannkuchredux$.prototype.main__AT__V = (function(args) {
-  var x = ("Pfannkuchen(12) = " + this.fannkuch__I__I(12));
+  var x = ("Pfannkuchen(10) = " + this.fannkuch__I__I(10));
   var this$2 = $m_s_Console$();
   var this$3 = $as_Ljava_io_PrintStream(this$2.outVar$2.v$1);
   this$3.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x + "\n"))

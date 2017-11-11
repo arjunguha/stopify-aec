@@ -60,7 +60,7 @@ object fannkuchredux
   }
 
   def main(args: Array[String]) {
-    val n = 12
+    val n = 10
     println("Pfannkuchen("+n+") = "+fannkuch(n))
   }
 }
