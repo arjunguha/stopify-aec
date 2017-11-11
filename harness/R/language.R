@@ -220,10 +220,6 @@ language_bar_plot <- function(lang) {
 }
 
 
-plots <- lapply(all_languages, language_histogram)
-do.call("grid.arrange", c(plots, ncol=3))
-
-
 for(lang in all_languages) {
   language_bar_plot(lang)
 }
