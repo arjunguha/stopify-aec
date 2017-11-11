@@ -30,6 +30,8 @@ mytheme <- function() {
 
 all_data <- read_csv("../results.csv")
 
+all_languages <- unique(all_data$Language)
+
 original <- all_data %>%
   filter(Transform == "original") %>%
   select(Benchmark,Language,Platform,RunningTime)
@@ -54,13 +56,12 @@ slowdowns <- all_data %>%
   inner_join(original_avgtimes) %>%
   inner_join(selector) %>%
   mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
-  select(Benchmark,Platform,Language,Slowdown) %>%  
-  mutate(N = 1) %>%
-  group_by(Platform, Language) %>%
-  arrange(Slowdown) %>%
-  mutate(.y = cumsum(N) / length(N)) %>%
-  ungroup() %>%
-  select(-N)
+  select(Benchmark,Platform,Language,Slowdown)
+
+mean_slowdowns <- slowdowns %>%
+  group_by(Benchmark,Platform,Language) %>%
+  summarize(.mean = mean(Slowdown),
+            .ci = 1.96 * sd(Slowdown) / sqrt(length(Slowdown)))
 
 by_platform <- function(platform) {
   slowdowns <- all_data %>%
@@ -85,7 +86,7 @@ platform_ecdf <-function(lang,platform) {
   cat(paste0("\\newcommand{\\", gsub("_", "", lang), platform,"95}{", round(g(.95), digits = 1),"x}\n"))
 }
 
-save_by_language <- function(lang) {
+language_cdf <- function(lang) {
   df <- slowdowns %>% filter(Language==lang)
   # platform_ecdf(lang, "firefox")
   # platform_ecdf(lang, "chrome")
@@ -98,13 +99,42 @@ save_by_language <- function(lang) {
   ggsave(paste0("slowdown-", lang, ".pdf"), plot, width=4, height=3, units=c("in"))
 }
 
-save_by_language("python_pyjs") # 1
-save_by_language("c++") # 2
-save_by_language("dart_dart2js") # 3
-save_by_language("clojurescript") # 4
-save_by_language("java") # 5
-save_by_language("scheme") # 6
-save_by_language("ocaml") # 7
-save_by_language("scala") # 8
-save_by_language("javascript") # 9
-save_by_language("pyret") # 10
+language_bar_plot <- function(lang) {
+  df <- mean_slowdowns %>% filter(Language == lang)
+  plot <- ggplot(df, aes(x=Benchmark,y=.mean,fill=Platform)) +
+    geom_bar(position="dodge", stat="identity") +
+    geom_errorbar(
+      aes(ymin=.mean-.ci/2,ymax=.mean+.ci/2), size=0.3, width=.9, 
+      position=position_dodge(.9)) +
+    theme_bw() + 
+    theme(axis.text.x = element_text(hjust = 1, angle=60),
+          text = element_text(family="serif", size=16),
+          panel.grid.major = element_line(colour="gray", size=0.1),
+          panel.grid.minor =
+            element_line(colour="gray", size=0.1, linetype='dotted'),
+          axis.ticks = element_line(size=0.05),
+          axis.ticks.length=unit("-0.05", "in"),
+          axis.text.y = element_text(margin = margin(r = 5)),
+          legend.key = element_rect(colour=NA),
+          legend.background = element_blank(),
+          legend.margin = margin(unit(0.001, "in")),
+          legend.key.size = unit(0.2, "in"),
+          legend.title = element_blank(),
+          legend.position = c(0.9, .8))
+  ggsave(paste0("detailed-slowdown-", lang, ".pdf"), plot, width=7, height=5, units=c("in"))
+}
+
+for(lang in all_languages) {
+  language_bar_plot(lang)
+}
+
+language_cdf("python_pyjs") # 1
+language_cdf("c++") # 2
+language_cdf("dart_dart2js") # 3
+language_cdf("clojurescript") # 4
+language_cdf("java") # 5
+language_cdf("scheme") # 6
+language_cdf("ocaml") # 7
+language_cdf("scala") # 8
+language_cdf("javascript") # 9
+language_cdf("pyret") # 10
