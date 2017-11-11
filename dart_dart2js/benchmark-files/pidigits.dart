@@ -70,7 +70,7 @@ class PiDigits extends BenchmarkBase {
   const PiDigits(): super('PiDigits');
 
   void run() {
-    int N = 3000;
+    int N = 2000;
     calculatePi(N);
   }
 

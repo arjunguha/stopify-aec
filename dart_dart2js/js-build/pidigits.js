@@ -3653,13 +3653,13 @@
     BenchmarkBase_measure_closure: {
       "^": "Closure;$this",
       call$0: function() {
-        G.calculatePi(3000);
+        G.calculatePi(2000);
       }
     },
     BenchmarkBase_measure_closure0: {
       "^": "Closure;$this",
       call$0: function() {
-        G.calculatePi(3000);
+        G.calculatePi(2000);
       }
     }
   }], ["", "../benchmark-files/pidigits.dart",, G, {
@@ -4042,7 +4042,30 @@
     };
   }
   // BEGIN invoke [main].
-  G.main([]);
+  (function(callback) {
+    if (typeof document === "undefined") {
+      callback(null);
+      return;
+    }
+    if (typeof document.currentScript != 'undefined') {
+      callback(document.currentScript);
+      return;
+    }
+    var scripts = document.scripts;
+    function onLoad(event) {
+      for (var i = 0; i < scripts.length; ++i)
+        scripts[i].removeEventListener("load", onLoad, false);
+      callback(event.target);
+    }
+    for (var i = 0; i < scripts.length; ++i)
+      scripts[i].addEventListener("load", onLoad, false);
+  })(function(currentScript) {
+    init.currentScript = currentScript;
+    if (typeof dartMainRunner === "function")
+      dartMainRunner(G.main, []);
+    else
+      G.main([]);
+  });
   // END invoke [main].
 })();
 
