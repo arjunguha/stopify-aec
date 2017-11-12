@@ -49,7 +49,12 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
     args.push('--new', newMethod!);
     args.push('--es', esMode!);
     args.push('--js-args', jsArgs!);
+
+    if (lang === 'c++' || lang === 'clojurescript') {
+      args.push('--hofs', 'fill');
+    }
   }
+
   args.push(benchmarkFilename, compiledFilename);
   try {
     console.error(`Running ./bin/compile ${args.join(' ')} ...`);
