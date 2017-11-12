@@ -212,7 +212,7 @@ void Towers ()    { /* Towers */
 int main()
 {
 	int i;
-	for (i = 0; i < 100; i++) Towers();
+	for (i = 0; i < 5000; i++) Towers();
 	return 0;
 }
 

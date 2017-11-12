@@ -29,7 +29,7 @@ Node *make(int d) {
 
 int main(int argc, char *argv[]) {
   int min_depth = 4,
-    max_depth = 21,
+    max_depth = 18,
     stretch_depth = max_depth+1;
 
   {
