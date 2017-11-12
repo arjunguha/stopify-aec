@@ -2,7 +2,7 @@ CXX = em++
 CC = emcc
 EMCONFIG = emconfigure
 EMMAKE = emmake
-EMCCFLAGS = -s TOTAL_MEMORY=1677721600 -s NO_DYNAMIC_EXECUTION=1 --memory-init-file 0
+EMCCFLAGS = -s TOTAL_MEMORY=167772160 -s NO_DYNAMIC_EXECUTION=1 --memory-init-file 0
 CFLAGS = -O3 -lm
 CXXFLAGS = $(CFLAGS) -std=c++11
 ZLIB = libz.a
