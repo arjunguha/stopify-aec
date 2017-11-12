@@ -4,8 +4,8 @@ all_data <- read_csv("../results.csv") %>%
   filter(Language == "pyret") %>%
   select(Benchmark,RunningTime,Platform,Transform,NumYields) %>%
   mutate(Transform = if_else(Transform == "lazy", "with Breakout", 
-                             if_else(Transform == "native", 
-                                     "No stopping", 
+                             if_else(Transform == "original", 
+                                     "no yields", 
                                      "without Breakout")))
 
 without_avgtimes <- all_data %>%
@@ -24,6 +24,7 @@ ggplot(slowdowns, aes(x = Slowdown, color=Platform)) +
   stat_ecdf() +
   scale_x_continuous(breaks = 1:20) +
   theme_bw() +
+  labs(y = "% of Trials") +
   theme(
     panel.background = element_rect(size = 0.9),
     text = element_text(family="serif", size=16),
@@ -41,4 +42,4 @@ ggplot(slowdowns, aes(x = Slowdown, color=Platform)) +
     legend.position = c(0.7, .2),
     legend.background = element_blank())
 
-ggsave("pyret_slowdown.pdf")
+ggsave("pyret_slowdown.pdf", width=5, height=5, units=c("in"))
