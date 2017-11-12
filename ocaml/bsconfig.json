@@ -19,8 +19,7 @@
       "./nucleic",
       "./nullable_array",
       "./num_analysis",
-      "./sequence",
-      "./vector_functor"
+      "./sequence"
     ]
   },
 }

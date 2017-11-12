@@ -385,7 +385,7 @@ if (typeof config === "number") {
   Micro_bench_run.run(/* Some */[/* Some */[config]], Micro_bench_types.functions(/* () */0));
 } else {
   var conf = config[1];
-  Fixture.run_n_times(100, (function () {
+  Fixture.run_n_times(10, (function () {
           var newrecord = conf.slice();
           return Micro_bench_run.run(/* Some */[/* Some */[/* `Run */[
                           4103979,

@@ -16,8 +16,8 @@ let rec make d =
 let rec check = function Empty -> 0 | Node(l, r) -> 1 + check l + check r
 
 let min_depth = 4
-let max_depth = (let n = try int_of_string(Array.get Sys.argv 1) with _ -> 21 in
-                 max (min_depth + 2) n)
+let max_depth = let n = 18 in
+  max (min_depth + 2) n
 let stretch_depth = max_depth + 1
 
 let () =

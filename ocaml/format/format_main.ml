@@ -73,4 +73,4 @@ let () = add [
   make_complicated_benchs "_empty" [] ;
 
   ];
-  Fixture.run_n_times 2000 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ()))
+  Fixture.run_n_times 500 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ()))

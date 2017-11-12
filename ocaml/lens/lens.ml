@@ -182,7 +182,7 @@ let () =
   let config = Micro_bench_run.Config.parse () in
   match config with
   | `Run conf ->
-      Fixture.run_n_times 100 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ())
+      Fixture.run_n_times 10 (fun () -> Micro_bench_run.run (Micro_bench_types.functions ())
       ~conf:(Some (`Run {conf with Micro_bench_run.Config.number_of_different_values=1000})))
   | _ ->
       Micro_bench_run.run (Micro_bench_types.functions ()) ~conf:(Some config)

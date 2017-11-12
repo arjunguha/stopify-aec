@@ -392,7 +392,7 @@ Micro_bench_types.add(/* :: */[
       ]
     ]);
 
-Fixture.run_n_times(2000, (function () {
+Fixture.run_n_times(500, (function () {
         return Micro_bench_run.run(/* None */0, Micro_bench_types.functions(/* () */0));
       }));
 
