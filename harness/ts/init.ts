@@ -183,7 +183,13 @@ function pyretBenchmark(name: string) {
     for (const b of browsers) {
       initTiming(i, 'pyret', name, b, 'native');
       initTiming(i, 'pyret', name, b, 'original');
-      initTiming(i, 'pyret', name, b, 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+      // edge uses retval
+      if (b === 'MicrosoftEdge') {
+        initTiming(i, 'pyret', name, b, 'retval', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+      }
+      else {
+        initTiming(i, 'pyret', name, b, 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+      }
     }
   }
 }

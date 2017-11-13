@@ -180,6 +180,9 @@ export function pyretSourceFilename(benchmark: Benchmark) {
   else if (transform === 'original') {
     suffix = 'v.jarr'
   }
+  else if (transform === 'retval') {
+    suffix = 'vs.jarr.retval'
+  }
   else {
     suffix = 'vs.jarr'
   }
