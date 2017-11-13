@@ -20,10 +20,14 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
   // These are the compile-time settings
   const { lang, bench, platform, transform, newMethod, esMode, jsArgs } = benchmark;
 
-  if (lang === 'pyret') {
-    const benchmarkFilename = common.pyretSourceFilename(benchmark);
+  if (lang === 'pyret' || lang == 'pyret_deepstacks') {
+    const benchmarkFilename = common.pyretSourceFilename(lang, benchmark);
     const compiledFilename =
       `./benchmarks/tmp/${common.benchmarkCompiledFilename(benchmark)}`
+
+    if (fs.existsSync('../../' + compiledFilename)) {
+      return;
+    }
 
     spawnSync('cp', [benchmarkFilename, compiledFilename], {
       stdio: 'inherit',

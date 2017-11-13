@@ -169,8 +169,8 @@ export function benchmarkSourceFilename(benchmark: Common) {
   return `./benchmarks/${lang}/js-build/${bench}.js`;
 }
 
-export function pyretSourceFilename(benchmark: Benchmark) {
-  const { lang, bench, transform } = benchmark
+export function pyretSourceFilename(lang: string, benchmark: Benchmark) {
+  const { bench, transform } = benchmark
 
   let suffix;
 
@@ -187,7 +187,7 @@ export function pyretSourceFilename(benchmark: Benchmark) {
     suffix = 'vs.jarr'
   }
 
-  return `./benchmarks/pyret/js-build/${bench}.${suffix}`
+  return `./benchmarks/${lang}/js-build/${bench}.${suffix}`
 }
 
 export function benchmarkCompiledFilename(benchmark: Common) {

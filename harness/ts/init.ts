@@ -67,7 +67,8 @@ db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS failure_index ON failures
 
 // 3 more needed: Java, Pyret, JavaScript
 const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js',
-  'scala', 'c++', 'scheme', 'java', 'microbenches' ];
+  'scala', 'c++', 'scheme', 'java', 'microbenches', 'pyret_deepstacks',
+  'deepstacks' ];
 
 function initTiming(i: number,
   lang: string,
@@ -194,6 +195,17 @@ function pyretBenchmark(name: string) {
   }
 }
 
+function deepstackBenchmark(lang: string, name: string) {
+  for (let i = 0; i < 10; i++) {
+    for (const b of browsers) {
+      initTiming(i, lang, name, b, 'lazyDeep')
+      if (lang === 'pyret_deepstacks') {
+        initTiming(i, lang, name, b, 'native')
+      }
+    }
+  }
+}
+
 const pythonOverviewBenchmarks = [
   'anagram',
   'b',
@@ -219,6 +231,12 @@ function benchmarksFor(lang: string, bench: string) {
     pyretBenchmark(bench)
     return
   }
+
+  if (lang === 'pyret_deepstacks' || lang === 'deepstacks') {
+    deepstackBenchmark(lang, bench)
+    return
+  }
+
 
   for (let i = 0; i < 10; i++) {
     /* Disable scala velocity benchmarks.
@@ -276,6 +294,20 @@ function createTimingTable() {
       continue;
     }
     const lang = 'pyret'
+    const bench = m[2];
+    benchmarksFor(lang, bench);
+  }
+
+  // Pyret deepstacks
+  const pyretdeepBench =
+    glob.sync(path.resolve(__dirname, '../../pyret_deepstacks/*.arr'))
+  for (const path of pyretdeepBench) {
+    const m = /^.*\/([^/]*)\/([^.]*)\.arr/.exec(path);
+    if (m === null) {
+      console.error(`could not parse filename ${path}`);
+      continue;
+    }
+    const lang = 'pyret_deepstacks'
     const bench = m[2];
     benchmarksFor(lang, bench);
   }
