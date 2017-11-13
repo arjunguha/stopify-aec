@@ -23,7 +23,7 @@ interface Common {
   lang: string,
   bench: string,
   platform: Platform,
-  transform?: 'native' | 'original' | 'lazy' | 'eager' | 'retval',
+  transform?: 'native' | 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
   newMethod?: 'direct' | 'wrapper',
   esMode?: 'sane' | 'es5',
   jsArgs?: 'simple' | 'faithful',
