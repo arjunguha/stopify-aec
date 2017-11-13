@@ -213,7 +213,7 @@ export function benchmarkRunOpts(benchmark: Benchmark | VarianceBench): string[]
 
   const args = [ '--env', platform, '-t', transform!];
   if (transform === 'lazyDeep') {
-    args.push('-d', 500)
+    args.push('-d', '500')
   }
   if (estimator) {
     args.push('--estimator', estimator!);
