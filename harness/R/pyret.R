@@ -3,9 +3,9 @@ library(tidyverse)
 all_data <- read_csv("../results.csv") %>%
   filter(Language == "pyret") %>%
   select(Benchmark,RunningTime,Platform,Transform,NumYields) %>%
-  mutate(Transform = if_else(Transform == "lazy", "with Breakout", 
-                             if_else(Transform == "original", 
-                                     "no yields", 
+  mutate(Transform = if_else(Transform == "lazy" | Transform == "retval", "with Breakout",
+                             if_else(Transform == "original",
+                                     "no yields",
                                      "without Breakout")))
 
 without_avgtimes <- all_data %>%
@@ -15,12 +15,13 @@ without_avgtimes <- all_data %>%
   ungroup() %>%
   select(Benchmark, Platform, MeanOriginal)
 
+
 slowdowns <- all_data %>%
   filter(Transform == "with Breakout") %>%
   inner_join(without_avgtimes) %>%
   mutate(Slowdown = RunningTime / MeanOriginal)
 
-ggplot(slowdowns, aes(x = Slowdown, color=Platform)) + 
+ggplot(slowdowns, aes(x = Slowdown, color=Platform)) +
   stat_ecdf() +
   scale_x_continuous(breaks = 1:20) +
   theme_bw() +
@@ -43,3 +44,14 @@ ggplot(slowdowns, aes(x = Slowdown, color=Platform)) +
     legend.background = element_blank())
 
 ggsave("pyret_slowdown.pdf", width=5, height=5, units=c("in"))
+
+stats <- function (plat) {
+    print(plat)
+    print(mean((slowdowns %>% filter(Platform == plat))$Slowdown))
+    print(sd((slowdowns %>% filter(Platform == plat))$Slowdown))
+}
+
+stats("chrome")
+stats("safari")
+stats("firefox")
+stats("MicrosoftEdge")
