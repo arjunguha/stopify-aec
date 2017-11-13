@@ -198,7 +198,7 @@ function pyretBenchmark(name: string) {
 function deepstackBenchmark(lang: string, name: string) {
   for (let i = 0; i < 10; i++) {
     for (const b of browsers) {
-      initTiming(i, lang, name, b, 'lazyDeep')
+      initTiming(i, lang, name, b, 'lazyDeep', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100)
       if (lang === 'pyret_deepstacks') {
         initTiming(i, lang, name, b, 'native')
       }
