@@ -203,11 +203,18 @@ export function benchmarkRunOpts(benchmark: Benchmark | VarianceBench): string[]
   const { lang, bench, platform, transform, newMethod, esMode, estimator,
     timePerElapsed, yieldInterval, resampleInterval, jsArgs } = benchmark;
 
+  if (transform === 'native') {
+    return []
+  }
+
   if (lang === 'pyret') {
     return  ['--env', platform];
   }
 
   const args = [ '--env', platform, '-t', transform!];
+  if (transform === 'lazyDeep') {
+    args.push('-d', 500)
+  }
   if (estimator) {
     args.push('--estimator', estimator!);
   }
