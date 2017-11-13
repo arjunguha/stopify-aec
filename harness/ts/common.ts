@@ -41,6 +41,7 @@ export interface Benchmark extends Common {
 
 export interface VarianceBench extends Common {
   type: 'variance',
+  ix: number,
   variance?: string,
 };
 
@@ -67,6 +68,7 @@ export function mayNull(x: any) {
 }
 
 export function initVariance(db: Database,
+  ix: number,
   lang: string,
   bench: string,
   platform: string,
@@ -78,15 +80,15 @@ export function initVariance(db: Database,
   timePerElapsed?: number,
   yieldInterval?: number,
   resampleInterval?: number) {
-  const r = db.prepare(`INSERT OR IGNORE INTO variance (lang, bench, platform, transform,
+  const r = db.prepare(`INSERT OR IGNORE INTO variance (ix, lang, bench, platform, transform,
     new_method, es_mode, js_args, estimator, time_per_elapsed, yield_interval, resample_interval) VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-    .run(lang, bench, platform, mayNull(transform),
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(ix, lang, bench, platform, mayNull(transform),
       mayNull(newMethod), mayNull(esMode), mayNull(jsArgs),
       mayNull(estimator), mayNull(timePerElapsed),
       mayNull(yieldInterval), mayNull(resampleInterval));
   if (r.changes > 0) {
-    console.error(`Creating variance configuration ${lang},${bench},${platform},${transform},${newMethod},${esMode},${jsArgs},${estimator},${timePerElapsed},${yieldInterval},${resampleInterval}`);
+    console.error(`Creating variance configuration ${ix},${lang},${bench},${platform},${transform},${newMethod},${esMode},${jsArgs},${estimator},${timePerElapsed},${yieldInterval},${resampleInterval}`);
   }
 }
 
@@ -122,6 +124,7 @@ export function parseBenchmarkVariance(row: any): VarianceBench {
   return {
     type: 'variance',
     rowId: row.rowid,
+    ix: row.ix,
     lang: row.lang,
     bench: row.bench,
     platform: row.platform,

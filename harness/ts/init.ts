@@ -27,7 +27,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS timing
    num_yields INTEGER);`);
 
 db.exec(`CREATE TABLE IF NOT EXISTS variance
-  (lang TEXT NOT NULL,
+  (ix INTEGER NOT NULL,
+   lang TEXT NOT NULL,
    bench TEXT NOT NULL,
    platform TEXT NOT NULL,
    transform TEXT NOT NULL,
@@ -59,7 +60,7 @@ db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS timing_index ON timing
   (ix,lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
    time_per_elapsed,yield_interval,resample_interval);`);
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS variance_index ON variance
-  (lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
+  (ix,lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
    time_per_elapsed,yield_interval,resample_interval);`);
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS failure_index ON failures
   (lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
@@ -94,16 +95,16 @@ function initTiming(i: number,
 }
 
 function pythonBenchmark(name: string) {
-  // Initialize python variance entries
-  initVariance(db, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
-  initVariance(db, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'exact', undefined,  100);
-  initVariance(db, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined,  100, 250);
-
   // Sadly, these two just crash with --es=es5
   if (name === 'gcbench' || name === 'schulze') {
     return;
   }
   for (let i = 0; i < 10; i++) {
+    // Initialize python variance entries
+    initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
+    initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'exact', undefined,  100);
+    initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined,  100, 250);
+
     initTiming(i, 'python_pyjs', name, 'native');
     initTiming(i, 'python_pyjs', name, 'chrome', 'original');
     initTiming(i, 'python_pyjs', name, 'firefox', 'original');

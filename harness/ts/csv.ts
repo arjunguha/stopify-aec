@@ -47,7 +47,7 @@ for (const row of rows) {
 fs.appendFileSync(<any>varianceFd,
   'Language,Benchmark,Platform,Transform,NewMethod,EsMode,JsArgs,Estimator,');
 fs.appendFileSync(<any>varianceFd,
-  'TimePerElapsed,YieldInterval,ResampleInterval,Index,Variance,RunningTime,NumYields\n');
+  'TimePerElapsed,YieldInterval,ResampleInterval,Iteration,Index,Variance,RunningTime,NumYields\n');
 for (const row of varianceRows) {
   const variance = na(row.variance);
   const lines = variance.split('\n');
@@ -61,6 +61,7 @@ for (const row of varianceRows) {
     fs.appendFileSync(varianceFd, `${na(row.time_per_elapsed)},`);
     fs.appendFileSync(varianceFd, `${na(row.yield_interval)},`);
     fs.appendFileSync(varianceFd, `${na(row.resample_interval)},`);
+    fs.appendFileSync(varianceFd, `${na(row.ix)},`);
     fs.appendFileSync(varianceFd, `${ix},`);
     fs.appendFileSync(varianceFd, `${latency},`);
     fs.appendFileSync(varianceFd, `${row.running_time},`);
