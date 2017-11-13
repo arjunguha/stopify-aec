@@ -40,6 +40,31 @@ by_estimator <- function (data, estimator) {
   return (df)
 }
 
+velocity <- all_data %>%
+  filter(Estimator == "velocity") %>%
+  select(Benchmark,RunningTime)
+
+velocity_avgtimes <- velocity %>%
+  group_by(Benchmark) %>%
+  summarise(AvgOriginalTime = mean(RunningTime)) %>%
+  ungroup()
+
+slowdowns <- all_data %>%
+  filter(Estimator != "velocity") %>%
+  inner_join(velocity_avgtimes) %>%
+  mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
+  select(Benchmark,Estimator,Slowdown, RunningTime)
+
+mean_slowdowns <- slowdowns %>%
+  group_by(Benchmark,Estimator) %>%
+  summarize(.mean = mean(Slowdown),
+            .ci = 1.96 * sd(Slowdown) / sqrt(length(Slowdown)))
+
+mean_runtimes <- all_data %>%
+  group_by(Benchmark,Estimator) %>%
+  summarize(.mean = mean(RunningTime),
+            .ci = 1.96 * sd(RunningTime) / sqrt(length(RunningTime)))
+
 latencies <- function (data) {
   digits <- 4
   countdown <- data %>% filter(Estimator=='countdown') %>% group_by(Benchmark) %>%
@@ -54,10 +79,36 @@ latencies <- function (data) {
   return (df)
 }
 
-# plot <- function(data) {
-#   ggplot(data, aes(x=Index/MaxIndex, y=Variance, color=Benchmark)) +
-#     geom_line()
-# }
+variance_plot <- function(data) {
+  ggplot(data, aes(x=Index/MaxIndex, y=Variance, color=Benchmark)) +
+    geom_line()
+}
+
+runtime_plot <- function() {
+  df <- mean_runtimes
+  plot <- ggplot(df, aes(x=Benchmark,y=.mean,fill=Estimator)) +
+    geom_bar(position="dodge", stat="identity") +
+    geom_errorbar(
+      aes(ymin=.mean-.ci/2,ymax=.mean+.ci/2), size=0.3, width=.9, 
+      position=position_dodge(.9)) +
+    theme_bw() + 
+    theme(axis.text.x = element_text(hjust = 1, angle=60),
+          text = element_text(family="serif", size=16),
+          panel.grid.major = element_line(colour="gray", size=0.1),
+          panel.grid.minor =
+            element_line(colour="gray", size=0.1, linetype='dotted'),
+          axis.ticks = element_line(size=0.05),
+          axis.ticks.length=unit("-0.05", "in"),
+          axis.text.y = element_text(margin = margin(r = 5)),
+          legend.key = element_rect(colour=NA),
+          legend.background = element_blank(),
+          legend.margin = margin(unit(0.001, "in")),
+          legend.key.size = unit(0.2, "in"),
+          legend.title = element_blank(),
+          legend.position = c(0.9, .8))
+  # ggsave(paste0("detailed-slowdown-", lang, ".pdf"), plot, width=7, height=5, units=c("in"))
+  return (plot)
+}
 
 latency_table <- function(data) {
   tbl <- xtable(data,align=c('l','l','r','r'),label='tbl:variance',
@@ -74,12 +125,12 @@ For $\\mu$, closer to 100ms is better. For $\\sigma$, lower is better.')
   return (tbl)
 }
 
-# countdown <- by_estimator(all_data, 'countdown')
-# exact <- by_estimator(all_data, 'exact')
-# velocity <- by_estimator(all_data, 'velocity')
+countdown <- by_estimator(all_data, 'countdown')
+exact <- by_estimator(all_data, 'exact')
+velocity <- by_estimator(all_data, 'velocity')
 
-# plot(countdown)
-# plot(exact)
-# plot(velocity)
+variance_plot(countdown)
+variance_plot(exact)
+variance_plot(velocity)
 
 latency_table(latencies(all_data))
