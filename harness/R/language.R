@@ -7,7 +7,7 @@ library(extrafont)
 library(fontcm)
 library(gridExtra)
 
-palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#D55E00", "#CC79A7")
 
 # Theme for output
 mytheme <- function() {
@@ -30,38 +30,47 @@ mytheme <- function() {
              legend.background = element_blank()))
 }
 
-all_languages <- c(
-  "python_pyjs",
-  "clojurescript",
-  "scala",
-  "c++",
-  "java",
-  "scheme",
-  "dart_dart2js",
-  "javascript",
-  "ocaml"
-)
+# Reads .CSV file, excludes native and Pyret results, relabels languages, and
+# relabels browsers.
+read_data <- function(filename) {
 
-all_data <- read_csv("../results.csv") %>%
-  filter(Language %in% all_languages) %>%
-  filter(Platform != "native") %>%
-  mutate(Platform  = fct_recode(Platform, 
-                                "Chrome" = "chrome", 
-                                "Edge" = "MicrosoftEdge",
-                                "Safari" = "safari",
-                                "Firefox" = "firefox"),
-         Language = fct_recode(Language,
-                               "Python (PyJS)" = "python_pyjs",
-                               "Clojure (ClojureScript)" = "clojurescript",
-                               "Scala (ScalaJS)" = "scala",
-                               "C++ (Emscripten)" = "c++",
-                               "Java (JSweet)" = "java",
-                               "Scheme (scheme2js)" = "scheme",
-                               "Dart (dart2js)" = "dart_dart2js",
-                               "JavaScript" = "javascript",
-                               "OCaml (BuckleScript)" = "ocaml")) %>%
-  mutate(Platform = fct_relevel(Platform, "Chrome", "Safari", "Edge", "Firefox", "ChromeBook")) %>%
-  mutate(Platform = droplevels(Platform), Language = droplevels(Language))
+  all_languages <- c(
+    "python_pyjs",
+    "clojurescript",
+    "scala",
+    "c++",
+    "java",
+    "scheme",
+    "dart_dart2js",
+    "javascript",
+    "ocaml"
+  )
+  
+  all_data <- read_csv("../results.csv") %>%
+    filter(Language %in% all_languages) %>%
+    filter(Platform != "native") %>%
+    mutate(Platform  = fct_recode(Platform, 
+                                  "Chrome" = "chrome", 
+                                  "Edge" = "MicrosoftEdge",
+                                  "Safari" = "safari",
+                                  "Firefox" = "firefox"),
+           Language = fct_recode(Language,
+                                 "Python (PyJS)" = "python_pyjs",
+                                 "Clojure (ClojureScript)" = "clojurescript",
+                                 "Scala (ScalaJS)" = "scala",
+                                 "C++ (Emscripten)" = "c++",
+                                 "Java (JSweet)" = "java",
+                                 "Scheme (scheme2js)" = "scheme",
+                                 "Dart (dart2js)" = "dart_dart2js",
+                                 "JavaScript" = "javascript",
+                                 "OCaml (BuckleScript)" = "ocaml")) %>%
+    mutate(Platform = fct_relevel(Platform, "Chrome", "Safari", "Edge", "Firefox", "ChromeBook")) %>%
+    mutate(Platform = droplevels(Platform), Language = droplevels(Language))
+  
+  return (all_data)
+}
+
+all_data <- read_data("../results.csv")
   
 all_platforms <- c("firefox", "chrome", "MicrosoftEdge", "ChromeBook", "safari")
 
@@ -94,17 +103,16 @@ slowdowns <- all_data %>%
   select(Benchmark,Platform,Language,Slowdown)
 
 
-calc_ecdf <- function(language, platform) {
-  df <- as.data.frame(slowdowns %>% 
-    filter(Language == language & Platform == platform) %>%
-    select(Slowdown))
+calc_ecdf <- function(language, platform, .max) {
+  df <- slowdowns %>% 
+    filter(Language == language & Platform == platform)
   if (nrow(df) == 0) {
     return (tribble(~Language, ~Platform, ~x, ~y))
   }
-  return (as_tibble(calc_dkw(df, column = "Slowdown")) %>%
-    filter(x < 100) %>%
-    select(x, y) %>%
-    mutate(Language = language, Platform = platform))
+  f <- ecdf(df$Slowdown)
+  return (tibble(1:.max) %>%
+    `colnames<-`(c("x")) %>%
+    mutate(y = f(x), Language = language, Platform = platform))
 }
 
 language_calc_ecdf <- function(language) {
@@ -113,35 +121,23 @@ language_calc_ecdf <- function(language) {
     return (tribble(~Language, ~Platform, ~x, ~y))
   }
   maxSlowdown <- ceiling(max(du$Slowdown))
-  df <- bind_rows(lapply(levels(slowdowns$Platform), function(p) calc_ecdf(language, p)))
-  return (df %>% filter(x <= maxSlowdown))
+  df <- bind_rows(lapply(levels(slowdowns$Platform), function(p) calc_ecdf(language, p, maxSlowdown)))
+  
+  return (df %>% filter(x <= maxSlowdown) %>% mutate(Platform = factor(Platform)))
 }
 
+# Filtered by Language and Platform, this is an ECDF of the slowdown incurred
+# by Stopify.
 slowdown_ecdf <- bind_rows(lapply(levels(slowdowns$Language), language_calc_ecdf))
 
-#ggplot(slowdown_ecdf %>% filter(Language == "Python (PyJS)"), aes(x,y, color=Platform,shape=Platform)) + geom_line() + geom_point()
+grouped_medians <- slowdowns %>% group_by(Language, Platform) %>% 
+  summarize(.median = median(Slowdown)) %>% 
+  ungroup()
 
 mean_slowdowns <- slowdowns %>%
   group_by(Benchmark,Platform,Language) %>%
   summarize(.mean = mean(Slowdown),
             .ci = 1.96 * sd(Slowdown) / sqrt(length(Slowdown)))
-
-by_platform <- function(platform) {
-  slowdowns <- all_data %>%
-    filter(Transform != "original") %>%
-    filter(Estimator == "reservoir") %>%
-    filter(Platform == platform) %>%
-    filter(YieldInterval == 100) %>%
-    inner_join(original_avgtimes) %>%
-    mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
-    filter(Slowdown < 100) %>%
-    select(Benchmark,Language,Slowdown) %>%
-    mutate(N = 1) %>%
-    arrange(Slowdown) %>%
-    mutate(Y = cumsum(N))
-  return(slowdowns)
-  
-}
 
 summary_stats <- function() {
   F <- function(platform,lang) {
@@ -172,11 +168,20 @@ platform_ecdf <-function(lang,platform) {
 }
 
 language_ecdf <- function(lang) {
-  df <- slowdown_ecdf %>% filter(Language == lang)
+  df <- language_calc_ecdf(lang)
+  # Draw shapes on the lines at 0, 5, 10, ..., halting when y == 100
   df_points <- df %>% filter(x %% 5 == 0) %>% filter(last(y) != y)
+  
+  # Add medians to labels
+  labels <- lapply(levels(df$Platform), function(p) 
+    sprintf("%s (%.1f)", p,
+            (grouped_medians %>% filter(Language == lang & Platform == p))$.median))
+
   plot <- ggplot(df, aes(x=x,y=y,color=Platform,shape=Platform)) +
     geom_line() +
     geom_point(data = df_points) +
+    scale_color_manual(labels=labels, values=palette) +
+    scale_shape_manual(labels=labels,values=c(15,16,17,4,5)) +
     theme_bw() +
     theme(
       panel.background = element_rect(size = 0.9),
@@ -194,12 +199,9 @@ language_ecdf <- function(lang) {
       # legend.key.size = unit(0.2, "in"),
       legend.key.height = unit(0.09, "in"),
       legend.title = element_blank(),
-      legend.position = c(0.7, .4),
+      legend.position = c(0.7, .3),
       legend.background = element_blank()) +
     labs(title=lang, y = "% of trials", x = "Slowdown")
-  # if (lang != "C++ (Emscripten)") {
-  #   plot <- plot + theme(legend.position = "none")
-  # }
   return (plot)
 }
 
@@ -210,7 +212,6 @@ ecdf_grid <- function() {
 
 all_slowdowns <- ecdf_grid()
 ggsave("all_slowdowns.pdf", all_slowdowns, width=7, height=5, units="in")
-
 
 
 language_bar_plot <- function(lang) {
