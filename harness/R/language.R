@@ -217,13 +217,15 @@ ggsave("all_slowdowns.pdf", all_slowdowns, width=7, height=5, units="in")
 language_bar_plot <- function(lang) {
   df <- mean_slowdowns %>% filter(Language == lang)
   plot <- ggplot(df, aes(x=Benchmark,y=.mean,fill=Platform)) +
+    labs(title=lang,y="Slowdown") +
+    scale_fill_manual(values=palette) +
     geom_bar(position="dodge", stat="identity") +
     geom_errorbar(
       aes(ymin=.mean-.ci/2,ymax=.mean+.ci/2), size=0.3, width=.9, 
       position=position_dodge(.9)) +
     theme_bw() + 
     theme(axis.text.x = element_text(hjust = 1, angle=60),
-          text = element_text(family="serif", size=16),
+          text = element_text(family="serif", size=8),
           panel.grid.major = element_line(colour="gray", size=0.1),
           panel.grid.minor =
             element_line(colour="gray", size=0.1, linetype='dotted'),
@@ -233,13 +235,14 @@ language_bar_plot <- function(lang) {
           legend.key = element_rect(colour=NA),
           legend.background = element_blank(),
           legend.margin = margin(unit(0.001, "in")),
-          legend.key.size = unit(0.2, "in"),
+          legend.key.size = unit(0.1, "in"),
+          legend.text = element_text(size=6),
           legend.title = element_blank(),
+          plot.title = element_text(size=10,hjust=0.5),
           legend.position = c(0.9, .8))
-  ggsave(paste0("detailed-slowdown-", lang, ".pdf"), plot, width=7, height=5, units=c("in"))
+  return (plot)
 }
 
+bar_plot_grid <- do.call("grid.arrange", c(lapply(slowdowns$Language %>% levels(), language_bar_plot), ncol=3))
 
-# for(lang in all_languages) {
-#   language_bar_plot(lang)
-# }
+ggsave("all_slowdowns_detail.pdf",bar_plot_grid, width=11,height=8, units="in")
