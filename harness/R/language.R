@@ -110,7 +110,7 @@ calc_ecdf <- function(language, platform, .max) {
     return (tribble(~Language, ~Platform, ~x, ~y))
   }
   f <- ecdf(df$Slowdown)
-  return (tibble(1:.max) %>%
+  return (tibble(0:.max) %>%
     `colnames<-`(c("x")) %>%
     mutate(y = f(x), Language = language, Platform = platform))
 }
