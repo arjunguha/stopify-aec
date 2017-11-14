@@ -181,7 +181,7 @@ language_ecdf <- function(lang) {
     geom_line() +
     geom_point(data = df_points) +
     scale_color_manual(labels=labels, values=palette) +
-    scale_shape_manual(labels=labels,values=c(15,16,17,4,5)) +
+    scale_shape_manual(labels=labels,values=c(0,1,2,4,5)) +
     theme_bw() +
     theme(
       panel.background = element_rect(size = 0.9),
