@@ -1,7 +1,7 @@
 import * as common from './common';
 import { parseRuntimeOpts } from '../../../built/src/cli-parse';
 
-const benchmarkTimeout = 800; //seconds
+const benchmarkTimeout = 1200; //seconds
 const checkInterval = 5; // seconds
 
 const label = <HTMLDivElement>document.getElementById('label');
