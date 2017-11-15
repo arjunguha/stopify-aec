@@ -1,57 +1,43 @@
 library(tidyverse)
 
-all_data <- read_csv("../results.csv") %>%
-  filter(Language == "pyret") %>%
-  select(Benchmark,RunningTime,Platform,Transform,NumYields) %>%
-  mutate(Transform = if_else(Transform == "lazy" | Transform == "retval", "with Breakout",
-                             if_else(Transform == "original",
-                                     "no yields",
-                                     "without Breakout")))
+plot_pyret <- function (lang) {
+  all_data <- read_csv("../results.csv") %>%
+    filter(Language == lang) %>%
+    select(Benchmark,RunningTime,Platform,Transform,NumYields) %>%
+    mutate(Transform = if_else(Transform == "native", "without Breakout",
+                               if_else(Transform == "original",
+                                       "no yields",
+                                       "with Breakout")))
 
-without_avgtimes <- all_data %>%
-  filter(Transform == "without Breakout") %>%
-  group_by(Benchmark, Platform) %>%
-  summarise(MeanOriginal = mean(RunningTime)) %>%
-  ungroup() %>%
-  select(Benchmark, Platform, MeanOriginal)
+  without_avgtimes <- all_data %>%
+    filter(Transform == "without Breakout") %>%
+    group_by(Benchmark, Platform) %>%
+    summarise(MeanOriginal = mean(RunningTime)) %>%
+    ungroup() %>%
+    select(Benchmark, Platform, MeanOriginal)
 
+  slowdowns <- all_data %>%
+    filter(Transform == "with Breakout") %>%
+    inner_join(without_avgtimes) %>%
+    mutate(Slowdown = RunningTime / MeanOriginal) %>%
+    filter(Slowdown < 20)
 
-slowdowns <- all_data %>%
-  filter(Transform == "with Breakout") %>%
-  inner_join(without_avgtimes) %>%
-  mutate(Slowdown = RunningTime / MeanOriginal)
+  ggplot(slowdowns, aes(x = Slowdown, color=Platform)) +
+    stat_ecdf()
 
-ggplot(slowdowns, aes(x = Slowdown, color=Platform)) +
-  stat_ecdf() +
-  scale_x_continuous(breaks = 1:20) +
-  theme_bw() +
-  labs(y = "% of Trials") +
-  theme(
-    panel.background = element_rect(size = 0.9),
-    text = element_text(family="serif", size=16),
-    panel.grid.major = element_line(colour="gray", size=0.1),
-    panel.grid.minor =
-      element_line(colour="gray", size=0.1, linetype='dotted'),
-    axis.ticks = element_line(size=0.05),
-    axis.ticks.length=unit("-0.05", "in"),
-    axis.text.y = element_text(margin = margin(r = 5)),
-    axis.text.x = element_text(margin = margin(t = 5)),
-    legend.key = element_rect(colour=NA),
-    legend.margin = margin(unit(0.001, "in")),
-    legend.key.size = unit(0.2, "in"),
-    legend.title = element_blank(),
-    legend.position = c(0.7, .2),
-    legend.background = element_blank())
+  ggsave(paste(lang, "_slowdown.pdf", sep=""), width=5, height=5, units=c("in"))
 
-ggsave("pyret_slowdown.pdf", width=5, height=5, units=c("in"))
-
-stats <- function (plat) {
+  stats <- function (plat) {
     print(plat)
     print(mean((slowdowns %>% filter(Platform == plat))$Slowdown))
     print(sd((slowdowns %>% filter(Platform == plat))$Slowdown))
+  }
+
+  stats("chrome")
+  stats("safari")
+  stats("firefox")
+  stats("MicrosoftEdge")
 }
 
-stats("chrome")
-stats("safari")
-stats("firefox")
-stats("MicrosoftEdge")
+plot_pyret("pyret_deepstacks")
+plot_pyret("pyret")
