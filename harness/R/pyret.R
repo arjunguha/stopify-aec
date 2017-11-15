@@ -19,8 +19,7 @@ plot_pyret <- function (lang) {
   slowdowns <- all_data %>%
     filter(Transform == "with Breakout") %>%
     inner_join(without_avgtimes) %>%
-    mutate(Slowdown = RunningTime / MeanOriginal) %>%
-    filter(Slowdown < 20)
+    mutate(Slowdown = RunningTime / MeanOriginal)
 
   ggplot(slowdowns, aes(x = Slowdown, color=Platform)) +
     stat_ecdf()
