@@ -84,14 +84,15 @@ original_avgtimes <- original %>%
   ungroup()
 
 selector <- tribble(
-  ~Platform, ~Transform, ~NewMethod, ~EsMode,
-  "Firefox", "lazy", "direct", "sane",
-  "Chrome", "lazy", "wrapper", "sane",
-  "Edge", "retval", "direct", "sane",
-  "Safari", "lazy", "direct", "sane",
-  "ChromeBook", "lazy", "wrapper", "sane") %>%
+  ~Platform, ~Transform, ~NewMethod,
+  "Firefox", "lazy", "direct", 
+  "Chrome", "lazy", "wrapper", 
+  "Edge", "retval", "direct",
+  "Safari", "lazy", "direct",
+  "ChromeBook", "lazy", "wrapper") %>%
   mutate(Platform = as.factor(Platform)) %>%
   mutate(Platform = fct_relevel(Platform, "Chrome", "Safari", "Edge", "Firefox", "ChromeBook"))
+
 
 slowdowns <- all_data %>%
   filter(Transform != "original" & Transform != "native") %>%
@@ -99,6 +100,8 @@ slowdowns <- all_data %>%
   filter(YieldInterval == 100) %>%
   inner_join(original_avgtimes) %>%
   inner_join(selector) %>%
+  filter((Language == "JavaScript" & EsMode == "es5" & JsArgs == "faithful") |
+         (Language != "JavaScript" & EsMode == "sane")) %>%
   mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
   select(Benchmark,Platform,Language,Slowdown)
 
@@ -246,3 +249,4 @@ language_bar_plot <- function(lang) {
 bar_plot_grid <- do.call("grid.arrange", c(lapply(slowdowns$Language %>% levels(), language_bar_plot), ncol=3))
 
 ggsave("all_slowdowns_detail.pdf",bar_plot_grid, width=11,height=8, units="in")
+  

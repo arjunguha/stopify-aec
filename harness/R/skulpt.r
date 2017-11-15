@@ -1,61 +1,40 @@
 #!/usr/bin/env Rscript
-source("./theme.R")
+library(tidyverse)
 
-sources <- commandArgs(TRUE)
+skulpt_times <- read_csv("../../scripts/timing-skulpt.csv") %>%
+  select(Benchmark,RunningTime) %>%
+  group_by(Benchmark) %>%
+  summarize(MeanSkulptTime = mean(RunningTime)) %>%
+  ungroup()
 
-if (length(sources) == 0) {
-  stop("Expected sources on comand line")
-}
+stopify_times <- read_csv("../results.csv") %>%
+  filter(Language == "python_pyjs") %>%  
+  filter(Platform == "chrome") %>%
+  filter(Transform == "lazy") %>%
+  select(Benchmark,RunningTime) %>%
+  group_by(Benchmark) %>%
+  ungroup()
 
-read_runtimes <- function(source) {
-  df <- read_csv(source) %>%
-    select(Platform,Transform, Benchmark, Language, RunningTime) %>%
-    mutate(Source = source)
-  return(df)
-}
+slowdowns <- stopify_times %>%
+  inner_join(skulpt_times) %>%
+  mutate(Slowdown = RunningTime / MeanSkulptTime) %>%
+  group_by(Benchmark) %>%
+  summarize(.mean = mean(Slowdown),
+            .ci = 1.96 * sd(Slowdown) / sqrt(length(Slowdown)))
 
-data <- NA
-for (source in sources) {
-  aData <- read_runtimes(source)
-  if (is.na(data)) {
-    data <- aData
-  } else {
-    data <- rbind(data, aData)
-  }
-}
 
-python_runtimes <- function(timing) {
-  a <- timing %>% filter(Transform == "lazy") %>% filter(Platform == "chrome") %>%
-    filter(Language == "python_pyjs") %>%
-    filter(Benchmark != "raytrace_simple" & Benchmark != "deltablue" & Benchmark != "richards" & Benchmark != "b")
-  b <- timing %>% filter(Transform == "skulpt") %>%
-    select(Platform,Benchmark,RunningTime)
+ggplot(slowdowns, aes(x=Benchmark,y=.mean)) + 
+  geom_bar(stat="identity") +
+  geom_errorbar(
+    aes(ymin=.mean-.ci/2,ymax=.mean+.ci/2), size=0.3, width=.9, 
+    position=position_dodge(.9)) +
+  labs(y = "Normalized runtime") +
+  theme_bw() + 
+  theme(axis.text.x = element_text(hjust = 1, angle=60),
+        text = element_text(family="serif", size=8),
+        panel.grid.major = element_line(colour="gray", size=0.1),
+        axis.ticks = element_line(size=0.05),
+        axis.ticks.length=unit("-0.05", "in"),
+        axis.text.y = element_text(margin = margin(r = 5)))
 
-  baseline <- a %>% mutate(Base = RunningTime) %>%
-    select(Platform,Benchmark,Base)
-
-  arel <- a %>% mutate(Relative=1)
-  brel <- inner_join(baseline, b) %>% mutate(Relative = RunningTime / Base) %>%
-    select(Platform,Benchmark,Relative)
-
-  amean <- arel %>% mutate(Mean=Relative,Min=NA,Max=NA,Transform="lazy") %>%
-    select(Benchmark,Mean,Min,Max,Transform)
-  bmean <- brel %>% group_by(Benchmark) %>%
-    summarize(Mean=mean(Relative),Min=min(Relative),Max=max(Relative),Transform="skulpt") %>%
-    ungroup() %>%
-    select(Benchmark,Mean,Min,Max,Transform)
-
-  df <- full_join(amean, bmean)
-  return (df)
-}
-
-df <- python_runtimes(data)
-
-plot <- ggplot(df, aes(x=Benchmark, fill=Transform, y=Mean, ymin=Min, ymax=Max)) +
-  geom_bar(position="dodge",stat="identity") +
-  geom_errorbar(position="dodge", color="black") +
-  ylab("Slowdown") +
-  xlab("Benchmark") +
-  mytheme()
-
-mysave("runtimes.jpg", plot)
+ggsave("pyjs_skulpt_relative_slowdown.pdf", width=4,height=2, units="in")
