@@ -34,7 +34,7 @@ all_data <- read_csv("../variance.csv") %>% mutate(Benchmark=gsub('_','-',Benchm
 by_estimator <- function (data, estimator) {
   df <- data %>% filter(Estimator==estimator) %>%
     group_by(Benchmark) %>%
-    mutate(MaxIndex=max(Index)) %>%
+    mutate(MaxIndex=max(Index), Type=paste(Benchmark,'-',Iteration)) %>%
     ungroup()
 
   return (df)
@@ -55,8 +55,15 @@ slowdowns <- all_data %>%
   mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
   select(Benchmark,Estimator,Slowdown, RunningTime)
 
+#by benchmark
 mean_slowdowns <- slowdowns %>%
   group_by(Benchmark,Estimator) %>%
+  summarize(.mean = mean(Slowdown),
+            .ci = 1.96 * sd(Slowdown) / sqrt(length(Slowdown)))
+
+#by estimator
+mean_slowdowns_est <- slowdowns %>%
+  group_by(Estimator) %>%
   summarize(.mean = mean(Slowdown),
             .ci = 1.96 * sd(Slowdown) / sqrt(length(Slowdown)))
 
@@ -73,14 +80,16 @@ latencies <- function (data) {
   velocity <- data %>% filter(Estimator=='velocity') %>% group_by(Benchmark) %>%
     mutate(VelocityMeanSD=paste(format(mean(Variance),digits=digits),'$\\pm$',format(sd(Variance),digits=digits),'ms')) %>%
     select(Benchmark,VelocityMeanSD) %>% distinct()
+  exact <- data %>% filter(Estimator=='exact') %>% group_by(Benchmark) %>%
+    mutate(ExactMeanSD=paste(format(mean(Variance),digits=digits),'$\\pm$',format(sd(Variance),digits=digits),'ms')) %>%
+    select(Benchmark,ExactMeanSD) %>% distinct()
   
-  df <- inner_join(countdown,velocity)
-
+  df <- inner_join(countdown,velocity) %>% inner_join(exact)
   return (df)
 }
 
-variance_plot <- function(data) {
-  ggplot(data, aes(x=Index/MaxIndex, y=Variance, color=Benchmark)) +
+variance_plot <- function(data, bench) {
+  ggplot(data %>% filter(Iteration==0), aes(x=Index/MaxIndex, y=Variance, color=Type)) +
     geom_line()
 }
 
@@ -111,7 +120,7 @@ runtime_plot <- function() {
 }
 
 latency_table <- function(data) {
-  tbl <- xtable(data,align=c('l','l','r','r'),label='tbl:variance',
+  tbl <- xtable(data,align=c('l','l','r','r','r'),label='tbl:variance',
                 caption='A comparison of Countdown and Velocity yielding strategies on Python benchmarks. \
 Results show the mean ($\\mu$) and standard deviation ($\\sigma$) of the latency between yield intervals. \
 For $\\mu$, closer to 100ms is better. For $\\sigma$, lower is better.')
@@ -120,7 +129,8 @@ For $\\mu$, closer to 100ms is better. For $\\sigma$, lower is better.')
                sanitize.text.function = function (x) {x},
                sanitize.rownames.function = NULL,
                sanitize.colnames.function = function(x) {
-                 return (c('Benchmark','Countdown ($\\mu \\pm \\sigma$)','Velocity ($\\mu \\pm \\sigma$)'))
+                 return (c('Benchmark','Countdown ($\\mu \\pm \\sigma$)','Velocity ($\\mu \\pm \\sigma$)',
+                           'Exact ($\\mu \\pm \\sigma$)'))
                  })
   return (tbl)
 }
@@ -133,4 +143,4 @@ variance_plot(countdown)
 variance_plot(exact)
 variance_plot(velocity)
 
-latency_table(latencies(all_data))
+latency_table(latencies(all_data %>% filter(Iteration==0)))
