@@ -68,7 +68,7 @@ db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS failure_index ON failures
 
 // 3 more needed: Java, Pyret, JavaScript
 const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js',
-  'scala', 'c++', 'scheme', 'java', 'microbenches', 'pyret_deepstacks',
+  'scala', 'c++', 'scheme', 'java', 'javascript', 'microbenches', 'pyret_deepstacks',
   'deepstacks' ];
 
 function initTiming(i: number,
@@ -175,6 +175,19 @@ function timeEstimatorComparisonBenchmarks() {
 
 const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' ];
 
+function javascriptBenchmark(name: string) {
+  for (let i = 0; i < 10; i++) {
+    for (const browser of browsers) {
+      initTiming(i, 'javascript', name, browser, 'original');
+    }
+    initTiming(i, 'javascript', name, 'ChromeBook', 'lazy', 'wrapper', 'es5', 'faithful', 'reservoir', undefined, 100);
+    initTiming(i, 'javascript', name, 'safari',  'lazy', 'direct', 'es5', 'faithful', 'reservoir', undefined, 100);
+    initTiming(i, 'javascript', name, 'chrome',  'lazy', 'wrapper', 'es5', 'faithful', 'reservoir', undefined,  100);
+    initTiming(i, 'javascript', name, 'firefox', 'lazy', 'direct', 'es5', 'faithful', 'reservoir', undefined,  100);
+    initTiming(i, 'javascript', name, edge, 'retval', 'direct', 'es5', 'faithful', 'reservoir', undefined,  100);
+  }
+}
+
 function pyretBenchmark(name: string) {
   // Benchmark harness for pyret.
   if (name === 'benchmark-base') {
@@ -226,18 +239,16 @@ function benchmarksFor(lang: string, bench: string) {
   if (lang === 'python_pyjs' && pythonOverviewBenchmarks.includes(bench)) {
     pythonBenchmark(bench);
     // We allow the other settings to run too.
+  } else if (lang === 'pyret') {
+    pyretBenchmark(bench);
+    return;
+  } else if (lang === 'pyret_deepstacks' || lang === 'deepstacks') {
+    deepstackBenchmark(lang, bench);
+    return;
+  } else if (lang === 'javascript') {
+    javascriptBenchmark(bench);
+    return;
   }
-
-  if (lang === 'pyret') {
-    pyretBenchmark(bench)
-    return
-  }
-
-  if (lang === 'pyret_deepstacks' || lang === 'deepstacks') {
-    deepstackBenchmark(lang, bench)
-    return
-  }
-
 
   for (let i = 0; i < 10; i++) {
     /* Disable scala velocity benchmarks.

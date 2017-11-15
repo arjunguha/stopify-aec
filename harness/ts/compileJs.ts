@@ -67,7 +67,7 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
     args.push('--es', esMode!);
     args.push('--js-args', jsArgs!);
 
-    if (lang === 'c++' || lang === 'clojurescript') {
+    if (lang === 'c++' || lang === 'clojurescript' || lang === 'javascript') {
       args.push('--hofs', 'fill');
     }
   }
