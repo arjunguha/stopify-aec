@@ -142,6 +142,14 @@ mean_slowdowns <- slowdowns %>%
   summarize(.mean = mean(Slowdown),
             .ci = 1.96 * sd(Slowdown) / sqrt(length(Slowdown)))
 
+num_benchmarks <- mean_slowdowns %>%
+  group_by(Benchmark,Language) %>%
+  summarize(NumPlatforms=length(Platform)) %>%
+  ungroup() %>%
+  filter(NumPlatforms==5) %>%
+  group_by(Language) %>%
+  summarize(NumBenchmarks=length(Language))
+
 summary_stats <- function() {
   F <- function(platform,lang) {
     f <- ecdf((slowdowns %>% filter(Platform == platform & Language==lang))$Slowdown)
@@ -216,9 +224,11 @@ ecdf_grid <- function() {
 all_slowdowns <- ecdf_grid()
 ggsave("all_slowdowns.pdf", all_slowdowns, width=7, height=5, units="in")
 
-
 language_bar_plot <- function(lang) {
-  df <- mean_slowdowns %>% filter(Language == lang)
+  df <- mean_slowdowns %>% filter(Language == lang) %>%
+    group_by(Benchmark,Language) %>%
+    filter(length(Benchmark)==5) %>%
+    ungroup()
   plot <- ggplot(df, aes(x=Benchmark,y=.mean,fill=Platform)) +
     labs(title=lang,y="Slowdown") +
     scale_fill_manual(values=palette) +
