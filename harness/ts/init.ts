@@ -160,6 +160,11 @@ function microbenchmarks(i: number, bench: string): void {
         initTiming(i, 'microbenches', bench, edge, 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
       }
       break;
+    case 'loop':
+      for (const t of <any[]>['lazy', 'retval']) {
+        initTiming(i, 'microbenches', bench, edge, t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+      }
+      break;
     default:
       break;
   }
