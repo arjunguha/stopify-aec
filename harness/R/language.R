@@ -180,9 +180,9 @@ platform_ecdf <-function(lang,platform) {
 
 language_ecdf <- function(lang) {
   df <- language_calc_ecdf(lang)
-  # Draw shapes on the lines at 0, 5, 10, ..., halting when y == 100
-  df_points <- df %>% filter(x %% 5 == 0) %>% filter(last(y) != y)
-  
+  # Draw 20 evenly-spaced shapes along the lines
+  df_points <- df %>% group_by(Platform) %>% filter(x %% ceiling(last(x)/20) == 0)
+
   # Add medians to labels
   labels <- lapply(levels(df$Platform), function(p) 
     sprintf("%s (%.1f)", p,

@@ -48,8 +48,8 @@ palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#D55E00", "#CC79A7")
 maxSlowdown <- ceiling(max(slowdowns$Slowdown))
 df <- bind_rows(lapply(levels(slowdowns$Platform), function(p) calc_ecdf(p, maxSlowdown))) %>%
     mutate(Platform = as.factor(Platform))
-# Draw shapes on the lines at 0, 5, 10, ..., halting when y == 100
-df_points <- df %>% filter(x %% 5 == 0) %>% filter(last(y) != y)
+# Draw 20 evenly-spaced shapes along the lines
+df_points <- df %>% group_by(Platform) %>% filter(x %% ceiling(last(x)/20) == 0)
 
 grouped_medians <- slowdowns %>% group_by(Platform) %>% 
   summarize(.median = median(Slowdown)) %>% 
@@ -62,7 +62,7 @@ labels <- lapply(levels(df$Platform), function(p)
 
 plot <- ggplot(df, aes(x=x,y=y,color=Platform,shape=Platform)) +
   geom_line() +
-  geom_point(data = df_points) +
+  geom_point(data = df_points,stroke=1,size=3) +
   scale_color_manual(labels=labels, values=palette) +
   scale_shape_manual(labels=labels,values=c(0,1,2,4,5)) +
   theme_bw() +
