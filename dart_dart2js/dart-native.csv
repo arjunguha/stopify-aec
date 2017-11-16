@@ -45,7 +45,6 @@ ix|lang|bench|platform|transform|new_method|es_mode|js_args|estimator|time_per_e
 3|java|regexdna|native|NA|NA|NA|NA|NA|NA|NA|NA|2667|NA
 3|java|Havlak|native|NA|NA|NA|NA|NA|NA|NA|NA|2186|NA
 3|java|fasta|native|NA|NA|NA|NA|NA|NA|NA|NA|8317|NA
-3|java|pubspec.lock|native|NA|NA|NA|NA|NA|NA|NA|NA|63|NA
 3|java|fannkuch_redux|native|NA|NA|NA|NA|NA|NA|NA|NA|5290|NA
 3|java|spectral_norm|native|NA|NA|NA|NA|NA|NA|NA|NA|9031|NA
 4|java|revcomp|native|NA|NA|NA|NA|NA|NA|NA|NA|2322|NA
@@ -58,7 +57,6 @@ ix|lang|bench|platform|transform|new_method|es_mode|js_args|estimator|time_per_e
 4|java|regexdna|native|NA|NA|NA|NA|NA|NA|NA|NA|2660|NA
 4|java|Havlak|native|NA|NA|NA|NA|NA|NA|NA|NA|2187|NA
 4|java|fasta|native|NA|NA|NA|NA|NA|NA|NA|NA|8567|NA
-4|java|pubspec.lock|native|NA|NA|NA|NA|NA|NA|NA|NA|63|NA
 4|java|fannkuch_redux|native|NA|NA|NA|NA|NA|NA|NA|NA|5314|NA
 4|java|spectral_norm|native|NA|NA|NA|NA|NA|NA|NA|NA|9097|NA
 5|java|revcomp|native|NA|NA|NA|NA|NA|NA|NA|NA|2328|NA
@@ -71,7 +69,6 @@ ix|lang|bench|platform|transform|new_method|es_mode|js_args|estimator|time_per_e
 5|java|regexdna|native|NA|NA|NA|NA|NA|NA|NA|NA|2171|NA
 5|java|Havlak|native|NA|NA|NA|NA|NA|NA|NA|NA|2189|NA
 5|java|fasta|native|NA|NA|NA|NA|NA|NA|NA|NA|8314|NA
-5|java|pubspec.lock|native|NA|NA|NA|NA|NA|NA|NA|NA|63|NA
 5|java|fannkuch_redux|native|NA|NA|NA|NA|NA|NA|NA|NA|5301|NA
 5|java|spectral_norm|native|NA|NA|NA|NA|NA|NA|NA|NA|9026|NA
 6|java|revcomp|native|NA|NA|NA|NA|NA|NA|NA|NA|2320|NA
@@ -84,7 +81,6 @@ ix|lang|bench|platform|transform|new_method|es_mode|js_args|estimator|time_per_e
 6|java|regexdna|native|NA|NA|NA|NA|NA|NA|NA|NA|2663|NA
 6|java|Havlak|native|NA|NA|NA|NA|NA|NA|NA|NA|2186|NA
 6|java|fasta|native|NA|NA|NA|NA|NA|NA|NA|NA|8565|NA
-6|java|pubspec.lock|native|NA|NA|NA|NA|NA|NA|NA|NA|63|NA
 6|java|fannkuch_redux|native|NA|NA|NA|NA|NA|NA|NA|NA|5311|NA
 6|java|spectral_norm|native|NA|NA|NA|NA|NA|NA|NA|NA|9027|NA
 7|java|revcomp|native|NA|NA|NA|NA|NA|NA|NA|NA|2321|NA
@@ -97,7 +93,6 @@ ix|lang|bench|platform|transform|new_method|es_mode|js_args|estimator|time_per_e
 7|java|regexdna|native|NA|NA|NA|NA|NA|NA|NA|NA|2669|NA
 7|java|Havlak|native|NA|NA|NA|NA|NA|NA|NA|NA|2190|NA
 7|java|fasta|native|NA|NA|NA|NA|NA|NA|NA|NA|8564|NA
-7|java|pubspec.lock|native|NA|NA|NA|NA|NA|NA|NA|NA|64|NA
 7|java|fannkuch_redux|native|NA|NA|NA|NA|NA|NA|NA|NA|5291|NA
 7|java|spectral_norm|native|NA|NA|NA|NA|NA|NA|NA|NA|9123|NA
 8|java|revcomp|native|NA|NA|NA|NA|NA|NA|NA|NA|2318|NA
@@ -110,7 +105,6 @@ ix|lang|bench|platform|transform|new_method|es_mode|js_args|estimator|time_per_e
 8|java|regexdna|native|NA|NA|NA|NA|NA|NA|NA|NA|2659|NA
 8|java|Havlak|native|NA|NA|NA|NA|NA|NA|NA|NA|2185|NA
 8|java|fasta|native|NA|NA|NA|NA|NA|NA|NA|NA|8337|NA
-8|java|pubspec.lock|native|NA|NA|NA|NA|NA|NA|NA|NA|63|NA
 8|java|fannkuch_redux|native|NA|NA|NA|NA|NA|NA|NA|NA|5291|NA
 8|java|spectral_norm|native|NA|NA|NA|NA|NA|NA|NA|NA|9040|NA
 9|java|revcomp|native|NA|NA|NA|NA|NA|NA|NA|NA|2316|NA
