@@ -38,12 +38,10 @@ for (y = 0; y < d; y += 1) {
     bit_num += 1;
 
     if (bit_num === 8) {
-      console.log(String.fromCharCode(byte_acc));
       byte_acc = 0,
       bit_num = 0;
     } else if (x === d - 1) {
       byte_acc <<= 8 - d % 8;
-      console.log(String.fromCharCode(byte_acc));
       byte_acc = 0,
       bit_num = 0;
     }
