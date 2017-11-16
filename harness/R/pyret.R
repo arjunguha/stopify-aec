@@ -62,7 +62,7 @@ labels <- lapply(levels(df$Platform), function(p)
 
 plot <- ggplot(df, aes(x=x,y=y,color=Platform,shape=Platform)) +
   geom_line() +
-  geom_point(data = df_points,stroke=1,size=3) +
+  geom_point(data = df_points,stroke=1,size=2.5) +
   scale_color_manual(labels=labels, values=palette) +
   scale_shape_manual(labels=labels,values=c(0,1,2,4,5)) +
   theme_bw() +
