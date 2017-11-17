@@ -196,7 +196,7 @@ language_ecdf <- function(lang) {
     theme_bw() +
     theme(
       panel.background = element_rect(size = 0.9),
-      plot.title = element_text(size=10,hjust=0.5),
+      plot.title = element_text(size=8,hjust=0.5,vjust=-1),
       text = element_text(family="serif", size=8),
       panel.grid.major = element_line(colour="gray", size=0.1),
       panel.grid.minor =
