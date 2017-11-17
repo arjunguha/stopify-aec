@@ -7,6 +7,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,396,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,302,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2639,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,481,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,694,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,584,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,238,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3460,NA
@@ -19,6 +20,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,391,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,304,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2682,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,478,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,658,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,595,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,241,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3541,NA
@@ -31,6 +33,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,386,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,309,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2721,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,477,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,655,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,603,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,241,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3695,NA
@@ -43,6 +46,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,390,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,301,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2659,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,481,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,672,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,588,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,238,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3482,NA
@@ -55,6 +59,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,397,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,302,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2628,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,477,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,685,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,594,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,237,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3701,NA
@@ -67,6 +72,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,390,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,304,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2694,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,502,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,666,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,590,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,239,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3446,NA
@@ -79,6 +85,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,390,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,300,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2646,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,498,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,679,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,600,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,237,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3537,NA
@@ -91,6 +98,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,392,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,301,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2654,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,504,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,677,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,616,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,239,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3715,NA
@@ -103,6 +111,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,390,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,297,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2593,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,474,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,658,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,625,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,240,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3457,NA
@@ -115,6 +124,7 @@ scala,Fasta,native,NA,NA,NA,NA,NA,NA,NA,NA,388,NA
 scala,Regexredux,native,NA,NA,NA,NA,NA,NA,NA,NA,297,NA
 scala,LongMicro,native,NA,NA,NA,NA,NA,NA,NA,NA,2668,NA
 scala,Fannkuchredux,native,NA,NA,NA,NA,NA,NA,NA,NA,508,NA
+scala,Meteor,native,NA,NA,NA,NA,NA,NA,NA,NA,677,NA
 scala,Pidigits3,native,NA,NA,NA,NA,NA,NA,NA,NA,600,NA
 scala,FastaRedux,native,NA,NA,NA,NA,NA,NA,NA,NA,238,NA
 scala,Tracer,native,NA,NA,NA,NA,NA,NA,NA,NA,3700,NA
