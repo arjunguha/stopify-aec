@@ -123,6 +123,12 @@ function pythonBenchmark(name: string) {
     initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'countdown', undefined,  1000000);
     initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined, 1000000);
 
+
+    if (["b", "binary_trees","nbody", "richards"].includes(name)) {
+      initTiming(i, 'python_pyjs', name, 'safari', 'lazy', 'direct', 'sane', 'simple', 'countdown', undefined,  1000000);
+      initTiming(i, 'python_pyjs', name, 'safari', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined, 1000000);
+    }
+
     initTiming(i, 'python_pyjs', name, 'firefox', 'retval', 'direct', 'sane', 'simple', 'countdown', undefined,  1000000);
     initTiming(i, 'python_pyjs', name, 'chrome', 'retval', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
     initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined,  100);
