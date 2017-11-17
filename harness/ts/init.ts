@@ -162,6 +162,10 @@ function microbenchmarks(i: number, bench: string): void {
       break;
     case 'loop':
       for (const t of <any[]>['lazy', 'retval']) {
+        initTiming(i, 'microbenches', bench, 'ChromeBook', t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'safari', t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'chrome', t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'microbenches', bench, 'firefox', t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
         initTiming(i, 'microbenches', bench, edge, t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
       }
       break;
