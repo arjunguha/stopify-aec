@@ -5,10 +5,7 @@
 ;; Adapted from the Java -server version
 
 (ns binarytrees.core
-  (:require [cljs.core]
-            [cljs.pprint :refer [cl-format]]))
-
-(enable-console-print!)
+  (:require [clojure.core]))
 
 (defrecord TreeNode [left right ^int item])
 

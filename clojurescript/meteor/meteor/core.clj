@@ -10,11 +10,11 @@
 ;; primitive support.
 
 (ns meteor.core
-  (:require [cljs.core]
-            [cljs.pprint :refer [cl-format]])
-  (:require-macros [meteor.macros :refer [node-fits,first-empty-index,board-has-no-islands]]))
+  (:require [clojure.string :as str])
+  (:require [clojure.pprint :as pprint]))
 
-(enable-console-print!)
+(set! *warn-on-reflection* true)
+
 
 ;; The board is a 50 cell hexagonal pattern.  For    . . . . .
 ;; maximum speed the board will be implemented as     . . . . .
@@ -175,8 +175,8 @@
 
 (defn make-oob-table []
   (object-array (map (fn [cell-idx]
-                       (into-array (map (fn [dir] (out-of-bounds cell-idx dir))
-                                   (range 6))))
+                       (boolean-array (map (fn [dir] (out-of-bounds cell-idx dir))
+                                           (range 6))))
                      (range 50))))
 
 
@@ -224,6 +224,20 @@
                           (aget shift-table-for-parent-loc dir))
                         0))  ;; dummy value
                (inc node))))))
+
+
+;; Convenience function to calculate if a piece fits on the board.
+;; Node 0 of the piece, at board index (indices 0), is assumed to be
+;; on the board, but the other nodes may be off.
+
+(defmacro node-fits [node-info indices ^objects oob-table]
+  `(let [pair# ~node-info
+         parent-node-num# (int (pair# 0))
+         dir# (int (pair# 1))
+         parent-idx# (int (~indices parent-node-num#))
+         ;^booleans oob-for-parent-idx# (aget ~oob-table parent-idx#)]
+         ^"[Z" oob-for-parent-idx# (aget ~oob-table parent-idx#)]
+     (not (aget oob-for-parent-idx# dir#))))
 
 
 (defn cells-fit-on-board [piece indices ^objects oob-table]
@@ -311,7 +325,7 @@
       (println ""))
     (when (== (rem i 10) 5)
       (print " "))
-    (cl-format true "~d " (aget soln i))))
+    (printf "%d " (aget soln i))))
 
 
 ;; Solutions are encoded as vectors of 50 integers, one for each board
@@ -341,13 +355,13 @@
 ;; trapped regions cannot possibly be filled with any pieces.
 
 (defn one-piece-has-island [indices shift-table oob-table]
-  (let [temp-board (long-array 50 0)]
+  (let [temp-board (long-array 50)]
     ;; Mark the piece board positions as filled
     (doseq [idx indices]
       (aset temp-board idx 1))
     (let [empty-region-sizes (board-empty-region-sizes! temp-board shift-table
                                                         oob-table)]
-      (not-every? #(zero? (rem % 5)) empty-region-sizes))))
+      (not (every? #(zero? (rem % 5)) empty-region-sizes)))))
 
 
 ;; Calculate the lowest possible open cell if the piece is placed on
@@ -403,6 +417,7 @@
                                                      indices)
                           next-index (long (first-empty-cell-after minimum
                                                                    indices))]
+
                       (let [^longs good-placement (long-array 3)
                             ^objects piece-arr (aget tbl p)]
                         (aset good-placement 0 (long piece-mask0))
@@ -423,6 +438,28 @@
 
 
 
+;; first-empty-index-aux assumptions: idx is in the range [0,24].
+;; half-board is an integer that has bits 25 and higher equal to 0, so
+;; the loop is guaranteed to terminate, and the return value will be
+;; in the range [0,25].
+
+(defmacro first-empty-index-aux [idx half-board]
+  `(loop [i# ~idx
+          hb# (bit-shift-right ~half-board ~idx)]
+     (if (zero? (bit-and hb# 1))
+       i#
+       (recur (inc i#) (bit-shift-right hb# 1)))))
+
+
+(defmacro first-empty-index [idx board0 board1]
+  `(if (< ~idx 25)
+     (let [i# (first-empty-index-aux ~idx ~board0)]
+       (if (== i# 25)
+         (+ 25 (first-empty-index-aux 0 ~board1))
+         i#))
+     (+ 25 (first-empty-index-aux (- ~idx 25) ~board1))))
+
+
 ;; Note: board-empty-region-sizes! runs faster if there are fewer
 ;; empty cells to fill.  So fill as much of the board as we can before
 ;; putting in the 3 partially filled rows.  There must be at least one
@@ -430,9 +467,9 @@
 ;; whether these 3 rows are a bad triple.
 
 (defn create-triples [shift-table oob-table]
-  (let [bad-even-triples (long-array (/ (bit-shift-left 1 15) 32) 0)
-        bad-odd-triples (long-array (/ (bit-shift-left 1 15) 32) 0)
-        temp-arr (long-array 50 0)]
+  (let [bad-even-triples (long-array (/ (bit-shift-left 1 15) 32))
+        bad-odd-triples (long-array (/ (bit-shift-left 1 15) 32))
+        temp-arr (long-array 50)]
     ;; Fill rows 0..5 completely.
     (dotimes [i 30]
       (aset temp-arr i 1))
@@ -489,7 +526,7 @@
     [bad-even-triples bad-odd-triples]))
 
 
-(def num-solutions (long-array 1 0))
+(def num-solutions (long-array 1))
 (def all-solutions (object-array 2200))
 
 ;; See comments above +piece-num-to-do-only-3-rotations+.  Each
@@ -511,6 +548,38 @@
         (aset rotated-soln other-idx tmp)))
     (aset all-solutions (inc n) rotated-soln)
     (aset num-solutions 0 (+ n 2))))
+
+
+;; Assume all args have been type-hinted to int in the environment
+;; where the macro board-has-no-islands is called.
+
+(defmacro board-has-no-islands [board0 board1 index
+                                ^longs bad-even-triples
+                                ^longs bad-odd-triples]
+  `(if (>= ~index 40)
+     true
+     (let [row-num# (long (/ ~index 5))
+           current-3-rows#
+           (case row-num#
+                 0 (bit-and 0x7FFF ~board0)
+                 1 (bit-and 0x7FFF (bit-shift-right ~board0 5))
+                 2 (bit-and 0x7FFF (bit-shift-right ~board0 10))
+                 3 (bit-or (bit-shift-right ~board0 15)
+                           (bit-shift-left (bit-and 0x1F ~board1)
+                                           10))
+                 4 (bit-or (bit-shift-right ~board0 20)
+                           (bit-shift-left (bit-and 0x3FF ~board1) 5))
+                 5 (bit-and 0x7FFF ~board1)
+                 6 (bit-and 0x7FFF (bit-shift-right ~board1 5))
+                 7 (bit-and 0x7FFF (bit-shift-right ~board1 10)))
+           int-num# (bit-shift-right current-3-rows# 5)
+           bit-num# (bit-and current-3-rows# 0x1F)
+           even-row# (zero? (bit-and row-num# 1))]
+       (if even-row#
+         (zero? (bit-and 1 (bit-shift-right (aget ~bad-even-triples int-num#)
+                                            bit-num#)))
+         (zero? (bit-and 1 (bit-shift-right (aget ~bad-odd-triples int-num#)
+                                            bit-num#)))))))
 
 
 ;; Arguments to solve-helper:
@@ -593,7 +662,7 @@
                                 mask-arr0 mask-arr1)))))))))
                (recur (inc piece-num) (bit-shift-left piece-num-mask 1))
                ))))]
-    (solve-helper 0 0 0 0 0 (long-array 10 0) (long-array 10 0) (long-array 10 0))))
+    (solve-helper 0 0 0 0 0 (long-array 10) (long-array 10) (long-array 10))))
 
 
 (defn compare-long-arrays [^longs a ^longs b]
@@ -608,18 +677,20 @@
         0))))
 
 
-(let [shift-table (make-shift-table)]
-  (let [oob-table (make-oob-table)]
-    (let [tbl (calc-pieces piece-defs shift-table oob-table)]
-      (let [[bad-even-triples bad-odd-triples] (create-triples shift-table
-                                                               oob-table)]
-        (solve! tbl bad-even-triples bad-odd-triples)
-        (let [^longs num-solutions num-solutions
-              n (aget num-solutions 0)
-              sorted-solns (sort compare-long-arrays (take n (seq all-solutions)))]
-          (println (cl-format nil "~d solutions found" n))
-          (print-board (first sorted-solns))
-          (println)
-          (print-board (nth sorted-solns (dec n)))
-          (println)
-          (println))))))  ; Just to match the output of the other programs exactly
+(defn -main []
+    (let [shift-table (make-shift-table)
+          oob-table (make-oob-table)
+          tbl (calc-pieces piece-defs shift-table oob-table)
+          [bad-even-triples bad-odd-triples] (create-triples shift-table
+                                                             oob-table)]
+      (solve! tbl bad-even-triples bad-odd-triples)
+      (let [^longs num-solutions num-solutions
+            n (aget num-solutions 0)
+            sorted-solns (sort compare-long-arrays (take n (seq all-solutions)))]
+        (println (format "%d solutions found" n))
+        (print-board (first sorted-solns))
+        (println)
+        (print-board (nth sorted-solns (dec n)))
+        (println)
+        (println))))  ; Just to match the output of the other programs exactly
+

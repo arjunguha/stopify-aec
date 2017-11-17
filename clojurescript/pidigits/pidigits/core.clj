@@ -5,7 +5,7 @@
 ;;; contributed by PheliX
 
 (ns pidigits.core
-  (:require [cljs.core]))
+  (:require [clojure.core]))
 
 (defn floor-ev [q r s t x]
   (quot (+ (* q x) r) (+ (* s x) t)))
@@ -29,7 +29,8 @@
 	(let [[q r s t] (ncomp q r s t k (* 2 (inc (* 2 k))) 0 (inc (* 2 k)))]
 	  (recur (inc k) q r s t n row col))))))
 
-(dotimes [_ 1000000]
+(defn -main[]
+  (dotimes [_ 1000000]
   ;; attempting to compute > 46 digits hangs for some reason. Maybe
   ;; something overflows.
-  (digit 1 1 0 0 1 5 0 0))
+  (digit 1 1 0 0 1 5 0 0)))
