@@ -115,17 +115,17 @@ runtime_plot <- function() {
           legend.key.size = unit(0.2, "in"),
           legend.title = element_blank(),
           legend.position = c(0.9, .8))
-  # ggsave(paste0("detailed-slowdown-", lang, ".pdf"), plot, width=7, height=5, units=c("in"))
+  ggsave(paste0("detailed-slowdown-", lang, ".pdf"), plot, width=7, height=5, units=c("in"))
   return (plot)
 }
 
 latency_table <- function(data) {
-  tbl <- xtable(data,align=c('l','l','r','r','r'),label='tbl:variance',
+  tbl <- xtable(data,align=c('|l','|l','|r','|r','|r|'),label='tbl:variance',
                 caption='A comparison of Countdown and Velocity yielding strategies on Python benchmarks. \
 Results show the mean ($\\mu$) and standard deviation ($\\sigma$) of the latency between yield intervals. \
 For $\\mu$, closer to 100ms is better. For $\\sigma$, lower is better.')
   print.xtable(tbl, file="variance.tex", include.rownames = F, size='\\small',
-               floating.environment = 'figure',
+               floating.environment = 'figure*',
                sanitize.text.function = function (x) {x},
                sanitize.rownames.function = NULL,
                sanitize.colnames.function = function(x) {
