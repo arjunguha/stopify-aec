@@ -5,6 +5,7 @@ library(stringr)
 library(extrafont)
 library(fontcm)
 library(gridExtra)
+library(xtable)
 
 palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#D55E00", "#CC79A7")
 
@@ -19,7 +20,10 @@ mean_table <- function (table, transform, language) {
   
   return(ret)
 }
-plot_language <- function(data, language) {
+
+all_data <- read_csv("../results.csv") 
+
+calc_slowdown <- function(language) {
   native_times <- read_csv(paste("../native/", language, "-native.csv", sep=""))
   
   original_m <- mean_table(all_data, 'original', language)
@@ -30,43 +34,66 @@ plot_language <- function(data, language) {
   slowdown <- original_m %>% 
     inner_join(native_m) %>%
     mutate(Slowdown = MeanOriginal / MeanNative, Language = language) %>%
-    select(Language, Benchmark, Platform, Slowdown)
+    group_by(Benchmark) %>%
+    filter(length(Benchmark) == 5) %>%
+    ungroup()
   
-  return(slowdown)
+  chrome <- slowdown %>%
+    filter(Platform == 'chrome') %>%
+    mutate(Chrome = Slowdown) %>% 
+    select(Language, Benchmark, Chrome)
+  
+  safari <- slowdown %>%
+    filter(Platform == 'safari') %>%
+    mutate(Safari = Slowdown) %>% 
+    select(Language, Benchmark, Safari)
+  
+  firefox <- slowdown %>%
+    filter(Platform == 'firefox') %>%
+    mutate(Firefox = Slowdown) %>% 
+    select(Language, Benchmark, Firefox)
+  
+  chromebook <- slowdown %>%
+    filter(Platform == 'ChromeBook') %>%
+    mutate(ChromeBook = Slowdown) %>% 
+    select(Language, Benchmark, ChromeBook)
+  
+  edge <- slowdown %>%
+    filter(Platform == 'MicrosoftEdge') %>%
+    mutate(Edge = Slowdown) %>% 
+    select(Language, Benchmark, Edge)
+  
+  ret <- chrome %>%
+    inner_join(safari) %>%
+    inner_join(firefox) %>% 
+    inner_join(chromebook) %>%
+    inner_join(edge)
+  
+  return(ret)
 }
-language_bar_plot <- function(df, lang) {
-  plot <- ggplot(df, aes(x=Benchmark,y=Slowdown,fill=Platform)) +
-    labs(title=lang,y="Slowdown") +
-    scale_fill_manual(values=palette) +
-    geom_bar(position="dodge", stat="identity") +
-    theme_bw() + 
-    theme(axis.text.x = element_text(hjust = 1, angle=60),
-          text = element_text(family="serif", size=8),
-          panel.grid.major = element_line(colour="gray", size=0.1),
-          panel.grid.minor =
-            element_line(colour="gray", size=0.1, linetype='dotted'),
-          axis.ticks = element_line(size=0.05),
-          axis.ticks.length=unit("-0.05", "in"),
-          axis.text.y = element_text(margin = margin(r = 5)),
-          legend.key = element_rect(colour=NA),
-          legend.background = element_blank(),
-          legend.margin = margin(unit(0.001, "in")),
-          legend.key.size = unit(0.1, "in"),
-          legend.text = element_text(size=6),
-          legend.title = element_blank(),
-          plot.title = element_text(size=10,hjust=0.5),
-          legend.position = c(0.9, .8))
-  return (plot)
-}
 
-all_data <- read_csv("../results.csv") 
+a <- calc_slowdown("ocaml")
+b <- calc_slowdown("c++")
+c <- calc_slowdown("dart_dart2js")
+d <- calc_slowdown("java")
+e <- calc_slowdown("scheme")
+f <- calc_slowdown("scala")
+g <- calc_slowdown("clojurescript")
 
-a <- plot_language(all_data, "ocaml")
-b <- plot_language(all_data, "c++")
-c <- plot_language(all_data, "dart_dart2js")
-d <- plot_language(all_data, "java")
-e <- plot_language(all_data, "scheme")
-f <- plot_language(all_data, "scala")
+k <- rbind(a, b, c, d, e, f, g)
 
-k <- rbind(a, b, c, d, e, f)
-write.csv(k, "native.csv")
+tbl <- xtable(format.data.frame(k, digits=2, scientific=FALSE),
+	      align=c('|l','|l','|r','|r','|r', '|r', '|r', '|r|'),
+	      label='tbl:native',
+	      caption='Slowdown of benchmarks when compiled to JavaScript, with respect to native running time')
+
+print.xtable(tbl, 
+	     file="native.tex", 
+	     include.rownames = F, size='\\small',
+	     floating.environment = 'figure*',
+	     sanitize.text.function = function (x) {return(gsub("_","-",x))},
+	     sanitize.rownames.function = NULL,
+             scalebox = 0.75,
+	     sanitize.colnames.function = function(x) {
+		x
+	     })
