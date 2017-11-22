@@ -93,6 +93,39 @@ selector <- tribble(
   mutate(Platform = as.factor(Platform)) %>%
   mutate(Platform = fct_relevel(Platform, "Chrome", "Safari", "Edge", "Firefox", "ChromeBook"))
 
+args_baseline <- all_data %>% filter(Benchmark=='arguments' & JsArgs=='simple') %>%
+  select(Benchmark,Language,Platform,RunningTime,Transform)
+arith_baseline <- all_data %>% filter(Benchmark=='arithmetic' & EsMode=='sane') %>%
+  select(Benchmark,Language,Platform,RunningTime,Transform)
+new_baseline <- all_data %>% filter(Benchmark=='constructor' & NewMethod=='direct') %>%
+  select(Benchmark,Language,Platform,RunningTime,Transform)
+loop_baseline <- all_data %>% filter(Benchmark=='loop' & Transform=='lazy') %>%
+  select(Benchmark,Language,Platform,RunningTime,Transform)
+micro_baseline <- full_join(args_baseline, arith_baseline) %>%
+  full_join(new_baseline) %>% full_join(loop_baseline) %>%
+  group_by(Benchmark,Language,Platform) %>%
+  summarize(AvgOriginalTime=mean(RunningTime)) %>%
+  ungroup()
+
+micro_slowdowns <- all_data %>% filter(Transform != 'original' & Transform != 'native') %>%
+  filter(Estimator == 'reservoir') %>%
+  filter(Language == 'microbenches') %>%
+  filter(JsArgs=='faithful' | EsMode=='es5' | (Benchmark=='constructor' & NewMethod=='wrapper') |
+           (Benchmark=='loop' & Transform=='retval')) %>%
+  inner_join(micro_baseline) %>%
+  mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
+  select(Benchmark,Platform,Language,Slowdown,Transform,JsArgs,EsMode,NewMethod)
+
+args <- micro_slowdowns %>% filter(Benchmark=='arguments') %>%
+  mutate(Type=paste(Benchmark,'-',JsArgs))
+arith <- micro_slowdowns %>% filter(Benchmark=='arithmetic') %>%
+  mutate(Type=paste(Benchmark,'-',EsMode))
+new <- micro_slowdowns %>% filter(Benchmark=='constructor') %>%
+  mutate(Type=paste(Benchmark,'-',NewMethod))
+loop <- micro_slowdowns %>% filter(Benchmark=='loop') %>%
+  mutate(Type=paste(Benchmark,'-',Transform))
+
+micro_slowdowns <- full_join(args, arith) %>% full_join(new) %>% full_join(loop)
 
 slowdowns <- all_data %>%
   filter(Transform != "original" & Transform != "native") %>%
@@ -259,4 +292,35 @@ language_bar_plot <- function(lang) {
 bar_plot_grid <- do.call("grid.arrange", c(lapply(slowdowns$Language %>% levels(), language_bar_plot), ncol=3))
 
 ggsave("all_slowdowns_detail.pdf",bar_plot_grid, width=11,height=8, units="in")
+
+mean_micro <- micro_slowdowns %>%
+  group_by(Benchmark,Platform,Language,Type) %>%
+  summarize(.mean = mean(Slowdown),
+            .ci = 1.96 * sd(Slowdown) / sqrt(length(Slowdown)))
+
+bar_plot <- function () {
+  plot <- ggplot(mean_micro, aes(x=Type, y=.mean, ymin=.mean-.ci, ymax=.mean+.ci, fill=Platform)) +
+    geom_bar(position='dodge', stat='identity') +
+    scale_y_continuous(breaks = seq(0,12, by=1)) +
+    labs(x='Benchmark',y='Slowdown') +
+    mytheme() +
+    scale_fill_manual(values=palette) +
+    theme(axis.text.x = element_text(hjust = 1, angle=60),
+          text = element_text(family="serif", size=32),
+          panel.grid.major = element_line(colour="gray", size=0.1),
+          panel.grid.minor =
+            element_line(colour="gray", size=0.1, linetype='dotted'),
+          axis.ticks = element_line(size=0.05),
+          axis.ticks.length=unit("-0.05", "in"),
+          axis.text.y = element_text(margin = margin(r = 5)),
+          legend.key = element_rect(colour=NA),
+          legend.background = element_blank(),
+          legend.margin = margin(unit(0.001, "in")),
+          legend.key.size = unit(0.1, "in"),
+          legend.text = element_text(size=16),
+          legend.title = element_blank(),
+          plot.title = element_text(size=10,hjust=0.5),
+          legend.position = c(0.9, .8))
   
+  return (plot)
+}
