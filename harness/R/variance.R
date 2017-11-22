@@ -93,29 +93,37 @@ variance_plot <- function(data, bench) {
     geom_line()
 }
 
+box_plot <- function(data) {
+  plot <- ggplot(data %>% filter(Iteration==0) %>%
+                  mutate(Estimator=fct_relevel(Estimator, 'countdown', 'velocity', 'exact')),
+                  aes(x=Benchmark, y=Variance, color=Estimator),
+            position='dodge') +
+    stat_summary(fun.ymin=function (x) { mean(x)-sd(x) },
+                 fun.y=mean,
+                 fun.ymax=function (x) { mean(x)+sd(x) },
+                 geom='errorbar', position='dodge', width=0.725) +
+    geom_boxplot(outlier.shape=NA, coef=0) +
+    scale_y_continuous(limits=c(0,500)) +
+    labs(y='Latency (ms)') +
+    mytheme() +
+    scale_color_manual(values=palette) +
+    theme(legend.position = c(0.8, 0.8))
+  
+  return (plot)
+}
+
 runtime_plot <- function() {
-  df <- mean_runtimes
+  df <- mean_slowdowns
   plot <- ggplot(df, aes(x=Benchmark,y=.mean,fill=Estimator)) +
+    labs(y='Slowdown') +
     geom_bar(position="dodge", stat="identity") +
     geom_errorbar(
       aes(ymin=.mean-.ci/2,ymax=.mean+.ci/2), size=0.3, width=.9, 
       position=position_dodge(.9)) +
-    theme_bw() + 
-    theme(axis.text.x = element_text(hjust = 1, angle=60),
-          text = element_text(family="serif", size=16),
-          panel.grid.major = element_line(colour="gray", size=0.1),
-          panel.grid.minor =
-            element_line(colour="gray", size=0.1, linetype='dotted'),
-          axis.ticks = element_line(size=0.05),
-          axis.ticks.length=unit("-0.05", "in"),
-          axis.text.y = element_text(margin = margin(r = 5)),
-          legend.key = element_rect(colour=NA),
-          legend.background = element_blank(),
-          legend.margin = margin(unit(0.001, "in")),
-          legend.key.size = unit(0.2, "in"),
-          legend.title = element_blank(),
-          legend.position = c(0.9, .8))
-  ggsave(paste0("detailed-slowdown-", lang, ".pdf"), plot, width=7, height=5, units=c("in"))
+    mytheme() + 
+    scale_fill_manual(values=palette) +
+    theme(legend.position = c(0.8, 0.8))
+  # ggsave(paste0("detailed-slowdown-", lang, ".pdf"), plot, width=7, height=5, units=c("in"))
   return (plot)
 }
 
