@@ -275,14 +275,6 @@ function benchmarksFor(lang: string, bench: string) {
     }
      */
 
-    if (lang === 'java') {
-      initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'faithful', 'reservoir', undefined, 100);
-      initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'faithful', 'reservoir', undefined, 100);
-      initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'faithful', 'reservoir', undefined,  100);
-      initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'faithful', 'reservoir', undefined,  100);
-      initTiming(i, lang, bench, edge,      'retval', 'direct', 'sane', 'faithful', 'reservoir', undefined,  100);
-    }
-
     for (const browser of browsers) {
       initTiming(i, lang, bench, browser, 'original');
     }
@@ -293,6 +285,15 @@ function benchmarksFor(lang: string, bench: string) {
     }
 
     initTiming(i, lang, bench, 'native');
+
+    if (lang === 'java') {
+      initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'faithful', 'reservoir', undefined, 100);
+      initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'faithful', 'reservoir', undefined, 100);
+      initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'faithful', 'reservoir', undefined,  100);
+      initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'faithful', 'reservoir', undefined,  100);
+      initTiming(i, lang, bench, edge,      'retval', 'direct', 'sane', 'faithful', 'reservoir', undefined,  100);
+      continue;
+    }
 
     // ChromeBook configuration
     initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
