@@ -28329,10 +28329,10 @@ let functions =
                                   Levinson_durbin_result.check, Long);
     "levinson-durbin", Int (Levinson_durbin.main, prepare, check,
                            [ Range (1000, 10000), Longer]);
-    "lu-decomposition", Unit (Lu_decomposition.main, Lu_decomposition_result.check, Longer);
+(*    "lu-decomposition", Unit (Lu_decomposition.main, Lu_decomposition_result.check, Longer);
     "naive-multilayer", Unit (Naive_multilayer.main, (fun _ -> Ok), Longer);
     "qr-decomposition", Unit (Qr_decomposition.main, 
-                              Qr_decomposition_result.check, Longer);
+                              Qr_decomposition_result.check, Longer); *)
     "rnd-access", Int (Rnd_access.main, prepare, check,
                            [ Range (1000000, 2000000), Longer]);
     "simple-access", Int (Simple_access.main, prepare, check,

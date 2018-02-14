@@ -15695,7 +15695,7 @@ $pyjs['loaded_modules']['main'] = function (__mod_name__) {
 		var $sub69,$iter11_idx,$iter10_nextval,$sub70,$iter11_array,i,$iter11_iter,$iter10_idx,$iter11_type,t2,$iter10_array,times,time,$iter10_type,$iter10_iter,t1,$iter11_nextval;
 		time = $p['___import___']('time', null);
 		times = $p['list']([]);
-		$iter10_iter = $p['range'](5);
+		$iter10_iter = $p['range'](1);
 		$iter10_nextval=$p['__iter_prepare']($iter10_iter,false);
 		while (typeof($p['__wrapped_next']($iter10_nextval)['$nextval']) != 'undefined') {
 			i = $iter10_nextval['$nextval'];

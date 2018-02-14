@@ -14571,7 +14571,7 @@ $pyjs['loaded_modules']['main'] = function (__mod_name__) {
 		for (var $item in $cls_definition) { $data['__setitem__']($item, $cls_definition[$item]); }
 		return $p['_create_class']('Node', $p['tuple']($bases), $data);
 	})();
-	$m['kStretchTreeDepth'] = 18;
+	$m['kStretchTreeDepth'] = 14;
 	$m['kLongLivedTreeDepth'] = 16;
 	$m['kArraySize'] = 500000;
 	$m['kMinTreeDepth'] = 4;

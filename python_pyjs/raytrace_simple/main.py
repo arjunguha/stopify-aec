@@ -354,7 +354,7 @@ def _main():
 def main(n):
     import time
     times = []
-    for i in range(5):
+    for i in range(1):
         _main() # warmup
     for i in range(n):
         t1 = time.time()

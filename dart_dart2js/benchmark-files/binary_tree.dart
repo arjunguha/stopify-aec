@@ -20,7 +20,7 @@ class BinaryTree extends BenchmarkBase {
   void setup() {}
   void teardown() {}
   void run () {
-    int n = 20;
+    int n = 18;
 
     int maxDepth = (minDepth + 2 > n) ? minDepth + 2 : n;
     int stretchDepth = maxDepth + 1;
