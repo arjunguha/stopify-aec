@@ -78,11 +78,11 @@ function initTiming(i: number,
   lang: string,
   bench: string,
   platform: string,
-  transform?: string,
+  transform?: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
   newMethod?: 'direct' | 'wrapper',
-  esMode?: string,
-  jsArgs?: string,
-  estimator?: string,
+  esMode?: 'sane' | 'es5',
+  jsArgs?: 'simple' | 'faithful',
+  estimator?: 'exact' | 'countdown' | 'reservoir' | 'velocity',
   timePerElapsed?: number,
   yieldInterval?: number,
   resampleInterval?: number) {
@@ -140,9 +140,12 @@ function pythonBenchmark(name: string) {
 }
 
 function microbenchmarks(i: number, bench: string): void {
+  const args: ('simple' | 'faithful')[] = ['simple', 'faithful']
+  const mode: ('sane' | 'es5')[] = ['sane', 'es5']
+
   switch (bench) {
     case 'arguments':
-      for (const jsArgs of ['simple', 'faithful']) {
+      for (const jsArgs of args) {
         initTiming(i, 'microbenches', bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
         initTiming(i, 'microbenches', bench, 'safari', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
         initTiming(i, 'microbenches', bench, 'chrome', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
@@ -151,7 +154,7 @@ function microbenchmarks(i: number, bench: string): void {
       }
       break;
     case 'arithmetic':
-      for (const esMode of ['sane', 'es5']) {
+      for (const esMode of mode) {
         initTiming(i, 'microbenches', bench, 'ChromeBook', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
         initTiming(i, 'microbenches', bench, 'safari', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
         initTiming(i, 'microbenches', bench, 'chrome', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);

@@ -23,11 +23,11 @@ interface Common {
   lang: string,
   bench: string,
   platform: Platform,
-  transform?: 'native' | 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
+  transform?: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
   newMethod?: 'direct' | 'wrapper',
   esMode?: 'sane' | 'es5',
   jsArgs?: 'simple' | 'faithful',
-  estimator?: 'countdown' | 'reservoir',
+  estimator?: 'countdown' | 'reservoir' | 'velocity',
   timePerElapsed?: string,
   yieldInterval?: string,
   resampleInterval?: string,
@@ -72,11 +72,11 @@ export function initVariance(db: Database,
   lang: string,
   bench: string,
   platform: string,
-  transform?: string,
+  transform?: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
   newMethod?: 'direct' | 'wrapper',
-  esMode?: string,
-  jsArgs?: string,
-  estimator?: string,
+  esMode?: 'sane' | 'es5',
+  jsArgs?: 'simple' | 'faithful',
+  estimator?: 'exact' | 'countdown' | 'reservoir' | 'velocity',
   timePerElapsed?: number,
   yieldInterval?: number,
   resampleInterval?: number) {
@@ -177,10 +177,7 @@ export function pyretSourceFilename(lang: string, benchmark: Benchmark) {
 
   let suffix;
 
-  if (transform === 'native') {
-    suffix = 'jarr'
-  }
-  else if (transform === 'original') {
+  if (transform === 'original') {
     suffix = 'v.jarr'
   }
   else if (transform === 'retval') {
@@ -202,10 +199,6 @@ export function benchmarkCompiledFilename(benchmark: Common) {
 export function benchmarkRunOpts(benchmark: Benchmark | VarianceBench): string[] {
   const { lang, bench, platform, transform, newMethod, esMode, estimator,
     timePerElapsed, yieldInterval, resampleInterval, jsArgs } = benchmark;
-
-  if (transform === 'native') {
-    return []
-  }
 
   if (lang === 'pyret') {
     return  ['--env', platform];
