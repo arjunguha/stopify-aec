@@ -70,8 +70,9 @@ db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS failure_index ON failures
 
 // 3 more needed: Java, Pyret, JavaScript
 const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js',
-  'scala', 'c++', 'scheme', 'java', 'javascript', 'pyret_deepstacks',
-  'deepstacks' ];
+  'scala', 'c++', 'scheme', 'java', 'javascript', 'deepstacks' ];
+
+const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' ];
 
 function initTiming(i: number,
   lang: string,
@@ -189,8 +190,6 @@ function timeEstimatorComparisonBenchmarks() {
   }
 }
 
-const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' ];
-
 function javascriptBenchmark(name: string) {
   for (let i = 0; i < ITERATIONS; i++) {
     for (const browser of browsers) {
@@ -201,6 +200,19 @@ function javascriptBenchmark(name: string) {
     initTiming(i, 'javascript', name, 'chrome',  'lazy', 'wrapper', 'es5', 'faithful', 'velocity', undefined,  100);
     initTiming(i, 'javascript', name, 'firefox', 'lazy', 'direct', 'es5', 'faithful', 'velocity', undefined,  100);
     initTiming(i, 'javascript', name, edge, 'retval', 'direct', 'es5', 'faithful', 'velocity', undefined,  100);
+  }
+}
+
+function javaBenchmark(bench: string) {
+  for (let i = 0; i < ITERATIONS; i++) {
+    for (const browser of browsers) {
+      initTiming(i, 'javascript', name, browser, 'original');
+    }
+      initTiming(i, 'java', bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'faithful', 'velocity', undefined, 100);
+      initTiming(i, 'java', bench, 'safari',  'lazy', 'direct', 'sane', 'faithful', 'velocity', undefined, 100);
+      initTiming(i, 'java', bench, 'chrome',  'lazy', 'wrapper', 'sane', 'faithful', 'velocity', undefined,  100);
+      initTiming(i, 'java', bench, 'firefox', 'lazy', 'direct', 'sane', 'faithful', 'velocity', undefined,  100);
+      initTiming(i, 'java', bench, edge, 'retval', 'direct', 'sane', 'faithful', 'velocity', undefined,  100);
   }
 }
 
@@ -228,68 +240,36 @@ function deepstackBenchmark(lang: string, name: string) {
   for (let i = 0; i < ITERATIONS; i++) {
     for (const b of browsers) {
       initTiming(i, lang, name, b, 'lazyDeep', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100)
-      if (lang === 'pyret_deepstacks') {
-      }
     }
   }
 }
 
-const pythonOverviewBenchmarks = [
-  'anagram',
-  'b',
-  'binary_trees',
-  'deltablue',
-  'fib',
-  'nbody',
-  'pystone',
-  'raytrace_simple',
-  'richards',
-  'spectral_norm'
-];
-
-
 function benchmarksFor(lang: string, bench: string) {
   // These are the benchmarks we use in Section 2.
-  if (lang === 'python_pyjs' && pythonOverviewBenchmarks.includes(bench)) {
-    console.log("PYTHON COMPARISON BENCHMARKS DISABLED")
-    //pythonBenchmark(bench);
-    // We allow the other settings to run too.
-  } else if (lang === 'pyret') {
-    console.log("IGNORING PYRET BENCHMARKS")
-    //pyretBenchmark(bench);
-    return;
-  } else if (lang === 'pyret_deepstacks' || lang === 'deepstacks') {
-    console.log("IGNORING PYRET DEEPSTACKS BENCHMARKS")
-    //deepstackBenchmark(lang, bench);
-    return;
-  } else if (lang === 'javascript') {
-    javascriptBenchmark(bench);
-    return;
-  }
-
-  for (let i = 0; i < ITERATIONS; i++) {
-    for (const browser of browsers) {
-      initTiming(i, lang, bench, browser, 'original');
+  switch(lang) {
+    case 'javascript': {
+      javascriptBenchmark(bench);
+      break;
     }
-
-    if (lang === 'java') {
-      initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'faithful', 'velocity', undefined, 100);
-      initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'faithful', 'velocity', undefined, 100);
-      initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'faithful', 'velocity', undefined,  100);
-      initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'faithful', 'velocity', undefined,  100);
-      initTiming(i, lang, bench, edge,      'retval', 'direct', 'sane', 'faithful', 'velocity', undefined,  100);
-      continue;
+    case 'java': {
+      javaBenchmark(bench)
+      break;
     }
+    default: {
+      for (let i = 0; i < ITERATIONS; i++) {
+        for (const browser of browsers) {
+          initTiming(i, lang, bench, browser, 'original');
+        }
 
-    // ChromeBook configuration
-    initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined, 100);
-
-    initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'simple', 'velocity', undefined, 100);
-    initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined,  100);
-    initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'velocity', undefined,  100);
-    initTiming(i, lang, bench, edge,      'retval', 'direct', 'sane', 'simple', 'velocity', undefined,  100);
+        initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined, 100);
+        initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'simple', 'velocity', undefined, 100);
+        initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined,  100);
+        initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'velocity', undefined,  100);
+        initTiming(i, lang, bench, edge, 'retval', 'direct', 'sane', 'simple', 'velocity', undefined,  100);
+      }
+      break;
+    }
   }
-
 }
 
 function createTimingTable() {
@@ -317,9 +297,8 @@ function createTimingTable() {
       console.error(`could not parse filename ${path}`);
       continue;
     }
-    const lang = 'pyret'
     const bench = m[2];
-    benchmarksFor(lang, bench);
+    pyretBenchmark(bench);
   }
 
   // Pyret deepstacks
@@ -334,11 +313,14 @@ function createTimingTable() {
     }
     const lang = 'pyret_deepstacks'
     const bench = m[2];
-    benchmarksFor(lang, bench);
+    deepstackBenchmark(lang, bench);
   }
 
 }
 
 createTimingTable();
 // Disable time estimator scala benchmark
-//timeEstimatorComparisonBenchmarks();
+// timeEstimatorComparisonBenchmarks();
+
+// Disable python comparison benchmarks
+// pythonBenchmark(bench);
