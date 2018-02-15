@@ -70,7 +70,7 @@ db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS failure_index ON failures
 
 // 3 more needed: Java, Pyret, JavaScript
 const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js',
-  'scala', 'c++', 'scheme', 'java', 'javascript', 'microbenches', 'pyret_deepstacks',
+  'scala', 'c++', 'scheme', 'java', 'javascript', 'pyret_deepstacks',
   'deepstacks' ];
 
 function initTiming(i: number,
