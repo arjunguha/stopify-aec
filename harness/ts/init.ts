@@ -254,13 +254,16 @@ const pythonOverviewBenchmarks = [
 function benchmarksFor(lang: string, bench: string) {
   // These are the benchmarks we use in Section 2.
   if (lang === 'python_pyjs' && pythonOverviewBenchmarks.includes(bench)) {
-    pythonBenchmark(bench);
+    console.log("PYTHON COMPARISON BENCHMARKS DISABLED")
+    //pythonBenchmark(bench);
     // We allow the other settings to run too.
   } else if (lang === 'pyret') {
-    pyretBenchmark(bench);
+    console.log("IGNORING PYRET BENCHMARKS")
+    //pyretBenchmark(bench);
     return;
   } else if (lang === 'pyret_deepstacks' || lang === 'deepstacks') {
-    deepstackBenchmark(lang, bench);
+    console.log("IGNORING PYRET DEEPSTACKS BENCHMARKS")
+    //deepstackBenchmark(lang, bench);
     return;
   } else if (lang === 'javascript') {
     javascriptBenchmark(bench);
@@ -295,9 +298,11 @@ function benchmarksFor(lang: string, bench: string) {
 }
 
 function createTimingTable() {
+
   const benchmarkFiles = langs
     .map(l => glob.sync(path.resolve(__dirname, `../../${l}/js-build/*.js`)))
     .reduce((arr1, arr2) => arr1.concat(arr2));
+
   for (const path of benchmarkFiles) {
     const m = /^.*\/([^/]*)\/js-build\/([^.]*)\.js$/.exec(path);
     if (m === null) {
@@ -325,6 +330,7 @@ function createTimingTable() {
   // Pyret deepstacks
   const pyretdeepBench =
     glob.sync(path.resolve(__dirname, '../../pyret_deepstacks/*.arr'))
+
   for (const path of pyretdeepBench) {
     const m = /^.*\/([^/]*)\/([^.]*)\.arr/.exec(path);
     if (m === null) {
@@ -335,6 +341,7 @@ function createTimingTable() {
     const bench = m[2];
     benchmarksFor(lang, bench);
   }
+
 }
 
 createTimingTable();
