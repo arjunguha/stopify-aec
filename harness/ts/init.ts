@@ -195,11 +195,11 @@ function javascriptBenchmark(name: string) {
     for (const browser of browsers) {
       initTiming(i, 'javascript', name, browser, 'original');
     }
-    initTiming(i, 'javascript', name, 'ChromeBook', 'lazy', 'wrapper', 'es5', 'faithful', 'reservoir', undefined, 100);
-    initTiming(i, 'javascript', name, 'safari',  'lazy', 'direct', 'es5', 'faithful', 'reservoir', undefined, 100);
-    initTiming(i, 'javascript', name, 'chrome',  'lazy', 'wrapper', 'es5', 'faithful', 'reservoir', undefined,  100);
-    initTiming(i, 'javascript', name, 'firefox', 'lazy', 'direct', 'es5', 'faithful', 'reservoir', undefined,  100);
-    initTiming(i, 'javascript', name, edge, 'retval', 'direct', 'es5', 'faithful', 'reservoir', undefined,  100);
+    initTiming(i, 'javascript', name, 'ChromeBook', 'lazy', 'wrapper', 'es5', 'faithful', 'velocity', undefined, 100);
+    initTiming(i, 'javascript', name, 'safari',  'lazy', 'direct', 'es5', 'faithful', 'velocity', undefined, 100);
+    initTiming(i, 'javascript', name, 'chrome',  'lazy', 'wrapper', 'es5', 'faithful', 'velocity', undefined,  100);
+    initTiming(i, 'javascript', name, 'firefox', 'lazy', 'direct', 'es5', 'faithful', 'velocity', undefined,  100);
+    initTiming(i, 'javascript', name, edge, 'retval', 'direct', 'es5', 'faithful', 'velocity', undefined,  100);
   }
 }
 
@@ -279,29 +279,24 @@ function benchmarksFor(lang: string, bench: string) {
       initTiming(i, lang, bench, browser, 'original');
     }
 
-    if (lang === 'microbenches') {
-      microbenchmarks(i, bench);
-      continue;
-    }
-
     initTiming(i, lang, bench, 'native');
 
     if (lang === 'java') {
-      initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'faithful', 'reservoir', undefined, 100);
-      initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'faithful', 'reservoir', undefined, 100);
-      initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'faithful', 'reservoir', undefined,  100);
-      initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'faithful', 'reservoir', undefined,  100);
-      initTiming(i, lang, bench, edge,      'retval', 'direct', 'sane', 'faithful', 'reservoir', undefined,  100);
+      initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'faithful', 'velocity', undefined, 100);
+      initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'faithful', 'velocity', undefined, 100);
+      initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'faithful', 'velocity', undefined,  100);
+      initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'faithful', 'velocity', undefined,  100);
+      initTiming(i, lang, bench, edge,      'retval', 'direct', 'sane', 'faithful', 'velocity', undefined,  100);
       continue;
     }
 
     // ChromeBook configuration
-    initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+    initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined, 100);
 
-    initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined, 100);
-    initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined,  100);
-    initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
-    initTiming(i, lang, bench, edge,      'retval', 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
+    initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'simple', 'velocity', undefined, 100);
+    initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined,  100);
+    initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'velocity', undefined,  100);
+    initTiming(i, lang, bench, edge,      'retval', 'direct', 'sane', 'simple', 'velocity', undefined,  100);
   }
 
 }
@@ -350,4 +345,5 @@ function createTimingTable() {
 }
 
 createTimingTable();
-timeEstimatorComparisonBenchmarks();
+// Disable time estimator scala benchmark
+//timeEstimatorComparisonBenchmarks();
