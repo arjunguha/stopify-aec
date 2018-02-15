@@ -10,6 +10,8 @@ const edge = 'MicrosoftEdge';
 
 const db = new Database('results.sqlite');
 
+const ITERATIONS = 3
+
 db.exec(`CREATE TABLE IF NOT EXISTS timing
   (ix INTEGER NOT NULL,
    lang TEXT NOT NULL,
@@ -99,7 +101,7 @@ function pythonBenchmark(name: string) {
   if (name === 'gcbench' || name === 'schulze') {
     return;
   }
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < ITERATIONS; i++) {
     // Initialize python variance entries
     initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
     initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'exact', undefined,  100);
@@ -181,7 +183,7 @@ function microbenchmarks(i: number, bench: string): void {
 }
 
 function timeEstimatorComparisonBenchmarks() {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < ITERATIONS; i++) {
     initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'exact', undefined, 100);
     initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined, 1000000);
     initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined, 100, 250);
@@ -191,7 +193,7 @@ function timeEstimatorComparisonBenchmarks() {
 const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' ];
 
 function javascriptBenchmark(name: string) {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < ITERATIONS; i++) {
     for (const browser of browsers) {
       initTiming(i, 'javascript', name, browser, 'original');
     }
@@ -209,7 +211,7 @@ function pyretBenchmark(name: string) {
     return;
   }
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < ITERATIONS; i++) {
     for (const b of browsers) {
       initTiming(i, 'pyret', name, b, 'native');
       initTiming(i, 'pyret', name, b, 'original');
@@ -225,7 +227,7 @@ function pyretBenchmark(name: string) {
 }
 
 function deepstackBenchmark(lang: string, name: string) {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < ITERATIONS; i++) {
     for (const b of browsers) {
       initTiming(i, lang, name, b, 'lazyDeep', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100)
       if (lang === 'pyret_deepstacks') {
@@ -265,16 +267,7 @@ function benchmarksFor(lang: string, bench: string) {
     return;
   }
 
-  for (let i = 0; i < 10; i++) {
-    /* Disable scala velocity benchmarks.
-    if (lang === 'scala') {
-      for (const resampleInterval of [ 100, 250, 500, 750, 1000 ]) {
-        initTiming(i, lang, bench, 'chrome', 'lazy', 'direct', 'sane', 'simple', 'velocity',
-          undefined, 100, resampleInterval);
-      }
-    }
-     */
-
+  for (let i = 0; i < ITERATIONS; i++) {
     for (const browser of browsers) {
       initTiming(i, lang, bench, browser, 'original');
     }
