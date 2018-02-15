@@ -107,7 +107,6 @@ function pythonBenchmark(name: string) {
     initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'exact', undefined,  100);
     initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined,  100, 250);
 
-    initTiming(i, 'python_pyjs', name, 'native');
     initTiming(i, 'python_pyjs', name, 'chrome', 'original');
     initTiming(i, 'python_pyjs', name, 'firefox', 'original');
     initTiming(i, 'python_pyjs', name, 'MicrosoftEdge', 'original');
@@ -213,7 +212,6 @@ function pyretBenchmark(name: string) {
 
   for (let i = 0; i < ITERATIONS; i++) {
     for (const b of browsers) {
-      initTiming(i, 'pyret', name, b, 'native');
       initTiming(i, 'pyret', name, b, 'original');
       // edge uses retval
       if (b === 'MicrosoftEdge') {
@@ -231,7 +229,6 @@ function deepstackBenchmark(lang: string, name: string) {
     for (const b of browsers) {
       initTiming(i, lang, name, b, 'lazyDeep', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100)
       if (lang === 'pyret_deepstacks') {
-        initTiming(i, lang, name, b, 'native')
       }
     }
   }
@@ -274,8 +271,6 @@ function benchmarksFor(lang: string, bench: string) {
     for (const browser of browsers) {
       initTiming(i, lang, bench, browser, 'original');
     }
-
-    initTiming(i, lang, bench, 'native');
 
     if (lang === 'java') {
       initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'faithful', 'velocity', undefined, 100);
