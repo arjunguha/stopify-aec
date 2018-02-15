@@ -1,4 +1,3 @@
-;#lang r5rs
 (define (time x) x)
 
 (define (run-bench name count ok? run)
@@ -19,7 +18,7 @@
         (write result)
         (newline))
       (begin
-        (display "OK") 
+        (display "OK")
         (newline)))))
 ;;; MBROT -- Generation of Mandelbrot set fractal.
 
@@ -30,7 +29,7 @@
 
     (let ((cr (+ r (* (exact->inexact x) step)))
           (ci (+ i (* (exact->inexact y) step))))
-      
+
       (let loop ((zr cr)
                  (zi ci)
                  (c 0))

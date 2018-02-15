@@ -1,5 +1,3 @@
-#lang r5rs
-
 (define boyer-iters 1)
 
 (define (error) (car '()))
@@ -24,7 +22,7 @@
         (write result)
         (newline))
       (begin
-        (display "OK") 
+        (display "OK")
         (newline)))))
 ;;; BOYER -- Logic programming benchmark, originally written by Bob Boyer.
 ;;; Fairly CONS intensive.

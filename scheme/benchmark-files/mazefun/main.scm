@@ -1,4 +1,3 @@
-#lang r5rs
 (define (time x) x)
 
 (define (run-bench name count ok? run)
@@ -19,7 +18,7 @@
         (write result)
         (newline))
       (begin
-        (display "OK") 
+        (display "OK")
         (newline)))))
 ;;; MAZEFUN -- Constructs a maze in a purely functional way,
 ;;; written by Marc Feeley.

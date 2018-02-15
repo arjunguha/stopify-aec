@@ -1,4 +1,3 @@
-#lang r5rs
 (define (fatal-error) (car '()))
 (define dderiv-iters 1)
 (define (time x) x)
@@ -21,7 +20,7 @@
         (write result)
         (newline))
       (begin
-        (display "OK") 
+        (display "OK")
         (newline)))))
 ;;; DDERIV -- Table-driven symbolic derivation.
 

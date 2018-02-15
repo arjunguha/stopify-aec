@@ -1,5 +1,4 @@
-#lang r5rs
-(define destruc-iters 50)  
+(define destruc-iters 50)
 (define (time x) x)
 
 (define (run-bench name count ok? run)
@@ -20,7 +19,7 @@
         (display result)
         (newline))
       (begin
-        (display "OK") 
+        (display "OK")
         (newline)))))
 ;;; DESTRUC -- Destructive operation benchmark.
 
@@ -70,7 +69,7 @@
     "destruc"
     destruc-iters
     (lambda (result) #t)
-; NOTE(arjun): We get the right result. Is equal? wrong in RacketScript?    
+; NOTE(arjun): We get the right result. Is equal? wrong in RacketScript?
 ;      (equal? result
 ;              '((1 1 2)
 ;                (1 1 1)

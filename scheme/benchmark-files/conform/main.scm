@@ -1,5 +1,4 @@
-#lang r5rs
-(define conform-iters 1)  
+(define conform-iters 1)
 (define (time x) x)
 
 (define (fatal-error) (car '()))
@@ -22,7 +21,7 @@
         (write result)
         (newline))
       (begin
-        (display "OK") 
+        (display "OK")
         (newline)))))
 ;;; CONFORM -- Type checker, written by Jim Miller.
 
@@ -190,7 +189,7 @@
 (define (canonicalize-graph graph classes)
   (define (fix node)
     (define (fix-set object selector mutator)
-      (mutator object 
+      (mutator object
                (map (lambda (node)
                       (find-canonical-representative node classes))
                     (selector object))))
@@ -198,7 +197,7 @@
         (begin
           (fix-set node green-edges set-green-edges!)
           (fix-set node red-edges set-red-edges!)
-          (for-each 
+          (for-each
            (lambda (blue-edge)
              (set-arg-node! blue-edge
                             (find-canonical-representative (arg-node blue-edge) classes))
@@ -342,11 +341,11 @@
 
 (define (find-canonical-representative element classification)
   (let loop ((classes classification))
-    (cond ((null? classes) (fatal-error "Can't classify" element)) 
+    (cond ((null? classes) (fatal-error "Can't classify" element))
           ((memq element (car classes)) (car (car classes)))
           (else (loop (cdr classes))))))
 
-; Reduce a graph by taking only one member of each equivalence 
+; Reduce a graph by taking only one member of each equivalence
 ; class and canonicalizing all outbound pointers
 
 (define (reduce graph)
@@ -371,7 +370,7 @@
         (set-cdr! table (cons (cons x (make-singleton-table y value))
                               (cdr table))))))
 
-;; MEET/JOIN 
+;; MEET/JOIN
 ; These update the graph when computing the node for node1*node2
 
 (define (blue-edge-operate arg-fn res-fn graph op sig1 sig2)
