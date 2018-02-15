@@ -18,8 +18,7 @@ var headers = new Headers();
 headers.append("Content-Type", "application/json");
 
 export function benchmarkUrl(args: string[]) {
-  const opts = parseRuntimeOpts(args);
-  return encodeURIComponent(JSON.stringify(opts));
+  return encodeURIComponent(JSON.stringify(args));
 }
 
 function getName(b: common.Benchmark | common.VarianceBench) {
