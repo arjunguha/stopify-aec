@@ -55,7 +55,7 @@ class Node(object):
         self.left = l
         self.right = r
 
-kStretchTreeDepth    = 18  # about 16Mb (for Java)
+kStretchTreeDepth    = 14  # about 16Mb (for Java)
 kLongLivedTreeDepth  = 16  # about 4Mb (for Java)
 kArraySize  = 500000   # about 4Mb
 kMinTreeDepth = 4
