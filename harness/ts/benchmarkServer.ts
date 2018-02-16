@@ -65,8 +65,9 @@ function serve(db: Database, port: number) {
       newMethod,
       esMode,
       jsArgs,
+      getters,
+      EVAL,
       estimator,
-      timePerElapsed,
       yieldInterval,
       resampleInterval
     } = req.body;
@@ -74,12 +75,13 @@ function serve(db: Database, port: number) {
     if (typeof result === 'undefined') {
       console.error(`Could not parse benchmark output`);
       db.prepare(`INSERT OR IGNORE INTO failures (lang, bench, platform, transform,
-    new_method, es_mode, js_args, estimator, time_per_elapsed, yield_interval, resample_interval) VALUES
+    new_method, es_mode, js_args, getters, eval, estimator, yield_interval, resample_interval) VALUES
     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
         .run(lang, bench, platform, common.mayNull(transform),
           common.mayNull(newMethod), common.mayNull(esMode),
-          common.mayNull(jsArgs), common.mayNull(estimator),
-          common.mayNull(timePerElapsed), common.mayNull(yieldInterval),
+          common.mayNull(jsArgs), common.mayNull(getters), common.mayNull(EVAL),
+          common.mayNull(estimator),
+          common.mayNull(yieldInterval),
           common.mayNull(resampleInterval));
       res.sendStatus(404);
       return;
