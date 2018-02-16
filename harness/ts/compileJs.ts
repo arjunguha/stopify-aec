@@ -2,9 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path'
 import * as fs from 'fs';
 import { spawnSync } from 'child_process';
-import  * as csvStringify  from 'csv-stringify';
 import * as Database from 'better-sqlite3';
-import * as glob from 'glob';
 import * as common from './common';
 
 const db = new Database('results.sqlite');

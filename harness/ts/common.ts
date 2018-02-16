@@ -1,22 +1,10 @@
-import * as path from 'path'
-import * as fs from 'fs';
-import { spawnSync } from 'child_process';
-import  * as csvStringify  from 'csv-stringify';
 import * as Database from 'better-sqlite3';
-import * as glob from 'glob';
 
 export type Platform = 'native' | 'chrome' | 'firefox' | 'MicrosoftEdge' | 'safari' | 'ChromeBook';
+
 export type BenchmarkOutput =
-  {
-    type: 'timing',
-    runningTime: number,
-    numYields: number
-  } | {
-    type: 'variance',
-    variance: string,
-    runningTime: number,
-    numYields: number
-  };
+  { type: 'timing', runningTime: number, numYields: number } |
+  { type: 'variance', variance: string, runningTime: number, numYields: number };
 
 export interface Config {
   transform: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
@@ -51,17 +39,11 @@ export interface VarianceBench extends Common {
 };
 
 function unna<T extends string | number>(x: T): T | undefined {
-  if (typeof x === 'string') {
-    if (x === 'NA') {
-      return undefined;
-    }
-    return x;
+  if (x === undefined || x === null || x === 'NA') {
+    return undefined;
   }
   else {
-    if (x === undefined || x === null) {
-      return undefined;
-    }
-    return x;
+    return x
   }
 }
 
@@ -148,7 +130,8 @@ export function parseBenchmarkVariance(row: any): VarianceBench {
 function getTimingBenchmarks(db: Database, platform: Platform|undefined,
   queryParam: string): Benchmark[] {
     const filter = decodeURIComponent(queryParam);
-    return db.prepare(`SELECT rowid,* FROM timing WHERE ${platform ? 'platform="' + platform + '" AND' : '' }
+    return db.prepare(
+    `SELECT rowid,* FROM timing WHERE ${platform ? 'platform="' + platform + '" AND' : '' }
                      running_time IS NULL ` + (filter === '' ? '' : `AND ${filter}` + ';'))
       .all()
       .map(parseBenchmarkTiming);
@@ -162,10 +145,11 @@ function getVarianceBenchmarks(db: Database, platform: Platform|undefined,
       .all()
       .map(parseBenchmarkVariance);
   }
+
 /**
  * Produces all benchmarks that still need to run.
  */
-export function unfinishedBenchmarks(db: Database, platform?: Platform, filter?: string): (Benchmark|VarianceBench)[] {
+export function unfinishedBenchmarks(db: Database, platform?: Platform, filter?: string): (Benchmark | VarianceBench)[] {
   return [
     ...getTimingBenchmarks(db, platform, filter || ''),
     ...getVarianceBenchmarks(db, platform, filter || ''),
@@ -197,13 +181,15 @@ export function pyretSourceFilename(lang: string, benchmark: Benchmark) {
 
 export function benchmarkCompiledFilename(benchmark: Common) {
   // These are the compile-time settings
-  const { lang, bench, transform, newMethod, esMode, jsArgs } = benchmark;
-  return `${lang}-${bench}-${transform}-${newMethod}-${esMode}-${jsArgs}.js`;
+  const { lang, bench, transform, newMethod, esMode, jsArgs,
+    getters, EVAL } = benchmark;
+
+  return `${lang}-${bench}-${transform}-${newMethod}-${esMode}-${jsArgs}-${getters}-${EVAL}.js`;
 }
 
 export function benchmarkRunOpts(benchmark: Benchmark | VarianceBench): string[] {
-  const { lang, bench, platform, transform, newMethod, esMode, estimator,
-    timePerElapsed, yieldInterval, resampleInterval, jsArgs } = benchmark;
+  const { lang, platform, transform, estimator, timePerElapsed, yieldInterval,
+          resampleInterval } = benchmark;
 
   if (lang === 'pyret') {
     return  ['--env', platform];

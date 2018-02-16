@@ -1,7 +1,4 @@
 import * as path from 'path'
-import * as fs from 'fs';
-import { spawnSync } from 'child_process';
-import  * as csvStringify  from 'csv-stringify';
 import * as Database from 'better-sqlite3';
 import * as glob from 'glob';
 import { mayNull, initVariance, Config } from './common';
@@ -100,7 +97,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
   }
 }
 
-function pythonBenchmark(name: string) {
+// TODO(rachit): This shouldn't be exported.
+export function pythonBenchmark(name: string) {
   // Sadly, these two just crash with --es=es5
   if (name === 'gcbench' || name === 'schulze') {
     return;
@@ -119,7 +117,6 @@ function pythonBenchmark(name: string) {
       esMode: 'sane',
       jsArgs: 'simple',
       estimator: 'exact',
-      timePerElapsed: undefined,
       yieldInterval: 100
     }
 
@@ -156,7 +153,6 @@ function pythonBenchmark(name: string) {
       esMode: 'sane',
       jsArgs: 'simple',
       estimator: 'countdown',
-      timePerElapsed: undefined,
       yieldInterval: 1000000
     }
 
@@ -171,7 +167,6 @@ function pythonBenchmark(name: string) {
       esMode: 'sane',
       jsArgs: 'simple',
       estimator: 'countdown',
-      timePerElapsed: undefined,
       yieldInterval: 1000000
     }
 
@@ -210,7 +205,6 @@ const chromeConfig: Config = {
   esMode: 'sane',
   jsArgs: 'simple',
   estimator: 'velocity',
-  timePerElapsed: undefined,
   yieldInterval: 100
 }
 
@@ -220,7 +214,6 @@ const safariConfig: Config = {
   esMode: 'sane',
   jsArgs: 'simple',
   estimator: 'velocity',
-  timePerElapsed: undefined,
   yieldInterval: 100
 }
 
@@ -230,40 +223,39 @@ const edgeConfig: Config = {
   esMode: 'sane',
   jsArgs: 'simple',
   estimator: 'velocity',
-  timePerElapsed: undefined,
   yieldInterval: 100
 }
 
-function timeEstimatorComparisonBenchmarks() {
+// TODO(rachit): This shouldn't be exported.
+export function timeEstimatorComparisonBenchmarks() {
 
-  const baseConfig = {
+  const baseConfig: Config = {
     transform: 'lazy',
     newMethod: 'wrapper',
     esMode: 'sane',
     jsArgs: 'simple',
+    estimator: 'exact',
+    yieldInterval: 100
   }
 
   const c1: Config = {
     ...baseConfig,
     estimator: 'exact',
-    timePerElapsed: undefined,
     yieldInterval: 100
-  } as Config
+  }
 
   const c2: Config = {
     ...baseConfig,
     estimator: 'countdown',
-    timePerElapsed: undefined,
     yieldInterval: 1000000
-  } as Config
+  }
 
   const c3: Config = {
     ...baseConfig,
     estimator: 'velocity',
-    timePerElapsed: undefined,
     yieldInterval: 100,
     resampleInterval: 250
-  } as Config
+  }
 
   for (let i = 0; i < ITERATIONS; i++) {
     initTiming(i, 'scala', 'Meteor', 'chrome', c1);
@@ -274,6 +266,7 @@ function timeEstimatorComparisonBenchmarks() {
 
 function javascriptBenchmark(name: string) {
 
+  // Enables full opts in a given configuration.
   function fullOpts(conf: Config): Config {
     return {
       ...conf,
@@ -346,7 +339,6 @@ function deepstackBenchmark(lang: string, name: string) {
     esMode: 'sane',
     jsArgs: 'simple',
     estimator: 'reservoir',
-    timePerElapsed: undefined,
     yieldInterval: 100
   }
 

@@ -11,7 +11,8 @@
         "noImplicitReturns": true,
         "noImplicitAny": true,
         "strictNullChecks": true,
-        "inlineSourceMap": true
+        "inlineSourceMap": true,
+        "noUnusedLocals": true
     },
     "include": [
       "ts"

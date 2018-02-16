@@ -4,7 +4,7 @@ import * as bodyParser from 'body-parser';
 const detectBrowser = require('detect-browser'); // NOTE(arjun): no @types
 import * as path from 'path';
 import * as common from './common';
-import { Platform, Benchmark, VarianceBench, unfinishedBenchmarks } from './common';
+import { Platform, unfinishedBenchmarks } from './common';
 
 function getPlatform(ua: string): Platform | undefined {
   if (ua.includes('CrOS')) {

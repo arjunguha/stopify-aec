@@ -1,5 +1,4 @@
 import * as common from './common';
-import { parseRuntimeOpts } from '../../../dist/src/cli-parse';
 
 const benchmarkTimeout = 1200; //seconds
 const checkInterval = 5; // seconds
