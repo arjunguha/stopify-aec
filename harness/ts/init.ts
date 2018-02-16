@@ -196,52 +196,6 @@ function pythonBenchmark(name: string) {
   }
 }
 
-/*function microbenchmarks(i: number, bench: string): void {
-  const args: ('simple' | 'faithful')[] = ['simple', 'faithful']
-  const mode: ('sane' | 'es5')[] = ['sane', 'es5']
-
-  switch (bench) {
-    case 'arguments':
-      for (const jsArgs of args) {
-        initTiming(i, 'microbenches', bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'safari', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'chrome', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'firefox', 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, edge, 'lazy', 'wrapper', 'sane', jsArgs, 'reservoir', undefined, 100);
-      }
-      break;
-    case 'arithmetic':
-      for (const esMode of mode) {
-        initTiming(i, 'microbenches', bench, 'ChromeBook', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'safari', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'chrome', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'firefox', 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, edge, 'lazy', 'wrapper', esMode, 'simple', 'reservoir', undefined, 100);
-      }
-      break;
-    case 'constructor':
-      for (const handleNew of <any[]>['wrapper', 'direct']) {
-        initTiming(i, 'microbenches', bench, 'ChromeBook', 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'safari', 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'chrome', 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'firefox', 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, edge, 'lazy', handleNew, 'sane', 'simple', 'reservoir', undefined, 100);
-      }
-      break;
-    case 'loop':
-      for (const t of <any[]>['lazy', 'retval']) {
-        initTiming(i, 'microbenches', bench, 'ChromeBook', t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'safari', t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'chrome', t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, 'firefox', t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
-        initTiming(i, 'microbenches', bench, edge, t, 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
-      }
-      break;
-    default:
-      break;
-  }
-}*/
-
 const chromeConfig: Config = {
   transform: 'lazy',
   newMethod: 'wrapper',
