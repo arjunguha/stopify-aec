@@ -18,19 +18,22 @@ export type BenchmarkOutput =
     numYields: number
   };
 
-interface Common {
+export interface Config {
+  transform: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
+  newMethod?: 'direct' | 'wrapper',
+  esMode?: 'sane' | 'es5',
+  jsArgs?: 'simple' | 'faithful',
+  estimator?: 'countdown' | 'reservoir' | 'velocity' | 'exact',
+  timePerElapsed?: string,
+  yieldInterval?: number,
+  resampleInterval?: number,
+}
+
+interface Common extends Config {
   rowId: number,
   lang: string,
   bench: string,
   platform: Platform,
-  transform?: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
-  newMethod?: 'direct' | 'wrapper',
-  esMode?: 'sane' | 'es5',
-  jsArgs?: 'simple' | 'faithful',
-  estimator?: 'countdown' | 'reservoir' | 'velocity',
-  timePerElapsed?: string,
-  yieldInterval?: string,
-  resampleInterval?: string,
 };
 
 export interface Benchmark extends Common {
@@ -72,24 +75,24 @@ export function initVariance(db: Database,
   lang: string,
   bench: string,
   platform: string,
-  transform?: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
-  newMethod?: 'direct' | 'wrapper',
-  esMode?: 'sane' | 'es5',
-  jsArgs?: 'simple' | 'faithful',
-  estimator?: 'exact' | 'countdown' | 'reservoir' | 'velocity',
-  timePerElapsed?: number,
-  yieldInterval?: number,
-  resampleInterval?: number) {
-  const r = db.prepare(`INSERT OR IGNORE INTO variance (ix, lang, bench, platform, transform,
+  config: Config) {
+
+  const { transform, newMethod, esMode, jsArgs, estimator, timePerElapsed,
+          yieldInterval, resampleInterval } = config
+
+  const r = db.prepare(
+  `INSERT OR IGNORE INTO variance (ix, lang, bench, platform, transform,
     new_method, es_mode, js_args, estimator, time_per_elapsed, yield_interval, resample_interval) VALUES
     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(ix, lang, bench, platform, mayNull(transform),
       mayNull(newMethod), mayNull(esMode), mayNull(jsArgs),
       mayNull(estimator), mayNull(timePerElapsed),
       mayNull(yieldInterval), mayNull(resampleInterval));
+
   if (r.changes > 0) {
     console.error(`Creating variance configuration ${ix},${lang},${bench},${platform},${transform},${newMethod},${esMode},${jsArgs},${estimator},${timePerElapsed},${yieldInterval},${resampleInterval}`);
   }
+
 }
 
 export function parseBenchmarkRow(row: any): Benchmark | VarianceBench {

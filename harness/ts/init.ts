@@ -4,7 +4,7 @@ import { spawnSync } from 'child_process';
 import  * as csvStringify  from 'csv-stringify';
 import * as Database from 'better-sqlite3';
 import * as glob from 'glob';
-import { mayNull, initVariance } from './common';
+import { mayNull, initVariance, Config } from './common';
 
 const edge = 'MicrosoftEdge';
 
@@ -74,24 +74,19 @@ const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js',
 
 const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' ];
 
-function initTiming(i: number,
-  lang: string,
-  bench: string,
-  platform: string,
-  transform?: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
-  newMethod?: 'direct' | 'wrapper',
-  esMode?: 'sane' | 'es5',
-  jsArgs?: 'simple' | 'faithful',
-  estimator?: 'exact' | 'countdown' | 'reservoir' | 'velocity',
-  timePerElapsed?: number,
-  yieldInterval?: number,
-  resampleInterval?: number) {
-  const r = db.prepare(`INSERT OR IGNORE INTO timing (ix, lang, bench, platform, transform,
-    new_method, es_mode, js_args, estimator, time_per_elapsed, yield_interval, resample_interval) VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+function initTiming(i: number, lang: string, bench: string, platform: string, config: Config) {
+
+  const { transform, newMethod, esMode, jsArgs, estimator, timePerElapsed,
+          yieldInterval, resampleInterval } = config;
+
+  const r = db.prepare(
+  `INSERT OR IGNORE INTO timing (ix, lang, bench, platform, transform, new_method,
+es_mode, js_args, estimator, time_per_elapsed, yield_interval, resample_interval)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(i, lang, bench, platform, mayNull(transform), mayNull(newMethod),
       mayNull(esMode), mayNull(jsArgs), mayNull(estimator),
       mayNull(timePerElapsed), mayNull(yieldInterval), mayNull(resampleInterval));
+
   if (r.changes > 0) {
     console.error(`Creating configuration ${i},${lang},${bench},${platform},${transform},${newMethod},${esMode},${jsArgs},${estimator},${timePerElapsed},${yieldInterval},${resampleInterval}`);
   }
@@ -103,43 +98,105 @@ function pythonBenchmark(name: string) {
     return;
   }
   for (let i = 0; i < ITERATIONS; i++) {
-    // Initialize python variance entries
-    initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
-    initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'exact', undefined,  100);
-    initVariance(db, i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined,  100, 250);
+    // Initialize originals
+    // TODO(rachit): Isn't this already handled by benchmarkFor
+    initTiming(i, 'python_pyjs', name, 'chrome', { transform: 'original' });
+    initTiming(i, 'python_pyjs', name, 'firefox', { transform: 'original' });
+    initTiming(i, 'python_pyjs', name, 'MicrosoftEdge', { transform: 'original'});
 
-    initTiming(i, 'python_pyjs', name, 'chrome', 'original');
-    initTiming(i, 'python_pyjs', name, 'firefox', 'original');
-    initTiming(i, 'python_pyjs', name, 'MicrosoftEdge', 'original');
+    // Initialize python variance entries
+    const varianceConfig: Config = {
+      transform: 'lazy',
+      newMethod: 'wrapper',
+      esMode: 'sane',
+      jsArgs: 'simple',
+      estimator: 'exact',
+      timePerElapsed: undefined,
+      yieldInterval: 100
+    }
+
+    initVariance(db, i, 'python_pyjs', name, 'chrome', { ...varianceConfig,
+      estimator: 'countdown', yieldInterval: 1000000 });
+
+    initVariance(db, i, 'python_pyjs', name, 'chrome', { ...varianceConfig,
+      estimator: 'exact', yieldInterval: 100 });
+
+    initVariance(db, i, 'python_pyjs', name, 'chrome', { ...varianceConfig,
+      estimator: 'velocity', yieldInterval: 100, resampleInterval: 250});
 
     // Compare ES5 sane vs. insane mode using Chrome only. The other browsers
     // are just way too slow.
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct',  'es5', 'simple', 'countdown');
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper',  'es5', 'simple', 'countdown');
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'direct',  'sane', 'simple', 'countdown', undefined,   1000000);
+    const exp1_c1: Config = {
+      transform: 'lazy',
+      newMethod: 'direct',
+      esMode: 'es5',
+      jsArgs: 'simple',
+      estimator: 'countdown'
+    }
+
+    const exp1_c2: Config = {
+      transform: 'lazy',
+      newMethod: 'wrapper',
+      esMode: 'es5',
+      jsArgs: 'simple',
+      estimator: 'countdown'
+    }
+
+    const exp1_c3: Config = {
+      transform: 'lazy',
+      newMethod: 'direct',
+      esMode: 'sane',
+      jsArgs: 'simple',
+      estimator: 'countdown',
+      timePerElapsed: undefined,
+      yieldInterval: 1000000
+    }
+
+    initTiming(i, 'python_pyjs', name, 'chrome', exp1_c1);
+    initTiming(i, 'python_pyjs', name, 'chrome', exp1_c2);
+    initTiming(i, 'python_pyjs', name, 'chrome', exp1_c3);
 
     // Compare all Chrome, Firefox, and Edge for new method.
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, edge,     'lazy', 'direct',  'sane', 'simple', 'countdown', undefined,   1000000);
-    initTiming(i, 'python_pyjs', name, edge,     'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined, 1000000);
+    const exp2: Config = {
+      transform: 'lazy',
+      newMethod: 'wrapper',
+      esMode: 'sane',
+      jsArgs: 'simple',
+      estimator: 'countdown',
+      timePerElapsed: undefined,
+      yieldInterval: 1000000
+    }
+
+    for (const browser in ['chrome', edge, 'firefox']) {
+      initTiming(i, 'python_pyjs', name, browser, {...exp2, newMethod: 'direct'});
+      initTiming(i, 'python_pyjs', name, browser, {...exp2, newMethod: 'wrapper'});
+    }
 
 
     if (["b", "binary_trees","nbody", "richards"].includes(name)) {
-      initTiming(i, 'python_pyjs', name, 'safari', 'lazy', 'direct', 'sane', 'simple', 'countdown', undefined,  1000000);
-      initTiming(i, 'python_pyjs', name, 'safari', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined, 1000000);
+      initTiming(i, 'python_pyjs', name, 'safari', {...exp2, newMethod: 'direct'});
+      initTiming(i, 'python_pyjs', name, 'safari', {...exp2, newMethod: 'wrapper'});
     }
 
-    initTiming(i, 'python_pyjs', name, 'firefox', 'retval', 'direct', 'sane', 'simple', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, 'chrome', 'retval', 'wrapper', 'sane', 'simple', 'countdown', undefined,  1000000);
-    initTiming(i, 'python_pyjs', name, 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined,  100);
-    initTiming(i, 'python_pyjs', name, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
-    initTiming(i, 'python_pyjs', name, edge, 'lazy', 'direct', 'sane', 'simple', 'reservoir', undefined,  100);
+    // TODO(rachit): What comparison are these used for?
+    initTiming(i, 'python_pyjs', name, 'firefox',
+      { ...exp2, newMethod: 'direct', transform: 'retval' });
+
+    initTiming(i, 'python_pyjs', name, 'firefox',
+      { ...exp2, newMethod: 'wrapper', transform: 'retval' });
+
+    initTiming(i, 'python_pyjs', name, 'chrome',
+      { ...exp2, newMethod: 'wrapper', estimator: 'reservoir', yieldInterval: 100});
+
+    initTiming(i, 'python_pyjs', name, 'chrome',
+      { ...exp2, newMethod: 'direct', estimator: 'reservoir', yieldInterval: 100});
+
+    initTiming(i, 'python_pyjs', name, edge,
+      { ...exp2, newMethod: 'direct', estimator: 'reservoir', yieldInterval: 100});
   }
 }
 
-function microbenchmarks(i: number, bench: string): void {
+/*function microbenchmarks(i: number, bench: string): void {
   const args: ('simple' | 'faithful')[] = ['simple', 'faithful']
   const mode: ('sane' | 'es5')[] = ['sane', 'es5']
 
@@ -183,66 +240,157 @@ function microbenchmarks(i: number, bench: string): void {
     default:
       break;
   }
+}*/
+
+const chromeConfig: Config = {
+  transform: 'lazy',
+  newMethod: 'wrapper',
+  esMode: 'sane',
+  jsArgs: 'simple',
+  estimator: 'velocity',
+  timePerElapsed: undefined,
+  yieldInterval: 100
+}
+
+const safariConfig: Config = {
+  transform: 'lazy',
+  newMethod: 'direct',
+  esMode: 'sane',
+  jsArgs: 'simple',
+  estimator: 'velocity',
+  timePerElapsed: undefined,
+  yieldInterval: 100
+}
+
+const edgeConfig: Config = {
+  transform: 'retval',
+  newMethod: 'direct',
+  esMode: 'sane',
+  jsArgs: 'simple',
+  estimator: 'velocity',
+  timePerElapsed: undefined,
+  yieldInterval: 100
 }
 
 function timeEstimatorComparisonBenchmarks() {
+
+  const baseConfig = {
+    transform: 'lazy',
+    newMethod: 'wrapper',
+    esMode: 'sane',
+    jsArgs: 'simple',
+  }
+
+  const c1: Config = {
+    ...baseConfig,
+    estimator: 'exact',
+    timePerElapsed: undefined,
+    yieldInterval: 100
+  } as Config
+
+  const c2: Config = {
+    ...baseConfig,
+    estimator: 'countdown',
+    timePerElapsed: undefined,
+    yieldInterval: 1000000
+  } as Config
+
+  const c3: Config = {
+    ...baseConfig,
+    estimator: 'velocity',
+    timePerElapsed: undefined,
+    yieldInterval: 100,
+    resampleInterval: 250
+  } as Config
+
   for (let i = 0; i < ITERATIONS; i++) {
-    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'exact', undefined, 100);
-    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'countdown', undefined, 1000000);
-    initTiming(i, 'scala', 'Meteor', 'chrome', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined, 100, 250);
+    initTiming(i, 'scala', 'Meteor', 'chrome', c1);
+    initTiming(i, 'scala', 'Meteor', 'chrome', c2);
+    initTiming(i, 'scala', 'Meteor', 'chrome', c3);
   }
 }
 
 function javascriptBenchmark(name: string) {
-  for (let i = 0; i < ITERATIONS; i++) {
-    for (const browser of browsers) {
-      initTiming(i, 'javascript', name, browser, 'original');
+
+  function fullOpts(conf: Config): Config {
+    return {
+      ...conf,
+      esMode: 'es5',
+      jsArgs: 'faithful',
     }
-    initTiming(i, 'javascript', name, 'ChromeBook', 'lazy', 'wrapper', 'es5', 'faithful', 'velocity', undefined, 100);
-    initTiming(i, 'javascript', name, 'safari',  'lazy', 'direct', 'es5', 'faithful', 'velocity', undefined, 100);
-    initTiming(i, 'javascript', name, 'chrome',  'lazy', 'wrapper', 'es5', 'faithful', 'velocity', undefined,  100);
-    initTiming(i, 'javascript', name, 'firefox', 'lazy', 'direct', 'es5', 'faithful', 'velocity', undefined,  100);
-    initTiming(i, 'javascript', name, edge, 'retval', 'direct', 'es5', 'faithful', 'velocity', undefined,  100);
   }
+
+  for (let i = 0; i < ITERATIONS; i++) {
+
+    for (const browser of browsers) {
+      initTiming(i, 'javascript', name, browser, { transform: 'original' });
+    }
+
+    initTiming(i, 'javascript', name, 'ChromeBook', fullOpts(chromeConfig));
+    initTiming(i, 'javascript', name, 'safari', fullOpts(safariConfig));
+    initTiming(i, 'javascript', name, 'chrome', fullOpts(chromeConfig));
+    initTiming(i, 'javascript', name, 'firefox', fullOpts(safariConfig));
+    initTiming(i, 'javascript', name, edge, fullOpts(edgeConfig));
+  }
+
 }
 
 function javaBenchmark(bench: string) {
+
+  function faithful(conf: Config): Config {
+    return {
+      ...conf,
+      jsArgs: 'faithful'
+    }
+  }
+
   for (let i = 0; i < ITERATIONS; i++) {
     for (const browser of browsers) {
-      initTiming(i, 'javascript', name, browser, 'original');
+      initTiming(i, 'javascript', name, browser, { transform: 'original' });
     }
-      initTiming(i, 'java', bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'faithful', 'velocity', undefined, 100);
-      initTiming(i, 'java', bench, 'safari',  'lazy', 'direct', 'sane', 'faithful', 'velocity', undefined, 100);
-      initTiming(i, 'java', bench, 'chrome',  'lazy', 'wrapper', 'sane', 'faithful', 'velocity', undefined,  100);
-      initTiming(i, 'java', bench, 'firefox', 'lazy', 'direct', 'sane', 'faithful', 'velocity', undefined,  100);
-      initTiming(i, 'java', bench, edge, 'retval', 'direct', 'sane', 'faithful', 'velocity', undefined,  100);
+
+    initTiming(i, 'java', bench, 'ChromeBook', faithful(chromeConfig));
+    initTiming(i, 'java', bench, 'safari', faithful(safariConfig));
+    initTiming(i, 'java', bench, 'chrome', faithful(chromeConfig));
+    initTiming(i, 'java', bench, 'firefox', faithful(safariConfig));
+    initTiming(i, 'java', bench, edge, faithful(edgeConfig));
   }
 }
 
 function pyretBenchmark(name: string) {
-  // Benchmark harness for pyret.
+  // Benchmarks harness for pyret.
   if (name === 'benchmark-base') {
     return;
   }
 
   for (let i = 0; i < ITERATIONS; i++) {
     for (const b of browsers) {
-      initTiming(i, 'pyret', name, b, 'original');
-      // edge uses retval
+      initTiming(i, 'pyret', name, b, { transform: 'original' });
+      //edge uses retval
       if (b === 'MicrosoftEdge') {
-        initTiming(i, 'pyret', name, b, 'retval', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'pyret', name, b, edgeConfig);
       }
       else {
-        initTiming(i, 'pyret', name, b, 'lazy', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100);
+        initTiming(i, 'pyret', name, b, chromeConfig);
       }
     }
   }
 }
 
 function deepstackBenchmark(lang: string, name: string) {
+  const config: Config = {
+    transform: 'lazyDeep',
+    newMethod: 'wrapper',
+    esMode: 'sane',
+    jsArgs: 'simple',
+    estimator: 'reservoir',
+    timePerElapsed: undefined,
+    yieldInterval: 100
+  }
+
   for (let i = 0; i < ITERATIONS; i++) {
     for (const b of browsers) {
-      initTiming(i, lang, name, b, 'lazyDeep', 'wrapper', 'sane', 'simple', 'reservoir', undefined, 100)
+      initTiming(i, lang, name, b, config)
     }
   }
 }
@@ -261,14 +409,14 @@ function benchmarksFor(lang: string, bench: string) {
     default: {
       for (let i = 0; i < ITERATIONS; i++) {
         for (const browser of browsers) {
-          initTiming(i, lang, bench, browser, 'original');
+          initTiming(i, lang, bench, browser, { transform: 'original' });
         }
 
-        initTiming(i, lang, bench, 'ChromeBook', 'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined, 100);
-        initTiming(i, lang, bench, 'safari',  'lazy', 'direct', 'sane', 'simple', 'velocity', undefined, 100);
-        initTiming(i, lang, bench, 'chrome',  'lazy', 'wrapper', 'sane', 'simple', 'velocity', undefined,  100);
-        initTiming(i, lang, bench, 'firefox', 'lazy', 'direct', 'sane', 'simple', 'velocity', undefined,  100);
-        initTiming(i, lang, bench, edge, 'retval', 'direct', 'sane', 'simple', 'velocity', undefined,  100);
+        initTiming(i, lang, bench, 'ChromeBook', chromeConfig);
+        initTiming(i, lang, bench, 'safari',  safariConfig);
+        initTiming(i, lang, bench, 'chrome',  chromeConfig);
+        initTiming(i, lang, bench, 'firefox', safariConfig);
+        initTiming(i, lang, bench, edge, edgeConfig);
       }
       break;
     }
@@ -326,4 +474,5 @@ createTimingTable();
 // timeEstimatorComparisonBenchmarks();
 
 // Disable python comparison benchmarks
+// TODO(rachit): This is wrong. Python benchmarks should be run.
 // pythonBenchmark(bench);
