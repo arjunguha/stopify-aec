@@ -26,13 +26,12 @@ function na(x: any): string {
 
 // Running Time benchmark csv
 fs.appendFileSync(fd,
-  'Language,Benchmark,Platform,Transform,NewMethod,EsMode,JsArgs,Estimator,');
-fs.appendFileSync(fd, 'TimePerElapsed,YieldInterval,ResampleInterval,RunningTime,NumYields\n');
+  'Language,Benchmark,Platform,Transform,NewMethod,EsMode,JsArgs,Getters,Eval,Estimator,YieldInterval,ResampleInterval,RunningTime,NumYields\n');
 for (const row of rows) {
   fs.appendFileSync(fd, `${row.lang},${row.bench},${row.platform},`);
   fs.appendFileSync(fd, `${na(row.transform)},${na(row.new_method)},`);
-  fs.appendFileSync(fd, `${na(row.es_mode)},${na(row.js_args)},${na(row.estimator)},`);
-  fs.appendFileSync(fd, `${na(row.time_per_elapsed)},`);
+  fs.appendFileSync(fd, `${na(row.es_mode)},${na(row.js_args)},`);
+  fs.appendFileSync(fd, `${na(row.getters)},${na(row["eval"])},${na(row.estimator)},`);
   fs.appendFileSync(fd, `${na(row.yield_interval)},`);
   fs.appendFileSync(fd, `${na(row.resample_interval)},`);
   fs.appendFileSync(fd, `${na(row.running_time)},`);
@@ -41,9 +40,7 @@ for (const row of rows) {
 
 // Variance benchmark csv
 fs.appendFileSync(<any>varianceFd,
-  'Language,Benchmark,Platform,Transform,NewMethod,EsMode,JsArgs,Estimator,');
-fs.appendFileSync(<any>varianceFd,
-  'TimePerElapsed,YieldInterval,ResampleInterval,Iteration,Index,Variance,RunningTime,NumYields\n');
+  'Language,Benchmark,Platform,Transform,NewMethod,EsMode,JsArgs,Estimator,Getters,Eval,YieldInterval,ResampleInterval,Iteration,Index,Variance,RunningTime,NumYields\n');
 for (const row of varianceRows) {
   const variance = na(row.variance);
   const lines = variance.split('\n');
@@ -53,8 +50,9 @@ for (const row of varianceRows) {
     const latency = factors[1];
     fs.appendFileSync(varianceFd, `${row.lang},${row.bench},${row.platform},`);
     fs.appendFileSync(varianceFd, `${na(row.transform)},${na(row.new_method)},`);
-    fs.appendFileSync(varianceFd, `${na(row.es_mode)},${na(row.js_args)},${na(row.estimator)},`);
-    fs.appendFileSync(varianceFd, `${na(row.time_per_elapsed)},`);
+    fs.appendFileSync(varianceFd, `${na(row.es_mode)},${na(row.js_args)},`);
+    fs.appendFileSync(varianceFd, `${na(row.getters)},${na(row["eval"])},`);
+    fs.appendFileSync(varianceFd, `${na(row.estimator)},`);
     fs.appendFileSync(varianceFd, `${na(row.yield_interval)},`);
     fs.appendFileSync(varianceFd, `${na(row.resample_interval)},`);
     fs.appendFileSync(varianceFd, `${na(row.ix)},`);
