@@ -21,6 +21,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS timing
    new_method TEXT NOT NULL,
    es_mode TEXT NOT NULL,
    js_args TEXT NOT NULL,
+   getters TEXT NOT NULL,
+   eval TEXT NOT NULL,
    estimator TEXT NOT NULL,
    time_per_elapsed TEXT NOT NULL,
    yield_interval TEXT NOT NULL,
@@ -37,6 +39,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS variance
    new_method TEXT NOT NULL,
    es_mode TEXT NOT NULL,
    js_args TEXT NOT NULL,
+   getters TEXT NOT NULL,
+   eval TEXT NOT NULL,
    estimator TEXT NOT NULL,
    time_per_elapsed TEXT NOT NULL,
    yield_interval TEXT NOT NULL,
@@ -53,19 +57,23 @@ db.exec(`CREATE TABLE IF NOT EXISTS failures
    new_method TEXT NOT NULL,
    es_mode TEXT NOT NULL,
    js_args TEXT NOT NULL,
+   getters TEXT NOT NULL,
+   eval TEXT NOT NULL,
    estimator TEXT NOT NULL,
    time_per_elapsed TEXT NOT NULL,
    yield_interval TEXT NOT NULL,
    resample_interval TEXT NOT NULL);`);
 
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS timing_index ON timing
-  (ix,lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
-   time_per_elapsed,yield_interval,resample_interval);`);
+  (ix,lang,bench,platform,transform,new_method,es_mode,js_args,getters,eval,
+  estimator,time_per_elapsed,yield_interval,resample_interval);`);
+
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS variance_index ON variance
-  (ix,lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
-   time_per_elapsed,yield_interval,resample_interval);`);
+  (ix,lang,bench,platform,transform,new_method,es_mode,js_args,getters,eval,
+    estimator, time_per_elapsed,yield_interval,resample_interval);`);
+
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS failure_index ON failures
-  (lang,bench,platform,transform,new_method,es_mode,js_args,estimator,
+  (lang,bench,platform,transform,new_method,es_mode,js_args,getters,eval,estimator,
    time_per_elapsed,yield_interval,resample_interval);`);
 
 // 3 more needed: Java, Pyret, JavaScript

@@ -24,6 +24,8 @@ export interface Config {
   esMode?: 'sane' | 'es5',
   jsArgs?: 'simple' | 'faithful',
   estimator?: 'countdown' | 'reservoir' | 'velocity' | 'exact',
+  getters?: 'getters',
+  EVAL?: 'eval', // TS complains when `eval` is used as a field name.
   timePerElapsed?: string,
   yieldInterval?: number,
   resampleInterval?: number,

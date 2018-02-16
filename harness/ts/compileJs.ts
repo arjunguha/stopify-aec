@@ -17,9 +17,12 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
   if (benchmark.type === 'variance') {
     return;
   }
-  // These are the compile-time settings
-  const { lang, bench, platform, transform, newMethod, esMode, jsArgs } = benchmark;
 
+  // These are the compile-time settings
+  const { lang, platform, transform, newMethod, esMode, jsArgs,
+          getters, EVAL } = benchmark;
+
+  // Pyret files are already compiled with Stopify. Just copy them.
   if (lang === 'pyret' || lang == 'pyret_deepstacks') {
     const benchmarkFilename = common.pyretSourceFilename(lang, benchmark);
     const compiledFilename =
@@ -61,8 +64,8 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
   }
 
 
-  const args = ['--webpack', '-t', transform!];
-  if (transform! !== 'original') {
+  const args = ['--webpack', '-t', transform];
+  if (transform !== 'original') {
     args.push('--new', newMethod!);
     args.push('--es', esMode!);
     args.push('--js-args', jsArgs!);
@@ -70,6 +73,9 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
     if (lang === 'c++' || lang === 'clojurescript' || lang === 'javascript') {
       args.push('--hofs', 'fill');
     }
+
+    if (getters) { args.push('--getters') }
+    if (EVAL) { args.push('--eval') }
   }
 
   args.push(benchmarkFilename, compiledFilename);
