@@ -61,8 +61,8 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
     return
   }
 
-
   const args = ['--webpack', '-t', transform];
+
   if (transform !== 'original') {
     args.push('--new', newMethod!);
     args.push('--es', esMode!);

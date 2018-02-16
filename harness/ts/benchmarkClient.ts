@@ -72,7 +72,6 @@ function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boole
             esMode: b.esMode,
             jsArgs: b.jsArgs,
             estimator: b.estimator,
-            timePerElapsed: b.timePerElapsed,
             yieldInterval: b.yieldInterval,
             resampleInterval: b.resampleInterval,
           })

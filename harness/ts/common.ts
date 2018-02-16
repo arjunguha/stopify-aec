@@ -14,7 +14,6 @@ export interface Config {
   estimator?: 'countdown' | 'reservoir' | 'velocity' | 'exact',
   getters?: 'getters',
   EVAL?: 'eval', // TS complains when `eval` is used as a field name.
-  timePerElapsed?: string,
   yieldInterval?: number,
   resampleInterval?: number,
 }
@@ -61,20 +60,20 @@ export function initVariance(db: Database,
   platform: string,
   config: Config) {
 
-  const { transform, newMethod, esMode, jsArgs, estimator, timePerElapsed,
+  const { transform, newMethod, esMode, jsArgs, getters, EVAL, estimator,
           yieldInterval, resampleInterval } = config
 
   const r = db.prepare(
   `INSERT OR IGNORE INTO variance (ix, lang, bench, platform, transform,
-    new_method, es_mode, js_args, estimator, time_per_elapsed, yield_interval, resample_interval) VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    new_method, es_mode, js_args, getters, eval, estimator, yield_interval, resample_interval) VALUES
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(ix, lang, bench, platform, mayNull(transform),
-      mayNull(newMethod), mayNull(esMode), mayNull(jsArgs),
-      mayNull(estimator), mayNull(timePerElapsed),
-      mayNull(yieldInterval), mayNull(resampleInterval));
+      mayNull(newMethod), mayNull(esMode), mayNull(jsArgs), mayNull(getters),
+      mayNull(EVAL), mayNull(estimator), mayNull(yieldInterval),
+      mayNull(resampleInterval));
 
   if (r.changes > 0) {
-    console.error(`Creating variance configuration ${ix},${lang},${bench},${platform},${transform},${newMethod},${esMode},${jsArgs},${estimator},${timePerElapsed},${yieldInterval},${resampleInterval}`);
+    console.error(`Creating variance configuration ${JSON.stringify(config)}`);
   }
 
 }
@@ -98,8 +97,9 @@ export function parseBenchmarkTiming(row: any): Benchmark {
     newMethod: unna(row.new_method),
     esMode: unna(row.es_mode),
     jsArgs: unna(row.js_args),
+    getters: unna(row.getters),
+    EVAL: unna(row.eval),
     estimator: unna(row.estimator),
-    timePerElapsed: unna(row.time_per_elapsed),
     yieldInterval: unna(row.yield_interval),
     resampleInterval: unna(row.resample_interval),
     runningTime: unna(row.running_time),
@@ -119,8 +119,9 @@ export function parseBenchmarkVariance(row: any): VarianceBench {
     newMethod: unna(row.new_method),
     esMode: unna(row.es_mode),
     jsArgs: unna(row.js_args),
+    getters: unna(row.getters),
+    EVAL: unna(row.eval),
     estimator: unna(row.estimator),
-    timePerElapsed: unna(row.time_per_elapsed),
     yieldInterval: unna(row.yield_interval),
     resampleInterval: unna(row.resample_interval),
     variance: unna(row.variance),
@@ -188,7 +189,7 @@ export function benchmarkCompiledFilename(benchmark: Common) {
 }
 
 export function benchmarkRunOpts(benchmark: Benchmark | VarianceBench): string[] {
-  const { lang, platform, transform, estimator, timePerElapsed, yieldInterval,
+  const { lang, platform, transform, estimator, yieldInterval,
           resampleInterval } = benchmark;
 
   if (lang === 'pyret') {
@@ -201,9 +202,6 @@ export function benchmarkRunOpts(benchmark: Benchmark | VarianceBench): string[]
   }
   if (estimator) {
     args.push('--estimator', estimator!);
-  }
-  if (timePerElapsed) {
-    args.push ('--time-per-elapsed', String(timePerElapsed));
   }
   if (yieldInterval) {
     args.push('-y', String(yieldInterval));
