@@ -10,7 +10,7 @@ export interface Config {
   transform: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
   newMethod?: 'direct' | 'wrapper',
   esMode?: 'sane' | 'es5',
-  jsArgs?: 'simple' | 'faithful',
+  jsArgs?: 'simple' | 'faithful' | 'full',
   estimator?: 'countdown' | 'reservoir' | 'velocity' | 'exact',
   getters?: 'getters',
   EVAL?: 'eval', // TS complains when `eval` is used as a field name.

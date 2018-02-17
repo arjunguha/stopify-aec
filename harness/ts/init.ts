@@ -268,7 +268,7 @@ function javascriptBenchmark(name: string) {
     return {
       ...conf,
       esMode: 'es5',
-      jsArgs: 'faithful',
+      jsArgs: 'full',
       getters: 'getters',
       EVAL: 'eval',
     }
