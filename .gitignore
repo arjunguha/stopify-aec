@@ -1,7 +1,1 @@
-*.html
-node_modules
-target
-bin/
-*.log
-minifier.js
-tmp/*
+_site

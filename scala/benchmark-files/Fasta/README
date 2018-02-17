@@ -1,7 +1,0 @@
-Modifications:
-
-1. Run in a loop 500000 times.
-2. Output from ScalaJS requires webpack's shim for global, but Stopify's
-   webpack configuration does not shim global. We could make the Webpack
-   configuration a language-dependent parameter to Stopify, but this is a very
-   boring detail.
