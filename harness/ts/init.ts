@@ -269,6 +269,8 @@ function javascriptBenchmark(name: string) {
       ...conf,
       esMode: 'es5',
       jsArgs: 'faithful',
+      getters: 'getters',
+      EVAL: 'eval',
     }
   }
 
@@ -298,7 +300,7 @@ function javaBenchmark(bench: string) {
 
   for (let i = 0; i < ITERATIONS; i++) {
     for (const browser of browsers) {
-      initTiming(i, 'javascript', name, browser, { transform: 'original' });
+      initTiming(i, 'java', bench, browser, { transform: 'original' });
     }
 
     initTiming(i, 'java', bench, 'ChromeBook', faithful(chromeConfig));
