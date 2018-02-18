@@ -20,6 +20,7 @@
     "@types/glob": "^5.0.32",
     "better-sqlite3": "^4.0.3",
     "body-parser": "^1.18.2",
+    "child_process": "^1.0.2",
     "csv-stringify": "^1.0.4",
     "detect-browser": "2.0.0",
     "glob": "^7.1.2",

@@ -6,6 +6,7 @@ const checkInterval = 5; // seconds
 const label = <HTMLDivElement>document.getElementById('label');
 const skip = document.getElementById('skip')!;
 const renderResults = document.getElementById('render')!;
+const resultsContainer = document.getElementById('results-container')!;
 
 function log(message: string) {
   const div = <HTMLDivElement>document.getElementById('log');
@@ -163,6 +164,16 @@ function resultsListener() {
       else {
         throw new Error(`GET /results status: ${resp.status}`);
       }
+    })
+    .then((results: any) => {
+      console.log('adding figures');
+      (<any>document.getElementById('figure2a'))!.src += results.figure2a;
+      (<any>document.getElementById('figure2b'))!.src += results.figure2b;
+      (<any>document.getElementById('figure2c'))!.src += results.figure2c;
+      (<any>document.getElementById('figure8'))!.src += results.figure8;
+      (<any>document.getElementById('figure10'))!.src += results.figure10;
+      (<any>document.getElementById('figure12'))!.src += results.figure12;
+      resultsContainer.style.display = 'block';
     });
 }
 

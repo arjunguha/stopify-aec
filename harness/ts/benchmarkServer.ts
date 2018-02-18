@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as Database from 'better-sqlite3';
 import * as bodyParser from 'body-parser';
+import { execSync } from 'child_process';
 const detectBrowser = require('detect-browser'); // NOTE(arjun): no @types
 import * as path from 'path';
 import * as common from './common';
@@ -42,6 +43,30 @@ function serve(db: Database, port: number) {
 
   // Serve the benchmark files
   app.use('/benchmarks', express.static(path.join(__dirname, '../../tmp')));
+
+  // Serve the rendered figures
+  app.use('/figures', express.static(path.join(__dirname, '../R')));
+
+  app.get('/results', (req, res) => {
+    console.log('Generating CSV files...');
+    execSync('rm -f *.csv && yarn run csv', { cwd: path.join(__dirname, '../') });
+    console.log('Generating python figures...');
+    execSync('./python_case_study.R', { cwd: path.join(__dirname, '../R') });
+    console.log('Generating multi-language figure...');
+    execSync('./language.R', { cwd: path.join(__dirname, '../R') });
+    console.log('Generating PyJS vs. Skulpt figure...');
+    execSync('./skulpt.R', { cwd: path.join(__dirname, '../R') });
+//    console.log('Generating Pyret figure...');
+//    execSync('./pyret.R', { cwd: path.join(__dirname, '../R') });
+    res.send(JSON.stringify({
+      figure2a: 'figures/pyjs_case_study_sane_vs_insane.png',
+      figure2b: 'figures/pyjs_case_study_new_method.png',
+      figure2c: 'figures/pyjs_case_study_interval_variance.png',
+      figure8: 'figures/all_slowdowns.png',
+      figure10: 'figures/pyjs_skulpt_relative_slowdown.png',
+//      figure12: 'pyret_slowdown.png',
+    }));
+  });
 
   app.post('/list', bodyParser.json(), (req, res) => {
     const { urlParams } = req.body;

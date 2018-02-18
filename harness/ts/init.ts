@@ -139,9 +139,9 @@ function pythonBenchmark(name: string) {
 
     // Compare Chrome and Edge estimators.
     initTiming(i, 'python_pyjs', name, 'chrome',
-      { ...exp2, newMethod: 'direct', estimator: 'velocity', yieldInterval: 100});
+      { ...exp2, newMethod: 'wrapper', estimator: 'velocity', yieldInterval: 100});
     initTiming(i, 'python_pyjs', name, edge,
-      { ...exp2, newMethod: 'direct', estimator: 'velocity', yieldInterval: 100});
+      { ...exp2, newMethod: 'wrapper', estimator: 'velocity', yieldInterval: 100});
   }
 }
 
