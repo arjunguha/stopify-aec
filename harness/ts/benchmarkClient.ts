@@ -5,6 +5,7 @@ const checkInterval = 5; // seconds
 
 const label = <HTMLDivElement>document.getElementById('label');
 const skip = document.getElementById('skip')!;
+const renderResults = document.getElementById('render')!;
 
 function log(message: string) {
   const div = <HTMLDivElement>document.getElementById('log');
@@ -127,6 +128,7 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
     progress.style.width = `${Math.floor(i/n * 100)}%`;
     progressText.innerText = `Completed ${completed} of ${n} benchmarks (${failed} failures)`;
     if (i === n) {
+      renderResults.style.display = 'block';
       return Promise.resolve(true);
     }
     return runBenchmark(benchmarks[i])
@@ -141,6 +143,22 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
   }
   return helper(0);
 }
+
+function resultsListener() {
+  fetch(new Request('/results', {
+    method: 'get',
+  }))
+    .then(resp => {
+      if (resp.status === 200) {
+        return resp.json();
+      }
+      else {
+        throw new Error(`GET /results status: ${resp.status}`);
+      }
+    });
+}
+
+renderResults.addEventListener('click', resultsListener);
 
 fetch(new Request('/list', {
   method: 'post',
