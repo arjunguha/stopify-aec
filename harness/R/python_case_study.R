@@ -92,7 +92,7 @@ my_error_bars <- geom_errorbar(
 plot <- ggplot(es_sane_vs_insane, aes(x=Benchmark,y=Mean,fill=Factor)) +
   mytheme() +
   geom_bar(stat="identity", position="dodge") +
-  my_errors_bars +
+  my_error_bars +
   ylab("Slowdown relative to PyJS")
 mysave("pyjs_case_study_sane_vs_insane.pdf", plot)
 
