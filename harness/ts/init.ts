@@ -72,7 +72,7 @@ db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS failure_index ON failures
 
 // 3 more needed: Java, Pyret, JavaScript
 const langs = [ 'python_pyjs', 'ocaml', 'clojurescript', 'dart_dart2js',
-  'scala', 'c++', 'scheme', 'java', 'javascript', 'deepstacks' ];
+  'scala', 'c++', 'scheme', 'java', 'javascript', 'deepstacks', 'skulpt' ];
 
 const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' ];
 
@@ -297,6 +297,11 @@ function deepstackBenchmark(lang: string, name: string) {
   }
 }
 
+function skulptBenchmark(name: string) {
+  for (let i = 0; i < ITERATIONS; i++) {
+    initTiming(i, 'skulpt', name, 'chrome', { transform: 'original' });
+  }
+}
 function benchmarksFor(lang: string, bench: string) {
   // These are the benchmarks we use in Section 2.
   switch(lang) {
@@ -371,6 +376,18 @@ function createTimingTable() {
     const lang = 'pyret_deepstacks'
     const bench = m[2];
     deepstackBenchmark(lang, bench);
+  }
+
+  // Skulpt benchmarks
+  const skulptBench = glob.sync(path.resolve(__dirname, '../../skulpt/js-build/*.html'))
+  for (const path of skulptBench) {
+    const m = /^.*\/([^/]*)\/([^.]*)\.html/.exec(path);
+    if (m === null) {
+      console.error(`could not parse filename ${path}`);
+      continue;
+    }
+    const bench = m[2];
+    skulptBenchmark(bench);
   }
 
 }
