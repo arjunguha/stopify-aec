@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as Database from 'better-sqlite3';
 import * as glob from 'glob';
-import { mayNull, initVariance, Config } from './common';
+import { mayNull, Config } from './common';
 
 const edge = 'MicrosoftEdge';
 
@@ -94,70 +94,35 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
   }
 }
 
-// TODO(rachit): This shouldn't be exported.
-export function pythonBenchmark(name: string) {
+function pythonBenchmark(name: string) {
   // Sadly, these two just crash with --es=es5
   if (name === 'gcbench' || name === 'schulze') {
     return;
   }
   for (let i = 0; i < ITERATIONS; i++) {
-    // Initialize originals
-    // TODO(rachit): Isn't this already handled by benchmarkFor
-    initTiming(i, 'python_pyjs', name, 'chrome', { transform: 'original' });
-    initTiming(i, 'python_pyjs', name, 'firefox', { transform: 'original' });
-    initTiming(i, 'python_pyjs', name, 'MicrosoftEdge', { transform: 'original'});
-
-    // Initialize python variance entries
-    const varianceConfig: Config = {
-      transform: 'lazy',
-      newMethod: 'wrapper',
-      esMode: 'sane',
-      jsArgs: 'simple',
-      estimator: 'exact',
-      yieldInterval: 100
-    }
-
-    initVariance(db, i, 'python_pyjs', name, 'chrome', { ...varianceConfig,
-      estimator: 'countdown', yieldInterval: 1000000 });
-
-    initVariance(db, i, 'python_pyjs', name, 'chrome', { ...varianceConfig,
-      estimator: 'exact', yieldInterval: 100 });
-
-    initVariance(db, i, 'python_pyjs', name, 'chrome', { ...varianceConfig,
-      estimator: 'velocity', yieldInterval: 100, resampleInterval: 250});
-
-    // Compare ES5 sane vs. insane mode using Chrome only. The other browsers
-    // are just way too slow.
+    // Compare ES5 sane vs. insane mode in Chrome.
     const exp1_c1: Config = {
       transform: 'lazy',
       newMethod: 'direct',
       esMode: 'es5',
       jsArgs: 'simple',
-      estimator: 'countdown'
-    }
+      estimator: 'countdown',
+      yieldInterval: 1000000,
+    };
 
     const exp1_c2: Config = {
-      transform: 'lazy',
-      newMethod: 'wrapper',
-      esMode: 'es5',
-      jsArgs: 'simple',
-      estimator: 'countdown'
-    }
-
-    const exp1_c3: Config = {
       transform: 'lazy',
       newMethod: 'direct',
       esMode: 'sane',
       jsArgs: 'simple',
       estimator: 'countdown',
-      yieldInterval: 1000000
-    }
+      yieldInterval: 1000000,
+    };
 
     initTiming(i, 'python_pyjs', name, 'chrome', exp1_c1);
     initTiming(i, 'python_pyjs', name, 'chrome', exp1_c2);
-    initTiming(i, 'python_pyjs', name, 'chrome', exp1_c3);
 
-    // Compare all Chrome, Firefox, and Edge for new method.
+    // Compare Chrome and Edge for new method.
     const exp2: Config = {
       transform: 'lazy',
       newMethod: 'wrapper',
@@ -167,32 +132,16 @@ export function pythonBenchmark(name: string) {
       yieldInterval: 1000000
     }
 
-    for (const browser in ['chrome', edge, 'firefox']) {
+    for (const browser of ['chrome', edge]) {
       initTiming(i, 'python_pyjs', name, browser, {...exp2, newMethod: 'direct'});
       initTiming(i, 'python_pyjs', name, browser, {...exp2, newMethod: 'wrapper'});
     }
 
-
-    if (["b", "binary_trees","nbody", "richards"].includes(name)) {
-      initTiming(i, 'python_pyjs', name, 'safari', {...exp2, newMethod: 'direct'});
-      initTiming(i, 'python_pyjs', name, 'safari', {...exp2, newMethod: 'wrapper'});
-    }
-
-    // TODO(rachit): What comparison are these used for?
-    initTiming(i, 'python_pyjs', name, 'firefox',
-      { ...exp2, newMethod: 'direct', transform: 'retval' });
-
-    initTiming(i, 'python_pyjs', name, 'firefox',
-      { ...exp2, newMethod: 'wrapper', transform: 'retval' });
-
+    // Compare Chrome and Edge estimators.
     initTiming(i, 'python_pyjs', name, 'chrome',
-      { ...exp2, newMethod: 'wrapper', estimator: 'reservoir', yieldInterval: 100});
-
-    initTiming(i, 'python_pyjs', name, 'chrome',
-      { ...exp2, newMethod: 'direct', estimator: 'reservoir', yieldInterval: 100});
-
+      { ...exp2, newMethod: 'direct', estimator: 'velocity', yieldInterval: 100});
     initTiming(i, 'python_pyjs', name, edge,
-      { ...exp2, newMethod: 'direct', estimator: 'reservoir', yieldInterval: 100});
+      { ...exp2, newMethod: 'direct', estimator: 'velocity', yieldInterval: 100});
   }
 }
 
@@ -365,6 +314,10 @@ function benchmarksFor(lang: string, bench: string) {
           initTiming(i, lang, bench, browser, { transform: 'original' });
         }
 
+        if (lang === 'python_pyjs') {
+          pythonBenchmark(bench);
+        }
+
         initTiming(i, lang, bench, 'ChromeBook', chromeConfig);
         initTiming(i, lang, bench, 'safari',  safariConfig);
         initTiming(i, lang, bench, 'chrome',  chromeConfig);
@@ -425,7 +378,3 @@ function createTimingTable() {
 createTimingTable();
 // Disable time estimator scala benchmark
 // timeEstimatorComparisonBenchmarks();
-
-// Disable python comparison benchmarks
-// TODO(rachit): This is wrong. Python benchmarks should be run.
-// pythonBenchmark(bench);
