@@ -46,7 +46,7 @@ read_data <- function(filename) {
     "ocaml"
   )
   
-  all_data <- read_csv("../results.csv") %>%
+  all_data <- read_csv(filename) %>%
     filter(Language %in% all_languages) %>%
     filter(Platform != "native") %>%
     mutate(Platform  = fct_recode(Platform, 
@@ -129,11 +129,11 @@ micro_slowdowns <- full_join(args, arith) %>% full_join(new) %>% full_join(loop)
 
 slowdowns <- all_data %>%
   filter(Transform != "original" & Transform != "native") %>%
-  filter(Estimator == "reservoir") %>%
+  filter(Estimator == "velocity") %>%
   filter(YieldInterval == 100) %>%
   inner_join(original_avgtimes) %>%
   inner_join(selector) %>%
-  filter((Language == "JavaScript" & EsMode == "es5" & JsArgs == "faithful") |
+  filter((Language == "JavaScript" & EsMode == "es5" & JsArgs == "full") |
          (Language != "JavaScript" & EsMode == "sane")) %>%
   mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
   select(Benchmark,Platform,Language,Slowdown)
@@ -157,7 +157,7 @@ language_calc_ecdf <- function(language) {
     return (tribble(~Language, ~Platform, ~x, ~y))
   }
   maxSlowdown <- ceiling(max(du$Slowdown))
-  df <- bind_rows(lapply(levels(slowdowns$Platform), function(p) calc_ecdf(language, p, maxSlowdown)))
+  df <- bind_rows(lapply(levels(as.factor(slowdowns$Platform)), function(p) calc_ecdf(language, p, maxSlowdown)))
   
   return (df %>% filter(x <= maxSlowdown) %>% mutate(Platform = factor(Platform)))
 }
@@ -255,7 +255,7 @@ ecdf_grid <- function() {
 }
 
 all_slowdowns <- ecdf_grid()
-ggsave("all_slowdowns.pdf", all_slowdowns, width=7, height=5, units="in")
+ggsave("all_slowdowns.png", all_slowdowns, width=7, height=5, units="in")
 
 language_bar_plot <- function(lang) {
   df <- mean_slowdowns %>% filter(Language == lang) %>%
@@ -291,7 +291,7 @@ language_bar_plot <- function(lang) {
 
 bar_plot_grid <- do.call("grid.arrange", c(lapply(slowdowns$Language %>% levels(), language_bar_plot), ncol=3))
 
-ggsave("all_slowdowns_detail.pdf",bar_plot_grid, width=11,height=8, units="in")
+ggsave("all_slowdowns_detail.png",bar_plot_grid, width=11,height=8, units="in")
 
 mean_micro <- micro_slowdowns %>%
   group_by(Benchmark,Platform,Language,Type) %>%

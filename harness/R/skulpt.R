@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 library(tidyverse)
 
-skulpt_times <- read_csv("../../scripts/timing-skulpt.csv") %>%
+skulpt_times <- read_csv("../results.csv") %>% filter(Language == 'skulpt') %>%
   select(Benchmark,RunningTime) %>%
   group_by(Benchmark) %>%
   summarize(MeanSkulptTime = mean(RunningTime)) %>%
@@ -9,7 +9,7 @@ skulpt_times <- read_csv("../../scripts/timing-skulpt.csv") %>%
 
 stopify_times <- read_csv("../results.csv") %>%
   filter(Language == "python_pyjs") %>%  
-  filter(Platform == "chrome" & Transform == "lazy" & Estimator == "reservoir" & YieldInterval == 100) %>%
+  filter(Platform == "chrome" & Transform == "lazy" & Estimator == "velocity" & YieldInterval == 100) %>%
   select(Benchmark,RunningTime) %>%
   group_by(Benchmark) %>%
   ungroup()
@@ -36,4 +36,4 @@ ggplot(slowdowns, aes(x=Benchmark,y=.mean)) +
         axis.ticks.length=unit("-0.05", "in"),
         axis.text.y = element_text(margin = margin(r = 5)))
 
-ggsave("pyjs_skulpt_relative_slowdown.pdf", width=4,height=2, units="in")
+ggsave("pyjs_skulpt_relative_slowdown.png", width=4,height=2, units="in")

@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 library(tidyverse)
 
 all_data <- read_csv("../results.csv") %>%

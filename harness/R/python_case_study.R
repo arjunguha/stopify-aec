@@ -94,7 +94,7 @@ plot <- ggplot(es_sane_vs_insane, aes(x=Benchmark,y=Mean,fill=Factor)) +
   geom_bar(stat="identity", position="dodge") +
   my_error_bars +
   ylab("Slowdown relative to PyJS")
-mysave("pyjs_case_study_sane_vs_insane.pdf", plot)
+mysave("pyjs_case_study_sane_vs_insane.png", plot)
 
 new_method <- all_data %>%
   filter(Transform == "lazy" & EsMode == "sane" & Estimator == "countdown") %>%
@@ -115,19 +115,19 @@ plot <- ggplot(new_method,
   geom_bar(stat="identity", position="dodge") +
   my_error_bars +
   ylab("Slowdown relative to PyJS")
-mysave("pyjs_case_study_new_method.pdf", plot)
+mysave("pyjs_case_study_new_method.png", plot)
 
 avg_interval <- all_data %>% 
   filter(Transform == "lazy" & EsMode == "sane" & Estimator == "countdown" &
-         ((Platform == "chrome" & NewMethod == "wrapper") |
-          (Platform == "firefox" & NewMethod == "direct"))) %>%
+         ((Platform == "chrome" & NewMethod == "new") |
+          (Platform == "edge" & NewMethod == "new"))) %>%
   mutate(AvgInterval = RunningTime / NumYields) %>%
   select(Benchmark,Platform,AvgInterval)
 plot <- ggplot(avg_interval, aes(x=Benchmark,y=AvgInterval,fill=Platform)) +
   mytheme() +
   geom_bar(stat="identity", position="dodge") +
   ylab("Average interval between yields")
-mysave("pyjs_case_study_interval_variance.pdf", plot)
+mysave("pyjs_case_study_interval_variance.png", plot)
 
 timing_reservoir <- inner_join(
   all_data %>%
