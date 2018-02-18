@@ -9,7 +9,7 @@ skulpt_times <- read_csv("../results.csv") %>% filter(Language == 'skulpt') %>%
 
 stopify_times <- read_csv("../results.csv") %>%
   filter(Language == "python_pyjs") %>%  
-  filter(Platform == "chrome" & Transform == "lazy" & Estimator == "velocity" & YieldInterval == 100) %>%
+  filter(Platform == "chrome" & Transform == "lazy" & EsMode == 'sane' & NewMethod == 'wrapper' & Estimator == "velocity" & YieldInterval == 100) %>%
   select(Benchmark,RunningTime) %>%
   group_by(Benchmark) %>%
   ungroup()
