@@ -76,7 +76,7 @@ function serve(db: Database, port: number) {
       console.error(`Could not parse benchmark output`);
       db.prepare(`INSERT OR IGNORE INTO failures (lang, bench, platform, transform,
     new_method, es_mode, js_args, getters, eval, estimator, yield_interval, resample_interval) VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
         .run(lang, bench, platform, common.mayNull(transform),
           common.mayNull(newMethod), common.mayNull(esMode),
           common.mayNull(jsArgs), common.mayNull(getters), common.mayNull(EVAL),
