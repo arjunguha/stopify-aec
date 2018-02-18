@@ -37,6 +37,9 @@ function serve(db: Database, port: number) {
   // Serve the benchmark running page
   app.use(express.static(path.join(__dirname, '../www')));
 
+  // Serve the skulpt runtimes
+  app.use(express.static(path.join(__dirname, '../../skulpt')));
+
   // Serve the benchmark files
   app.use('/benchmarks', express.static(path.join(__dirname, '../../tmp')));
 

@@ -26,12 +26,20 @@ function getName(b: common.Benchmark | common.VarianceBench) {
 }
 
 function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boolean> {
-  const url =
-  (b.lang === 'pyret_deepstacks' || b.lang === 'deepstacks' ?
-  '/deep-benchmark.html#' : '/benchmark.html#') +
-   benchmarkUrl([
-     ...common.benchmarkRunOpts(b),
-     '/benchmarks/' + common.benchmarkCompiledFilename(b)]);
+  let url;
+  if (b.lang === 'pyret_deepstacks' || b.lang === 'deepstacks') {
+    url = '/deep-benchmark.html#' +
+      benchmarkUrl([
+        ...common.benchmarkRunOpts(b),
+        '/benchmarks/' + common.benchmarkCompiledFilename(b)]);
+  } else if (b.lang === 'skulpt') {
+    url = `/benchmarks/skulpt-${b.bench}-original-undefined-undefined-undefined-undefined-undefined.html`;
+  } else {
+    url = '/benchmark.html#' +
+      benchmarkUrl([
+        ...common.benchmarkRunOpts(b),
+        '/benchmarks/' + common.benchmarkCompiledFilename(b)]);
+  }
 
   const iframe = document.createElement('iframe');
   iframe.src = url;
