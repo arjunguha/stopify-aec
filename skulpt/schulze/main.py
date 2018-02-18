@@ -1386,5 +1386,5 @@ while cl:
 
 # NOTE(arjun): Verify the result
 results = [int(reverseCandidates[i]) for i in order]
-assert(sum(results) == 6402391)
+assert(sum(results) == 2282760)
 
