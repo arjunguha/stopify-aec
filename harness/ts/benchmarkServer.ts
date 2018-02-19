@@ -56,15 +56,15 @@ function serve(db: Database, port: number) {
     execSync('./language.R', { cwd: path.join(__dirname, '../R') });
     console.log('Generating PyJS vs. Skulpt figure...');
     execSync('./skulpt.R', { cwd: path.join(__dirname, '../R') });
-//    console.log('Generating Pyret figure...');
-//    execSync('./pyret.R', { cwd: path.join(__dirname, '../R') });
+    console.log('Generating Pyret figure...');
+    execSync('./pyret.R', { cwd: path.join(__dirname, '../R') });
     res.send(JSON.stringify({
       figure2a: 'figures/pyjs_case_study_sane_vs_insane.png',
       figure2b: 'figures/pyjs_case_study_new_method.png',
       figure2c: 'figures/pyjs_case_study_interval_variance.png',
       figure8: 'figures/all_slowdowns.png',
       figure10: 'figures/pyjs_skulpt_relative_slowdown.png',
-//      figure12: 'pyret_slowdown.png',
+      figure12: 'figures/pyret_slowdown.png',
     }));
   });
 

@@ -86,7 +86,7 @@ plot <- ggplot(df, aes(x=x,y=y,color=Platform,shape=Platform)) +
     legend.background = element_blank()) +
   labs(y = "% of trials", x = "Slowdown")
 
-ggsave("pyret_slowdown.pdf", width = 5, height = 3, units=c("in"))
+ggsave("pyret_slowdown.png", width = 5, height = 3, units=c("in"))
 # return (plot)
 # # ggplot(slowdowns, aes(x=Benchmark,y=.mean,fill=Platform)) + 
 # #   geom_bar(position = "dodge", stat="identity") + 
