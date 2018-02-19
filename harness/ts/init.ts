@@ -105,7 +105,7 @@ function pythonBenchmark(name: string) {
       transform: 'lazy',
       newMethod: 'direct',
       esMode: 'es5',
-      jsArgs: 'simple',
+      jsArgs: 'faithful',
       estimator: 'countdown',
       yieldInterval: 1000000,
     };
@@ -114,7 +114,7 @@ function pythonBenchmark(name: string) {
       transform: 'lazy',
       newMethod: 'direct',
       esMode: 'sane',
-      jsArgs: 'simple',
+      jsArgs: 'faithful',
       estimator: 'countdown',
       yieldInterval: 1000000,
     };
@@ -127,7 +127,7 @@ function pythonBenchmark(name: string) {
       transform: 'lazy',
       newMethod: 'wrapper',
       esMode: 'sane',
-      jsArgs: 'simple',
+      jsArgs: 'faithful',
       estimator: 'countdown',
       yieldInterval: 1000000
     }
@@ -238,7 +238,7 @@ function javascriptBenchmark(name: string) {
 
 }
 
-function javaBenchmark(bench: string) {
+function faithfulBenchmark(lang: string, bench: string) {
 
   function faithful(conf: Config): Config {
     return {
@@ -249,14 +249,14 @@ function javaBenchmark(bench: string) {
 
   for (let i = 0; i < ITERATIONS; i++) {
     for (const browser of browsers) {
-      initTiming(i, 'java', bench, browser, { transform: 'original' });
+      initTiming(i, lang, bench, browser, { transform: 'original' });
     }
 
-    initTiming(i, 'java', bench, 'ChromeBook', faithful(chromeConfig));
-    initTiming(i, 'java', bench, 'safari', faithful(safariConfig));
-    initTiming(i, 'java', bench, 'chrome', faithful(chromeConfig));
-    initTiming(i, 'java', bench, 'firefox', faithful(safariConfig));
-    initTiming(i, 'java', bench, edge, faithful(edgeConfig));
+    initTiming(i, lang, bench, 'ChromeBook', faithful(chromeConfig));
+    initTiming(i, lang, bench, 'safari', faithful(safariConfig));
+    initTiming(i, lang, bench, 'chrome', faithful(chromeConfig));
+    initTiming(i, lang, bench, 'firefox', faithful(safariConfig));
+    initTiming(i, lang, bench, edge, faithful(edgeConfig));
   }
 }
 
@@ -312,17 +312,18 @@ function benchmarksFor(lang: string, bench: string) {
       break;
     }
     case 'java': {
-      javaBenchmark(bench)
+      faithfulBenchmark(lang, bench)
+      break;
+    }
+    case 'python_pyjs': {
+      pythonBenchmark(bench);
+      faithfulBenchmark(lang, bench)
       break;
     }
     default: {
       for (let i = 0; i < ITERATIONS; i++) {
         for (const browser of browsers) {
           initTiming(i, lang, bench, browser, { transform: 'original' });
-        }
-
-        if (lang === 'python_pyjs') {
-          pythonBenchmark(bench);
         }
 
         initTiming(i, lang, bench, 'ChromeBook', chromeConfig);
