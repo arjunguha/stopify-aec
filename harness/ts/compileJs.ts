@@ -35,7 +35,8 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
       cwd: path.resolve(__dirname, '../../..')
     })
     return
-  } else if (lang === 'skulpt') {
+  }
+  else if (lang === 'skulpt') {
     const benchmarkFilename = `./benchmarks/skulpt/js-build/${benchmark.bench}.html`;
     const compiledFilename =
       `./benchmarks/tmp/skulpt-${benchmark.bench}-original-undefined-undefined-undefined-undefined-undefined.html`
@@ -63,7 +64,7 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
     return;
   }
 
-  const args = ['--webpack', '-t', transform];
+  const args = ['-t', transform];
 
   if (transform !== 'original') {
     args.push('--new', newMethod!);

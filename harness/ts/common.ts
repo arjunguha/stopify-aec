@@ -170,6 +170,9 @@ export function pyretSourceFilename(lang: string, benchmark: Benchmark) {
   if (transform === 'original') {
     suffix = 'v.jarr'
   }
+  else if (transform === 'native') {
+    suffix = 'jarr'
+  }
   else if (transform === 'retval') {
     suffix = 'vs.jarr.retval'
   }
@@ -261,7 +264,7 @@ function parseRunningTimes(output: string[]): any {
 
   let lastLine: string[];
 
-  if (output.pop() !== 'OK.') {
+  if (output[output.length - 1] !== 'OK.') {
     // Try parsing the output as Pyret's output.
     const out = parsePyretRunningTimes(output);
     if (!out) {
@@ -274,6 +277,7 @@ function parseRunningTimes(output: string[]): any {
     }
   }
   else {
+    output.pop()
     lastLine = output[output.length - 1].split(',');
   }
 
@@ -292,12 +296,7 @@ function parseRunningTimes(output: string[]): any {
 }
 
 export function parseBenchmarkOutput(stdout: string): BenchmarkOutput | undefined {
-  let output = String(stdout).split('\n')
-  if (output.length < 3) {
-    console.error(`unexpected result from benchmark`);
-    console.error(output.join('\n'));
-    return undefined;
-  }
+  let output = String(stdout).split('\n').filter(line => line.length > 0)
   let variance =
     takeWhile(line => line !== "END VARIANCE",
       dropWhile(line => line !== "BEGIN VARIANCE", output));

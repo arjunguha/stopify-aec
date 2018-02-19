@@ -45,10 +45,17 @@ function generateConfigInfo(b: common.Benchmark | common.VarianceBench): string 
 }
 
 function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boolean> {
-  let url;
+  let url: string;
   if (b.lang === 'skulpt') {
     url = `/benchmarks/skulpt-${b.bench}-original-undefined-undefined-undefined-undefined-undefined.html`;
-  } else {
+  }
+  else if (b.lang === 'pyret' || b.lang === 'pyret_deepstack') {
+    url = '/pyret-benchmark.html#' +
+      benchmarkUrl([
+        ...common.benchmarkRunOpts(b),
+        '/benchmarks/' + common.benchmarkCompiledFilename(b)]);
+  }
+  else {
     url = '/benchmark.html#' +
       benchmarkUrl([
         ...common.benchmarkRunOpts(b),
@@ -213,5 +220,4 @@ fetch(new Request('/list', {
 
 window.onerror = function(message, src, line, col, err) {
   log(`Error: ${message} ${err}`);
-
 }

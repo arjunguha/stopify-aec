@@ -113,12 +113,14 @@ function serve(db: Database, port: number) {
           common.mayNull(resampleInterval));
       res.sendStatus(404);
       return;
-    } else {
+    }
+    else {
       if (result.type === 'variance') {
         db.prepare(`UPDATE variance SET variance = ?, running_time = ?, num_yields = ?
                   WHERE rowid = ?`).run(result.variance, result.runningTime,
                     result.numYields, rowId);
-      } else {
+      }
+      else {
         db.prepare(`UPDATE timing SET running_time = ?, num_yields = ?
                 WHERE rowid = ?`)
           .run(result.runningTime, result.numYields, rowId);
