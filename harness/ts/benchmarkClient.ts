@@ -29,7 +29,7 @@ function getName(b: common.Benchmark | common.VarianceBench) {
 function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boolean> {
   let url;
   if (b.lang === 'pyret_deepstacks' || b.lang === 'deepstacks') {
-    url = '/deep-benchmark.html#' +
+    url = '/benchmark.html#' +
       benchmarkUrl([
         ...common.benchmarkRunOpts(b),
         '/benchmarks/' + common.benchmarkCompiledFilename(b)]);

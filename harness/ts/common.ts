@@ -192,6 +192,7 @@ export function benchmarkRunOpts(benchmark: Benchmark | VarianceBench): string[]
   const { lang, platform, transform, estimator, yieldInterval,
           resampleInterval } = benchmark;
 
+  // Pyret sets up its own options.
   if (lang === 'pyret') {
     return  ['--env', platform];
   }
@@ -234,15 +235,50 @@ function takeWhile<T>(f: (elt: T) => boolean, arr: T[]): T[] {
   return arr.slice(0);
 }
 
-function parseRunningTimes(output: string[]): any {
-  if (output.pop() !== 'OK.') {
-    console.error(`unexpected result from benchmark`);
-    console.error(output.join('\n'));
+/**
+ * Expects the somewhere in the output, there are two lines:
+ *
+ * BEGIN STOPIFY BENCHMARK RESULTS
+ * num,num/NA,num/NA,num/NA
+ *
+ * If no such line is found, return undefined.
+ *
+ * Otherwise, return the second line split on ,.
+ */
+function parsePyretRunningTimes(output: string[]): string[] | undefined {
+  const ix = output.findIndex(x => x === "BEGIN STOPIFY BENCHMARK RESULTS");
+
+  if(ix === -1) {
     return undefined;
   }
 
-  const lastLine = output[output.length - 1].split(',');
+  const lastLine = output[ix + 1];
+
+  return lastLine ? lastLine.split(',') : undefined;
+}
+
+function parseRunningTimes(output: string[]): any {
+
+  let lastLine: string[];
+
+  if (output.pop() !== 'OK.') {
+    // Try parsing the output as Pyret's output.
+    const out = parsePyretRunningTimes(output);
+    if (!out) {
+      console.error(`unexpected result from benchmark`);
+      console.error(output.join('\n'));
+      return undefined;
+    }
+    else {
+      lastLine = out;
+    }
+  }
+  else {
+    lastLine = output[output.length - 1].split(',');
+  }
+
   const runningTime = Number(lastLine[0]);
+
   // Pyret outputs NA for numYields in all cases
   const numYields = lastLine[1] === 'NA' ? 0 : Number(lastLine[1])
   if (runningTime >= 0 && numYields >= 0) {

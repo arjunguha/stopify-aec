@@ -7,7 +7,7 @@
     "compileJs": "node ./dist/compileJs",
     "csv": "node ./dist/csv",
     "init": "node ./dist/init",
-    "benchmarkServer": "node ./dist/benchmarkServer",
+    "server": "node ./dist/benchmarkServer",
     "run": "node ./dist/run"
   },
   "repository": "git+https://github.com/plasma-umass/stopify-benchmarks.git",

@@ -128,6 +128,8 @@ function serve(db: Database, port: number) {
   });
 
   app.listen(port);
+
+  console.log(`Visit http://localhost:${port} to start benchmarks`)
 }
 
 serve(new Database('results.sqlite'), 4997);
