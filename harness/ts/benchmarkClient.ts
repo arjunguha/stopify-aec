@@ -3,10 +3,10 @@ import * as common from './common';
 const benchmarkTimeout = 1200; //seconds
 const checkInterval = 5; // seconds
 
-const label = <HTMLDivElement>document.getElementById('label');
 const skip = document.getElementById('skip')!;
 const renderResults = document.getElementById('render')!;
 const resultsContainer = document.getElementById('results-container')!;
+const configInfo = document.getElementById('configuration-info')!;
 
 function log(message: string) {
   const div = <HTMLDivElement>document.getElementById('log');
@@ -26,14 +26,30 @@ function getName(b: common.Benchmark | common.VarianceBench) {
   return `${b.lang}-${b.bench}-${b.transform}-${b.esMode}-${b.newMethod}-${b.estimator}-${b.yieldInterval}`;
 }
 
+function capitalFirst(str: string): string {
+  return str[0].toUpperCase() + str.slice(1);
+}
+
+function generateConfigInfo(b: common.Benchmark | common.VarianceBench): string {
+  const { lang, bench } = b;
+  let str = `<b>Language</b>: ${lang}<br />
+  <b>Name</b>: ${bench}<br />`;
+
+  const ignoreOpts = ['lang', 'bench', 'type', 'platform', 'rowId']
+
+  for (const flag in b) {
+    if (ignoreOpts.includes(flag) || (<any>b)[flag] === undefined) {
+      continue;
+    }
+    str += `<b>${capitalFirst(flag)}</b>: ${capitalFirst((<any>b)[flag])}<br />`
+  }
+
+  return str;
+}
+
 function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boolean> {
   let url;
-  if (b.lang === 'pyret_deepstacks' || b.lang === 'deepstacks') {
-    url = '/benchmark.html#' +
-      benchmarkUrl([
-        ...common.benchmarkRunOpts(b),
-        '/benchmarks/' + common.benchmarkCompiledFilename(b)]);
-  } else if (b.lang === 'skulpt') {
+  if (b.lang === 'skulpt') {
     url = `/benchmarks/skulpt-${b.bench}-original-undefined-undefined-undefined-undefined-undefined.html`;
   } else {
     url = '/benchmark.html#' +
@@ -47,7 +63,8 @@ function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boole
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
   const bStr = getName(b)
-  label.innerText = bStr;
+
+  configInfo.innerHTML = generateConfigInfo(b)
 
   return new Promise<boolean>((resolve, reject) => {
 
@@ -131,13 +148,15 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
   const n = benchmarks.length;
 
   let completed = 0;
-  let failed = 0;
 
   function helper(i: number): Promise<boolean> {
     progress.style.width = `${Math.floor(i/n * 100)}%`;
-    progressText.innerText = `Completed ${completed} of ${n} benchmarks (${failed} failures)`;
+    progressText.innerText = `Completed ${completed} of ${n}`;
+
     if (i === n) {
       renderResults.style.display = 'block';
+      skip.style.display = 'none';
+      document.getElementById('configuration')!.style.display = 'none';
       return Promise.resolve(true);
     }
     return runBenchmark(benchmarks[i])
@@ -145,7 +164,6 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
         completed++;
       })
       .catch(() => {
-        failed++;
         log(`${getName(benchmarks[i])} failed`)
       })
       .then(() => helper(i + 1));

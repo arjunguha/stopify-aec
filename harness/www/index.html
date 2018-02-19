@@ -2,60 +2,82 @@
 <html>
 
 <head>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+    crossorigin="anonymous">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
 <body>
 
-<div class="container">
-  <div id="label"></div>
-  <div id="progressText"></div>
-  
-  <button id="skip" type="button" class="btn btn-warning">Skip</button>
-  <div class="progress">
-    <div id="progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+  <div class="container">
+
+    <div class="jumbotron">
+      <h1>Stopify Benchmarking Harness</h1>
+      <p>
+        This website is being used to run benchmarks compiled by 
+        <a href="https://github.com/plasma-umass/stopify">Stopify</a>. For more
+        information on reproducing the results from the paper, read the wiki
+        page in the <a href="https://github.com/plasma-umass/stopify-aec">benchmarks repository</a>.
+      </p>
+    </div>
+
+    <!-- Progress information -->
+    <div class="progress">
+      <div id="progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 50%"></div>
+    </div>
+    <div id="progressText" class="text-right"> Completed 10 of 100 </div>
+
+    <div id="configuration" class="card" style="margin-top: 40px; display: none">
+      <div class="card-header bg-success text-white"> Configuration Information </div>
+      <div id="configuration-info" class="card-body">Content</div>
+    </div>
+
+    <div class="row" style="margin-top: 20px">
+      <div class="col-5">
+      </div>
+      <div class="col-4">
+        <button id="skip" type="button" class="btn-lg btn btn-warning" style="min-width: 170px">Skip</button>
+        <button id="render" type="button" class="btn-lg btn btn-success" style="min-width: 170px; display: none">Render Results</button>
+      </div>
+    </div>
+
   </div>
-  <button id="render" type="button" class="btn btn-warning" style='display: none'>Render Results</button>
 
-  <div id="log">
+  <div id="results-container" class="container" style="display: none">
+    <ul>
+      <h>Figure 2: Stopify + PyJS in Several Configurations</h>
+      <li>
+        <img id='figure2a' width=350 height=350></img>
+      </li>
+      <li>
+        <img id='figure2b' width=350 height=350></img>
+      </li>
+      <li>
+        <img id='figure2c' width=350 height=350></img>
+      </li>
+      <h>Figure 8: Stopify Applied to Nine Programming Languages</h>
+      <li>
+        <img id='figure8' width=500 height=500></img>
+      </li>
+      <h>Figure 10: Stopify + PyJS vs. Skulpt</h>
+      <li>
+        <img id='figure10' width=500></img>
+      </li>
+      <h>Figure 12: Stopify vs. Pyret</h>
+      <li>
+        <img id='figure12' width=400 height=400></img>
+      </li>
+    </ul>
   </div>
 
-</div>
-
-<div id="results-container" class="container" style="display: none">
-  <ul>
-    <h>Figure 2: Stopify + PyJS in Several Configurations</h>
-    <li>
-      <img id='figure2a' width=350 height=350></img>
-    </li>
-    <li>
-      <img id='figure2b' width=350 height=350></img>
-    </li>
-    <li>
-      <img id='figure2c' width=350 height=350></img>
-    </li>
-    <h>Figure 8: Stopify Applied to Nine Programming Languages</h>
-    <li>
-      <img id='figure8' width=500 height=500></img>
-    </li>
-    <h>Figure 10: Stopify + PyJS vs. Skulpt</h>
-    <li>
-      <img id='figure10' width=500></img>
-    </li>
-    <h>Figure 12: Stopify vs. Pyret</h>
-    <li>
-      <img id='figure12' width=400 height=400></img>
-    </li>
-  </ul>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-<script src="benchmarkClient.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+    crossorigin="anonymous"></script>
+  <script src="benchmarkClient.js"></script>
 </body>
 
 </html>
