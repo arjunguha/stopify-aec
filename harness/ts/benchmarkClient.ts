@@ -49,7 +49,7 @@ function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boole
   if (b.lang === 'skulpt') {
     url = `/benchmarks/skulpt-${b.bench}-original-undefined-undefined-undefined-undefined-undefined.html`;
   }
-  else if (b.lang === 'pyret' || b.lang === 'pyret_deepstack') {
+  else if (b.lang === 'pyret' || b.lang === 'pyret_deepstacks') {
     url = '/pyret-benchmark.html#' +
       benchmarkUrl([
         ...common.benchmarkRunOpts(b),
