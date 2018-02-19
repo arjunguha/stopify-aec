@@ -7,7 +7,7 @@ export type BenchmarkOutput =
   { type: 'variance', variance: string, runningTime: number, numYields: number };
 
 export interface Config {
-  transform: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep',
+  transform: 'original' | 'lazy' | 'eager' | 'retval' | 'lazyDeep' | 'native',
   newMethod?: 'direct' | 'wrapper',
   esMode?: 'sane' | 'es5',
   jsArgs?: 'simple' | 'faithful' | 'full',

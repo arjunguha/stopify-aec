@@ -268,6 +268,7 @@ function pyretBenchmark(name: string) {
 
   for (let i = 0; i < ITERATIONS; i++) {
     for (const b of browsers) {
+      initTiming(i, 'pyret', name, b, { transform: 'native' });
       initTiming(i, 'pyret', name, b, { transform: 'original' });
       //edge uses retval
       if (b === 'MicrosoftEdge') {
@@ -292,6 +293,7 @@ function deepstackBenchmark(lang: string, name: string) {
 
   for (let i = 0; i < ITERATIONS; i++) {
     for (const b of browsers) {
+      initTiming(i, lang, name, b, { ...config, transform: 'native' })
       initTiming(i, lang, name, b, config)
     }
   }
