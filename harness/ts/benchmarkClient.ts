@@ -9,10 +9,7 @@ const resultsContainer = document.getElementById('results-container')!;
 const configInfo = document.getElementById('configuration-info')!;
 
 function log(message: string) {
-  const div = <HTMLDivElement>document.getElementById('log');
-  const msg = document.createElement('div');
-  msg.appendChild(document.createTextNode(message));
-  div.insertBefore(msg, div.firstChild);
+  console.error(message)
 }
 
 var headers = new Headers();
