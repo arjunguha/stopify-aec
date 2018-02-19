@@ -63,18 +63,6 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
     return;
   }
 
-  if (lang === 'deepstacks') {
-
-    const preCompiled = benchmarkFilename + ".compiled"
-
-    spawnSync('cp', [preCompiled, compiledFilename], {
-      stdio: 'inherit',
-      cwd: path.resolve(__dirname, '../../..')
-    })
-
-    return
-  }
-
   const args = ['--webpack', '-t', transform];
 
   if (transform !== 'original') {
