@@ -81,7 +81,10 @@ function serve(db: Database, port: number) {
     res.send(JSON.stringify(getBenchmarks(db, platform, urlParams)));
   });
 
-  app.post('/done', bodyParser.json(), (req, res) => {
+  app.post('/done', bodyParser.json({
+    limit:1024 * 1024 * 10,
+    type:'application/json'
+  }), (req, res) => {
     const ua = req.headers['user-agent'];
     const platform = getPlatform(<string>ua)!;
     const {
@@ -121,9 +124,9 @@ function serve(db: Database, port: number) {
                     result.numYields, rowId);
       }
       else {
-        db.prepare(`UPDATE timing SET running_time = ?, num_yields = ?
+        db.prepare(`UPDATE timing SET running_time = ?, num_yields = ?, output = ?
                 WHERE rowid = ?`)
-          .run(result.runningTime, result.numYields, rowId);
+          .run(result.runningTime, result.numYields, result.output, rowId);
       }
       res.sendStatus(200);
     }

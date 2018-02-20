@@ -3,7 +3,7 @@ import * as Database from 'better-sqlite3';
 export type Platform = 'native' | 'chrome' | 'firefox' | 'MicrosoftEdge' | 'safari' | 'ChromeBook';
 
 export type BenchmarkOutput =
-  { type: 'timing', runningTime: number, numYields: number } |
+  { type: 'timing', runningTime: number, numYields: number, output: string } |
   { type: 'variance', variance: string, runningTime: number, numYields: number };
 
 export interface Config {
@@ -16,6 +16,7 @@ export interface Config {
   EVAL?: 'eval', // TS complains when `eval` is used as a field name.
   yieldInterval?: number,
   resampleInterval?: number,
+  output?: string,
 }
 
 interface Common extends Config {
@@ -26,9 +27,10 @@ interface Common extends Config {
 };
 
 export interface Benchmark extends Common {
-  type: 'timing',
-  runningTime?: number,
-  numYields?: number,
+  type: 'timing';
+  runningTime?: number;
+  numYields?: number;
+  output?: string;
 };
 
 export interface VarianceBench extends Common {
@@ -285,8 +287,15 @@ function parseRunningTimes(output: string[]): any {
 
   // Pyret outputs NA for numYields in all cases
   const numYields = lastLine[1] === 'NA' ? 0 : Number(lastLine[1])
+
+  const ix = output.findIndex(x => x === "BEGIN STOPIFY BENCHMARK RESULTS");
+  let stdout = undefined;
+  if(ix !== -1) {
+    stdout = output.slice(0, ix).join('\n');
+  }
+
   if (runningTime >= 0 && numYields >= 0) {
-    return { runningTime, numYields };
+    return { runningTime, numYields, output: stdout };
   }
   else {
     console.error(`unexpected result from benchmark`);

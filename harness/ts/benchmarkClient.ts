@@ -84,17 +84,11 @@ function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boole
       if (iframe.contentDocument.title === 'done') {
         const data = (<HTMLTextAreaElement>iframe.contentDocument.getElementById('data')).value;
 
-        const output = common.dropWhile(
-          line => line !== "BEGIN STOPIFY BENCHMARK RESULTS",
-          String(data)
-            .split('\n')
-            .filter(line => line.length> 0)).join("\n")
-
         fetch(new Request('/done', {
           method: 'post',
           headers: headers,
           body: JSON.stringify({
-            output: output,
+            output: data,
             rowId: b.rowId,
             lang: b.lang,
             bench: b.bench,

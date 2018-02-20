@@ -24,7 +24,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS timing
    yield_interval TEXT NOT NULL,
    resample_interval TEXT NOT NULL,
    running_time INTEGER,
-   num_yields INTEGER);`);
+   num_yields INTEGER,
+   output TEXT);`);
 
 db.exec(`CREATE TABLE IF NOT EXISTS variance
   (ix INTEGER NOT NULL,
@@ -79,15 +80,16 @@ const browsers = [ 'chrome', 'firefox', 'MicrosoftEdge', 'safari', 'ChromeBook' 
 function initTiming(i: number, lang: string, bench: string, platform: string, config: Config) {
 
   const { transform, newMethod, esMode, jsArgs, getters, EVAL, estimator,
-          yieldInterval, resampleInterval } = config;
+          yieldInterval, resampleInterval, output } = config;
 
   const r = db.prepare(
   `INSERT OR IGNORE INTO timing (ix, lang, bench, platform, transform, new_method,
-es_mode, js_args, getters, eval, estimator, yield_interval, resample_interval)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+es_mode, js_args, getters, eval, estimator, yield_interval, resample_interval, output)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(i, lang, bench, platform, mayNull(transform), mayNull(newMethod),
       mayNull(esMode), mayNull(jsArgs), mayNull(getters), mayNull(EVAL),
-      mayNull(estimator), mayNull(yieldInterval), mayNull(resampleInterval));
+      mayNull(estimator), mayNull(yieldInterval), mayNull(resampleInterval),
+      mayNull(output));
 
   if (r.changes > 0) {
     console.error(`Creating configuration ${i},${lang},${bench},${platform},${transform},${newMethod},${esMode},${jsArgs},${estimator},${yieldInterval},${resampleInterval}`);
