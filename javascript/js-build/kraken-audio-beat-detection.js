@@ -1,4 +1,3 @@
-var console = undefined;
 // Audio sample data.
 var channels          = 2,
     rate              = 44100,
