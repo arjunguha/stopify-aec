@@ -44,31 +44,74 @@
 
   </div>
 
-  <div id="results-container" class="container" style="display: none">
-    <ul>
-      <h>Figure 2: Stopify + PyJS in Several Configurations</h>
-      <li>
-        <img id='figure2a' width=350 height=350></img>
-      </li>
-      <li>
-        <img id='figure2b' width=350 height=350></img>
-      </li>
-      <li>
-        <img id='figure2c' width=350 height=350></img>
-      </li>
-      <h>Figure 8: Stopify Applied to Nine Programming Languages</h>
-      <li>
-        <img id='figure8' width=500 height=500></img>
-      </li>
-      <h>Figure 10: Stopify + PyJS vs. Skulpt</h>
-      <li>
-        <img id='figure10' width=500></img>
-      </li>
-      <h>Figure 12: Stopify vs. Pyret</h>
-      <li>
-        <img id='figure12' width=400 height=400></img>
-      </li>
-    </ul>
+  <div class="container">
+    <div id="results-container" class="card" style="margin-top: 40px; display: none">
+      <div class="card-header bg-success text-white">Figure 2</div>
+      <div id="configuration-info" class="card-body">Python Case Study</div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="thumbnail">
+            <img id='figure2a' style="width:100%">
+            <div class="caption">
+              <p class='text-center'>(a) Non-terminating arithmetic.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="thumbnail">
+            <img id='figure2b' style="width:100%">
+            <div class="caption">
+              <p class='text-center'>(b) Constructor encoding.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="thumbnail">
+            <img id='figure2c' style="width:100%">
+            <div class="caption">
+              <p class='text-center'>(c) Average time between yields</p>
+            </div>
+          </div>
+        </div>
+        <div id="configuration-info" class="card-body">
+          Performance of Stopify relative to unmodified PyJS on a suite of 10
+          Python benchmarks run 10 times each. Each graph shows how an option
+          setting in Stopify affects running time or latency.
+        </div>
+      </div>
+
+      <div class="card-header bg-success text-white">Figure 8</div>
+      <div id="configuration-info" class="card-body">Stopify Applied to Nine Programming Languages</div>
+      <div class="thumbnail">
+        <img id='figure8' style="width:100%">
+        <div class="caption">
+          <p class='text-center'>
+          CDFs of Stopify’s slowdown on nine languages. The median slowdown is
+          in the legend.
+          </p>
+        </div>
+      </div>
+
+      <div class="card-header bg-success text-white">Figure 10</div>
+      <div id="configuration-info" class="card-body">A Comparison of Stopify applied to PyJS against Skulpt</div>
+      <img id='figure10' class='center-block' style="width:100%">
+      <div class="caption">
+        <p class='text-center'>
+        Stopify+PyJS vs. Skulpt. Runtimes are normalized to that of Stopify (< 1.0 => Stopify is better).
+        </p>
+      </div>
+
+      <div class="card-header bg-success text-white">Figure 12</div>
+      <div id="configuration-info" class="card-body">A Comparison of Stopify against Pyret</div>
+      <img id='figure12' class='center-block' style="width:100%">
+      <div class="caption">
+        <p class='text-center'>
+        Pyret with Stopify. Running time is normalized to Pyret without Stopify.
+        </p>
+      </div>
+
+    </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
