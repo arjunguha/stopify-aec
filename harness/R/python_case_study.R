@@ -3,6 +3,8 @@ suppressMessages(library(tidyverse))
 suppressMessages(source("./theme.R"))
 library(stringr)
 
+palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#D55E00", "#CC79A7")
+
 # 99% within 2.58all stddev
 plot_ci <- .99
 
@@ -91,6 +93,7 @@ my_error_bars <- geom_errorbar(
 
 plot <- ggplot(es_sane_vs_insane, aes(x=Benchmark,y=Mean,fill=Factor)) +
   mytheme() +
+  scale_fill_manual(values=palette) +
   geom_bar(stat="identity", position="dodge") +
   my_error_bars +
   ylab("Slowdown relative to PyJS")
@@ -112,6 +115,7 @@ new_method <- all_data %>%
 plot <- ggplot(new_method, 
                aes(x=Benchmark,y=Mean,fill=Factor)) +
   mytheme() +
+  scale_fill_manual(values=palette) +
   geom_bar(stat="identity", position="dodge") +
   my_error_bars +
   ylab("Slowdown relative to PyJS")
@@ -125,6 +129,7 @@ avg_interval <- all_data %>%
   select(Benchmark,Platform,AvgInterval)
 plot <- ggplot(avg_interval, aes(x=Benchmark,y=AvgInterval,fill=Platform)) +
   mytheme() +
+  scale_fill_manual(values=palette) +
   geom_bar(stat="identity", position="dodge") +
   ylab("Average interval between yields")
 mysave("pyjs_case_study_interval_variance.png", plot)
