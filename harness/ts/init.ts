@@ -97,8 +97,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 }
 
 function pythonBenchmark(name: string) {
-  // Sadly, these two just crash with --es=es5
-  if (name === 'gcbench' || name === 'schulze') {
+  // Sadly, these just crash with --es=es5
+  if (name === 'gcbench' || name === 'schulze' || name === 'scimark-lu') {
     return;
   }
   for (let i = 0; i < ITERATIONS; i++) {

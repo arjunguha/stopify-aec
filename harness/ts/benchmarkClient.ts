@@ -143,6 +143,7 @@ function runBenchmark(b: common.Benchmark | common.VarianceBench): Promise<boole
 function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[]): Promise<boolean> {
   const progress = <HTMLDivElement>document.getElementById('progress');
   const progressText = <HTMLDivElement>document.getElementById('progressText');
+  const progressContainer = document.getElementById('progress-container') as HTMLDivElement;
   const n = benchmarks.length;
 
   let completed = 0;
@@ -154,6 +155,7 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
     if (i === n) {
       renderResults.style.display = 'block';
       skip.style.display = 'none';
+      progressContainer.style.display = progressText.style.display = 'none';
       document.getElementById('configuration')!.style.display = 'none';
       return Promise.resolve(true);
     }
@@ -170,6 +172,7 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
 }
 
 function resultsListener() {
+  renderResults.innerText = 'Rendering';
   fetch(new Request('/results', {
     method: 'get',
   }))
@@ -189,6 +192,7 @@ function resultsListener() {
       (<any>document.getElementById('figure8'))!.src += results.figure8;
       (<any>document.getElementById('figure10'))!.src += results.figure10;
       (<any>document.getElementById('figure12'))!.src += results.figure12;
+      renderResults.style.display = 'none';
       resultsContainer.style.display = 'block';
     });
 }
