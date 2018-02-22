@@ -4,6 +4,14 @@ suppressMessages(source("./theme.R"))
 library(stringr)
 
 palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#D55E00", "#CC79A7")
+# Theme for output
+my_theme <- function() {
+  return(mytheme() +
+           theme(
+             legend.key.size = unit(0.1, "in"),
+             legend.position = c(0.75, .9),
+             legend.text = element_text(family="serif", size=8)))
+}
 
 # 99% within 2.58all stddev
 plot_ci <- .99
@@ -18,9 +26,12 @@ if (length(timing_csv) != 1) {
 
 all_data <- read_csv(timing_csv) %>%
   filter(Language == "python_pyjs") %>%
+  filter(Benchmark == 'b' | Benchmark=='binary_trees' | Benchmark=='deltablue' |
+           Benchmark=='fib' | Benchmark=='float' | Benchmark=='nbody' | Benchmark=='pystone' |
+           Benchmark=='richards' | Benchmark=='scimark-fft' | Benchmark=='spectral_norm') %>%
   select(-Language) %>%
-  mutate(Platform = ifelse(Platform == "MicrosoftEdge", "edge", Platform),
-         NewMethod = ifelse(NewMethod == "direct", "new", "object"))
+  mutate(Platform = ifelse(Platform == "MicrosoftEdge", "Edge", ifelse(Platform == "chrome", "Chrome", Platform)),
+         NewMethod = ifelse(NewMethod == "direct", "dynamic", "desugar"))
 
 # Some Python benchmarks do not complete in full ES5 mode in a reasonable
 # amount of time. So, we exclude them from the case study but they are in
@@ -48,7 +59,7 @@ original_avgtimes <- original %>%
   ungroup()
 
 original_chrome <- original_avgtimes %>% 
-  filter(Platform == 'chrome') %>%
+  filter(Platform == 'Chrome') %>%
   select(-Platform)
 
 ci <- function(vec) {
@@ -58,7 +69,7 @@ ci <- function(vec) {
   
 # Compare vanilla PyJS vs. PyJS + Stopify with naive settings on Chrome
 conservative <- all_data %>%
-  filter(Platform == "chrome" & Transform == "lazy" & NewMethod == "new" &
+  filter(Platform == "Chrome" & Transform == "lazy" & NewMethod == "dynamic" &
            EsMode == "es5" & Estimator == "countdown") %>% 
   select(Benchmark,RunningTime) %>%
   inner_join(original_chrome) %>%
@@ -72,7 +83,7 @@ mean(conservative$Mean)
 
 # Slowdown without implicit conversions
 es_sane <- all_data %>%
-  filter(Platform == "chrome" & Transform == "lazy" & NewMethod == "new" &
+  filter(Platform == "Chrome" & Transform == "lazy" & NewMethod == "dynamic" &
          EsMode == "sane" & Estimator == "countdown") %>%
   select(Benchmark,RunningTime) %>%
   inner_join(original_chrome, by="Benchmark") %>%
@@ -83,8 +94,8 @@ es_sane <- all_data %>%
   ungroup()
 
 es_sane_vs_insane <- rbind(
-  conservative %>% mutate(Factor = "Implicit Conversions"),
-  es_sane %>% mutate(Factor = "No Conversions")
+  conservative %>% mutate(Factor = "Implicit method calls"),
+  es_sane %>% mutate(Factor = "No implicit method calls")
 )
 
 my_error_bars <- geom_errorbar(
@@ -92,7 +103,7 @@ my_error_bars <- geom_errorbar(
       position=position_dodge(.9))
 
 plot <- ggplot(es_sane_vs_insane, aes(x=Benchmark,y=Mean,fill=Factor)) +
-  mytheme() +
+  my_theme() +
   scale_fill_manual(values=palette) +
   geom_bar(stat="identity", position="dodge") +
   my_error_bars +
@@ -103,7 +114,7 @@ new_method <- all_data %>%
   filter(Transform == "lazy" & EsMode == "sane" & Estimator == "countdown") %>%
   select(Benchmark,Platform,NewMethod,RunningTime) %>%
   inner_join(original_avgtimes, by=c("Benchmark", "Platform")) %>%
-  filter(Platform == "chrome" | Platform == "edge") %>%
+  filter(Platform == "Chrome" | Platform == "Edge") %>%
   mutate(Factor = str_c(Platform, NewMethod, sep = " - ")) %>%
   select(Benchmark,Factor,RunningTime, AvgOriginalTime) %>%
   mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
@@ -114,23 +125,42 @@ new_method <- all_data %>%
 
 plot <- ggplot(new_method, 
                aes(x=Benchmark,y=Mean,fill=Factor)) +
-  mytheme() +
+  my_theme() +
   scale_fill_manual(values=palette) +
   geom_bar(stat="identity", position="dodge") +
   my_error_bars +
   ylab("Slowdown relative to PyJS")
 mysave("pyjs_case_study_new_method.png", plot)
 
-avg_interval <- all_data %>% 
+avg_countdown_interval <- all_data %>% 
   filter(Transform == "lazy" & EsMode == "sane" & Estimator == "countdown" &
-         ((Platform == "chrome" & NewMethod == "new") |
-          (Platform == "edge" & NewMethod == "new"))) %>%
+         ((Platform == "Chrome" & NewMethod == "desugar") |
+          (Platform == "Edge" & NewMethod == "desugar"))) %>%
   mutate(AvgInterval = RunningTime / NumYields) %>%
-  select(Benchmark,Platform,AvgInterval)
-plot <- ggplot(avg_interval, aes(x=Benchmark,y=AvgInterval,fill=Platform)) +
-  mytheme() +
+  select(Benchmark,Platform,Estimator,AvgInterval) %>%
+  group_by(Benchmark,Platform,Estimator) %>%
+  summarise(Mean = mean(AvgInterval), CI = ci(AvgInterval)) %>%
+  ungroup()
+avg_velocity_interval <- all_data %>% 
+  filter(Transform == "lazy" & EsMode == "sane" & Estimator == "velocity" &
+           ((Platform == "Chrome" & NewMethod == "desugar") |
+              (Platform == "Edge" & NewMethod == "desugar"))) %>%
+  mutate(AvgInterval = RunningTime / NumYields) %>%
+  select(Benchmark,Platform,Estimator,AvgInterval) %>%
+  group_by(Benchmark,Platform,Estimator) %>%
+  summarise(Mean = mean(AvgInterval), CI = ci(AvgInterval)) %>%
+  ungroup()
+
+intervals <- rbind(
+  avg_countdown_interval %>% mutate(Type = paste(Platform,'-',Estimator)),
+  avg_velocity_interval %>% mutate(Type = paste(Platform,'-','sampling'))
+)
+
+plot <- ggplot(intervals, aes(x=Benchmark,y=Mean,fill=Type)) +
+  my_theme() +
   scale_fill_manual(values=palette) +
   geom_bar(stat="identity", position="dodge") +
+  my_error_bars +
   ylab("Average interval between yields")
 mysave("pyjs_case_study_interval_variance.png", plot)
 
