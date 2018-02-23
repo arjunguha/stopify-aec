@@ -97,8 +97,9 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 }
 
 function pythonBenchmark(name: string) {
-  // Sadly, these just crash with --es=es5
-  if (name === 'gcbench' || name === 'schulze' || name === 'scimark-lu') {
+  // Run comparison benchmarks from paper figures
+  if (!['b', 'binary_trees', 'deltablue', 'fib', 'float', 'nbody', 'pystone',
+    'richards', 'scimark-fft', 'spectral_norm'].includes(name)) {
     return;
   }
   for (let i = 0; i < ITERATIONS; i++) {
