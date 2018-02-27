@@ -51,6 +51,20 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
     })
     return;
   }
+  else if (lang === 'javascript' && benchmark.bench.startsWith('kraken-imaging-') && transform === 'original') {
+  const benchmarkFilename = common.benchmarkSourceFilename(benchmark);
+  const compiledFilename = './benchmarks/tmp/' + common.benchmarkCompiledFilename(benchmark);
+
+    if (fs.existsSync('../../' + compiledFilename)) {
+      return;
+    }
+
+    spawnSync('webpack', [benchmarkFilename, compiledFilename], {
+      stdio: 'inherit',
+      cwd: path.resolve(__dirname, '../../..')
+    })
+    return
+  }
 
   if (platform === 'native') {
     // no compile step for natives
