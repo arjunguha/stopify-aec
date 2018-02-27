@@ -52,8 +52,8 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
     return;
   }
   else if (lang === 'javascript' && benchmark.bench.startsWith('kraken-imaging-') && transform === 'original') {
-  const benchmarkFilename = common.benchmarkSourceFilename(benchmark);
-  const compiledFilename = './benchmarks/tmp/' + common.benchmarkCompiledFilename(benchmark);
+    const benchmarkFilename = common.benchmarkSourceFilename(benchmark);
+    const compiledFilename = './benchmarks/tmp/' + common.benchmarkCompiledFilename(benchmark);
 
     if (fs.existsSync('../../' + compiledFilename)) {
       return;
@@ -63,7 +63,22 @@ export function compileBenchmark(benchmark: common.Benchmark | common.VarianceBe
       stdio: 'inherit',
       cwd: path.resolve(__dirname, '../../..')
     })
-    return
+
+    const args = ['-t', transform];
+    args.push(compiledFilename, compiledFilename);
+    try {
+      console.error(`Running ./bin/compile ${args.join(' ')} ...`);
+      spawnSync('./bin/compile', args, {
+        stdio: 'inherit',
+        cwd: path.resolve(__dirname, '../../..')
+      });
+    }
+    catch (exn) {
+      console.error(exn);
+      assert.fail(`Exception running ./bin/compile ${args.join(' ')}`);
+    }
+
+    return;
   }
 
   if (platform === 'native') {
