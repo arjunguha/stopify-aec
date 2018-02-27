@@ -151,6 +151,7 @@ function runAllBenchmarks(benchmarks: (common.Benchmark|common.VarianceBench)[])
   function helper(i: number): Promise<boolean> {
     progress.style.width = `${Math.floor(i/n * 100)}%`;
     progressText.innerText = `Completed ${completed} of ${n}`;
+    progressText.style.display = 'block';
 
     if (i === n) {
       renderResults.style.display = 'block';
@@ -218,4 +219,7 @@ fetch(new Request('/list', {
 
 window.onerror = function(message, src, line, col, err) {
   log(`Error: ${message} ${err}`);
+
+  const progressText = <HTMLDivElement>document.getElementById('progressText');
+  progressText.style.display = 'block';
 }
