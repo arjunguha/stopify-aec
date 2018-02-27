@@ -215,7 +215,11 @@ fetch(new Request('/list', {
       throw new Error(`POST /list get status ${resp.status}`);
     }
   })
-  .then(runAllBenchmarks);
+  .then(runAllBenchmarks)
+  .catch(() => {
+    const progressText = <HTMLDivElement>document.getElementById('progressText');
+    progressText.style.display = 'block';
+  });
 
 window.onerror = function(message, src, line, col, err) {
   log(`Error: ${message} ${err}`);
