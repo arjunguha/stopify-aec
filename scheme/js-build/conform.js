@@ -85,7 +85,7 @@ function sc_error() {
    var e = new Error("sc_error");
 
    if (arguments.length >= 1) {
-      e.name = arguments[0];
+      e.nameF = arguments[0];
       if (arguments.length >= 2) {
 	 e.message = arguments[1];
 	 if (arguments.length >= 3) {
@@ -100,8 +100,8 @@ function sc_error() {
 function sc_arity_check(fun, nbArgs) {
    function err( args, msg, obj ) {
       var where= ("callee" in args && "caller" in args.callee ?
-		  ("sc_name" in args.callee.caller ?
-		   args.callee.caller.sc_name : args.callee.caller)
+		  ("sc_nameF" in args.callee.caller ?
+		   args.callee.caller.sc_nameF : args.callee.caller)
 		  : "arity-check");
       sc_error(where, msg, obj);
       return undefined;
@@ -1793,8 +1793,8 @@ function sc_dynamicWind(before, thunk, after) {
 // LIMITATION: transcript-on/transcript-off doesn't exist without files.
 
 
-function sc_Struct(name) {
-    this.name = name;
+function sc_Struct(nameF) {
+    this.nameF = nameF;
 }
 sc_Struct.prototype.sc_toDisplayString = function() {
     return "#<struct" + sc_hash(this) + ">";
@@ -1802,10 +1802,10 @@ sc_Struct.prototype.sc_toDisplayString = function() {
 sc_Struct.prototype.sc_toWriteString = sc_Struct.prototype.sc_toDisplayString;
 
 /*** META ((export #t) (arity #t)
-           (peephole (hole 1 "new sc_Struct(" name ")")))
+           (peephole (hole 1 "new sc_Struct(" nameF ")")))
 */
-function sc_makeStruct(name) {
-    return new sc_Struct(name);
+function sc_makeStruct(nameF) {
+    return new sc_Struct(nameF);
 }
 
 /*** META ((export #t) (arity 1)
@@ -1818,23 +1818,23 @@ function sc_isStruct(o) {
 
 /*** META ((export #t) (arity #t)
            (type bool)
-           (peephole (hole 2 "(" 1 " instanceof sc_Struct) && ( " 1 ".name === " 0 ")")))
+           (peephole (hole 2 "(" 1 " instanceof sc_Struct) && ( " 1 ".nameF === " 0 ")")))
 */
-function sc_isStructNamed(name, s) {
-    return ((s instanceof sc_Struct) && (s.name === name));
+function sc_isStructNamed(nameF, s) {
+    return ((s instanceof sc_Struct) && (s.nameF === nameF));
 }
 
 /*** META ((export struct-field) (arity #t)
            (peephole (hole 3 0 "[" 2 "]")))
 */
-function sc_getStructField(s, name, field) {
+function sc_getStructField(s, nameF, field) {
     return s[field];
 }
 
 /*** META ((export struct-field-set!) (arity #t)
            (peephole (hole 4 0 "[" 2 "] = " 3)))
 */
-function sc_setStructFieldBang(s, name, field, val) {
+function sc_setStructFieldBang(s, nameF, field, val) {
     s[field] = val;
 }
 
@@ -3765,7 +3765,7 @@ function sc_openOutputFile(s) {
 
 /* ----------------------------------------------------------------------------*/
 /*** META ((export #t) (arity #t)) */
-function sc_basename(p) {
+function sc_basenameF(p) {
    var i = p.lastIndexOf('/');
 
    if(i >= 0)
@@ -3775,7 +3775,7 @@ function sc_basename(p) {
 }
 
 /*** META ((export #t) (arity #t)) */
-function sc_dirname(p) {
+function sc_dirnameF(p) {
    var i = p.lastIndexOf('/');
 
    if(i >= 0)
@@ -3912,8 +3912,8 @@ function sc_write(o, p) {
 }
 
 function sc_toWriteStringProcedure(o) {
-   if ("sc_name" in o) {
-      return "#<procedure " + sc_name + " " + (o.sc_location != "#f" ? o.sc_location : "") + ":" + sc_hash(o) + ">";
+   if ("sc_nameF" in o) {
+      return "#<procedure " + sc_nameF + " " + (o.sc_location != "#f" ? o.sc_location : "") + ":" + sc_hash(o) + ">";
    } else {
       var n = o.toString().match( /function[ \t\n]+([_a-zA-Z0-9$]+)/ );
       
@@ -4312,14 +4312,14 @@ var BgL_bluezd2edgeszd2;
 var BgL_makezd2graphzd2;
 var setup;
 var BgL_makezd2internalzd2nodez00;
-var BgL_internalzd2nodezd2namez00;
+var BgL_internalzd2nodezd2nameFz00;
 var union;
 var adjoin;
 var BgL_bluezd2edgezd2operationz00;
 var d;
 var c;
 var b;
-var name;
+var nameF;
 var a;
 var reduce;
 var BgL_cleanzd2graphzd2;
@@ -4358,7 +4358,7 @@ var BgL_copyzd2graphzd2;
 var BgL_insertz12z12;
 var BgL_makezd2nodezd2;
 var BgL_runzd2benchmarkzd2;
-var BgL_setzd2internalzd2nodezd2namez12zc0;
+var BgL_setzd2internalzd2nodezd2nameFz12zc0;
 var BgL_makezd2internalzd2graphz00;
 var BgL_setzd2bluezd2edgezd2operationz12zc0;
 var BgL_internalzd2graphzd2alreadyzd2joinedzd2;
@@ -4392,7 +4392,7 @@ time = function(x) {
 BgL_fatalzd2errorzd2 = function() {
     return null.car;
   };
-BgL_runzd2benchzd2 = function(name, count, is_ok, run) {
+BgL_runzd2benchzd2 = function(nameF, count, is_ok, run) {
     var i;
     var result;
     var g1263;
@@ -4405,7 +4405,7 @@ BgL_runzd2benchzd2 = function(name, count, is_ok, run) {
     }
     return result;
   };
-BgL_runzd2benchmarkzd2 = function(name, count, is_ok, run_maker) {
+BgL_runzd2benchmarkzd2 = function(nameF, count, is_ok, run_maker) {
     var args = null;
     for (var sc_tmp = arguments.length - 1; sc_tmp >= 4; --sc_tmp) {
       args = sc_cons(arguments[sc_tmp], args);
@@ -4414,7 +4414,7 @@ BgL_runzd2benchmarkzd2 = function(name, count, is_ok, run_maker) {
     var run;
     sc_newline();
     run = sc_apply(run_maker, args);
-    result = time(BgL_runzd2benchzd2(name, count, is_ok, run));
+    result = time(BgL_runzd2benchzd2(nameF, count, is_ok, run));
     if (is_ok(result) === false) {
       sc_display(BgL_sc_const_1z00_main);
       sc_newline();
@@ -4508,7 +4508,7 @@ union = function(list1, list2) {
     }
   };
 BgL_makezd2internalzd2nodez00 = sc_vector;
-BgL_internalzd2nodezd2namez00 = function(node) {
+BgL_internalzd2nodezd2nameFz00 = function(node) {
     return node[0];
   };
 BgL_internalzd2nodezd2greenzd2edgeszd2 = function(node) {
@@ -4520,8 +4520,8 @@ BgL_internalzd2nodezd2redzd2edgeszd2 = function(node) {
 BgL_internalzd2nodezd2bluezd2edgeszd2 = function(node) {
     return node[3];
   };
-BgL_setzd2internalzd2nodezd2namez12zc0 = function(node, name) {
-    return node[0] = name;
+BgL_setzd2internalzd2nodezd2nameFz12zc0 = function(node, nameF) {
+    return node[0] = nameF;
   };
 BgL_setzd2internalzd2nodezd2greenzd2edgesz12z12 = function(node, edges) {
     return node[1] = edges;
@@ -4532,29 +4532,29 @@ BgL_setzd2internalzd2nodezd2redzd2edgesz12z12 = function(node, edges) {
 BgL_setzd2internalzd2nodezd2bluezd2edgesz12z12 = function(node, edges) {
     return node[3] = edges;
   };
-BgL_makezd2nodezd2 = function(name) {
+BgL_makezd2nodezd2 = function(nameF) {
     var blue_edges = null;
     for (var sc_tmp = arguments.length - 1; sc_tmp >= 1; --sc_tmp) {
       blue_edges = sc_cons(arguments[sc_tmp], blue_edges);
     }
     var blue_edges_6;
-    var name_7;
-    if (sc_isSymbol(name)) {
-      name_7 = name.slice(1);
+    var nameF_7;
+    if (sc_isSymbol(nameF)) {
+      nameF_7 = nameF.slice(1);
     } else {
-      name_7 = name;
+      nameF_7 = nameF;
     }
     if (blue_edges === null) {
       blue_edges_6 = "\uEBACNOT-A-NODE-YET";
     } else {
       blue_edges_6 = blue_edges.car;
     }
-    return BgL_makezd2internalzd2nodez00(name_7, null, null, blue_edges_6);
+    return BgL_makezd2internalzd2nodez00(nameF_7, null, null, blue_edges_6);
   };
 BgL_copyzd2nodezd2 = function(node) {
-    return BgL_makezd2internalzd2nodez00(name(node), null, null, BgL_bluezd2edgeszd2(node));
+    return BgL_makezd2internalzd2nodez00(nameF(node), null, null, BgL_bluezd2edgeszd2(node));
   };
-name = BgL_internalzd2nodezd2namez00;
+nameF = BgL_internalzd2nodezd2nameFz00;
 BgL_makezd2edgezd2getterz00 = function(selector) {
     return function(node) {
             var tmp1264;
@@ -4962,7 +4962,7 @@ classify = function(nodes) {
     while (!(L1295 === null)) {
       class_17 = L1295.car;
       stmp = new sc_Pair(BgL_sortzd2listzd2(class_17, function(node1, node2) {
-                  return name(node1).length < name(node2).length;
+                  return nameF(node1).length < nameF(node2).length;
                 }), null);
       tail1299.cdr = stmp;
       tail1299 = tail1299.cdr;
@@ -5063,7 +5063,7 @@ meet = function(graph, node1, node2) {
                 if (BgL_conformszf3zf3(node2, node1) !== false) {
                   return node1;
                 } else {
-                  result = BgL_makezd2nodezd2("(" + name(node1) + " ^ " + name(node2) + ")");
+                  result = BgL_makezd2nodezd2("(" + nameF(node1) + " ^ " + nameF(node2) + ")");
                   BgL_addzd2graphzd2nodesz12z12(graph, result);
                   BgL_insertz12z12(BgL_alreadyzd2metzd2(graph), node1, node2, result);
                   falseHead1313 = new sc_Pair(null, null);
@@ -5156,7 +5156,7 @@ join = function(graph, node1, node2) {
                 if (BgL_conformszf3zf3(node2, node1) !== false) {
                   return node2;
                 } else {
-                  result = BgL_makezd2nodezd2("(" + name(node1) + " v " + name(node2) + ")");
+                  result = BgL_makezd2nodezd2("(" + nameF(node1) + " v " + nameF(node2) + ")");
                   BgL_addzd2graphzd2nodesz12z12(graph, result);
                   BgL_insertz12z12(BgL_alreadyzd2joinedzd2(graph), node1, node2, result);
                   falseHead1328 = new sc_Pair(null, null);
@@ -5284,7 +5284,7 @@ test = function() {
     var falseHead1339;
     var tmpF1337;
     setup();
-    tmpF1337 = name;
+    tmpF1337 = nameF;
     falseHead1339 = new sc_Pair(null, null);
     L1336_33 = BgL_graphzd2nodeszd2(BgL_makezd2latticezd2(BgL_makezd2graphzd2(a, b, c, d, BgL_anyzd2nodezd2, BgL_nonezd2nodezd2), false));
     tail1340 = falseHead1339;

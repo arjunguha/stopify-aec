@@ -3,16 +3,16 @@
 
 (define (fatal-error) (car '()))
 
-(define (run-bench name count ok? run)
+(define (run-bench nameF count ok? run)
   (let loop ((i 0) (result (list 'undefined)))
     (if (< i count)
       (loop (+ i 1) (run))
       result)))
 
-(define (run-benchmark name count ok? run-maker . args)
+(define (run-benchmark nameF count ok? run-maker . args)
   (newline)
   (let* ((run (apply run-maker args))
-         (result (time (run-bench name count ok? run))))
+         (result (time (run-bench nameF count ok? run))))
     (if (not (ok? result))
       (begin
         (display "*** wrong result ***")
@@ -76,26 +76,26 @@
 ;; GRAPH NODES
 
 (define make-internal-node vector)
-(define (internal-node-name node) (vector-ref node 0))
+(define (internal-node-nameF node) (vector-ref node 0))
 (define (internal-node-green-edges node) (vector-ref node 1))
 (define (internal-node-red-edges node) (vector-ref node 2))
 (define (internal-node-blue-edges node) (vector-ref node 3))
-(define (set-internal-node-name! node name) (vector-set! node 0 name))
+(define (set-internal-node-nameF! node nameF) (vector-set! node 0 nameF))
 (define (set-internal-node-green-edges! node edges) (vector-set! node 1 edges))
 (define (set-internal-node-red-edges! node edges) (vector-set! node 2 edges))
 (define (set-internal-node-blue-edges! node edges) (vector-set! node 3 edges))
 
-(define (make-node name . blue-edges)   ; User's constructor
-  (let ((name (if (symbol? name) (symbol->string name) name))
+(define (make-node nameF . blue-edges)   ; User's constructor
+  (let ((nameF (if (symbol? nameF) (symbol->string nameF) nameF))
         (blue-edges (if (null? blue-edges) 'NOT-A-NODE-YET (car blue-edges))))
-    (make-internal-node name '() '() blue-edges)))
+    (make-internal-node nameF '() '() blue-edges)))
 
 (define (copy-node node)
-  (make-internal-node (name node) '() '() (blue-edges node)))
+  (make-internal-node (nameF node) '() '() (blue-edges node)))
 
 ; Selectors
 
-(define name internal-node-name)
+(define nameF internal-node-nameF)
 (define (make-edge-getter selector)
   (lambda (node)
     (if (or (none-node? node) (any-node? node))
@@ -322,8 +322,8 @@
         (map (lambda (class)
                (sort-list class
                           (lambda (node1 node2)
-                            (< (string-length (name node1))
-                               (string-length (name node2))))))
+                            (< (string-length (nameF node1))
+                               (string-length (nameF node2))))))
              classes)
         (let ((this-node (car nodes)))
           (define (add-node classes)
@@ -388,7 +388,7 @@
         ((conforms? node2 node1) node1)
         (else
          (let ((result
-                (make-node (string-append "(" (name node1) " ^ " (name node2) ")"))))
+                (make-node (string-append "(" (nameF node1) " ^ " (nameF node2) ")"))))
            (add-graph-nodes! graph result)
            (insert! (already-met graph) node1 node2 result)
            (set-blue-edges! result
@@ -409,7 +409,7 @@
         ((conforms? node2 node1) node2)
         (else
          (let ((result
-                (make-node (string-append "(" (name node1) " v " (name node2) ")"))))
+                (make-node (string-append "(" (nameF node1) " v " (nameF node2) ")"))))
            (add-graph-nodes! graph result)
            (insert! (already-joined graph) node1 node2 result)
            (set-blue-edges! result
@@ -472,7 +472,7 @@
 
 (define (test)
   (setup)
-  (map name
+  (map nameF
        (graph-nodes (make-lattice (make-graph a b c d any-node none-node) #f))))
 
 (define (main . args)
