@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 library(tidyverse)
 library(forcats)
 library(GoFKernel)
@@ -5,95 +6,84 @@ library(stringr)
 library(extrafont)
 library(fontcm)
 library(gridExtra)
-library(xtable)
 
 palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#D55E00", "#CC79A7")
 
-mean_table <- function (table, transform, language) {
-  ret <- table %>%
-    filter(Transform == transform) %>%
-    filter(Language == language) %>%
-    group_by(Benchmark, Platform) %>%
-    summarise(MeanOriginal = mean(RunningTime)) %>%
-    ungroup() %>%
-    select(Benchmark, Platform, MeanOriginal)
-  
-  return(ret)
+# Theme for output
+mytheme <- function() {
+  return(theme_bw() +
+           theme(
+             panel.background = element_rect(size = 0.9),
+             text = element_text(family="serif", size=16),
+             panel.grid.major = element_line(colour="gray", size=0.1),
+             panel.grid.minor =
+               element_line(colour="gray", size=0.1, linetype='dotted'),
+             axis.ticks = element_line(size=0.05),
+             axis.ticks.length=unit("-0.05", "in"),
+             axis.text.y = element_text(margin = margin(r = 5)),
+             axis.text.x = element_text(margin = margin(t = 5)),
+             legend.key = element_rect(colour=NA),
+             legend.margin = margin(unit(0.001, "in")),
+             legend.key.size = unit(0.2, "in"),
+             legend.title = element_blank(),
+             legend.position = c(0.75, 0.45),
+             legend.background = element_blank()))
 }
 
-all_data <- read_csv("../results.csv") 
-
-calc_slowdown <- function(language) {
-  native_times <- read_csv(paste("../native/", language, "-native.csv", sep=""))
+read_data <- function(filename) {
   
-  original_m <- mean_table(all_data, 'original', language)
-  native_m <- mean_table(native_times, 'native', language) %>%
-    mutate(MeanNative = MeanOriginal) %>%
-    select(Benchmark, MeanNative)
+  # Excludes JS
+  all_languages <- c(
+    "python_pyjs",
+    "clojurescript",
+    "scala",
+    "c++",
+    "java",
+    "scheme",
+    "dart_dart2js",
+    "ocaml"
+  )
   
-  slowdown <- original_m %>% 
-    inner_join(native_m) %>%
-    mutate(Slowdown = MeanOriginal / MeanNative, Language = language) %>%
-    group_by(Benchmark) %>%
-    filter(length(Benchmark) == 5) %>%
-    ungroup()
-  
-  chrome <- slowdown %>%
-    filter(Platform == 'chrome') %>%
-    mutate(Chrome = Slowdown) %>% 
-    select(Language, Benchmark, Chrome)
-  
-  safari <- slowdown %>%
-    filter(Platform == 'safari') %>%
-    mutate(Safari = Slowdown) %>% 
-    select(Language, Benchmark, Safari)
-  
-  firefox <- slowdown %>%
-    filter(Platform == 'firefox') %>%
-    mutate(Firefox = Slowdown) %>% 
-    select(Language, Benchmark, Firefox)
-  
-  chromebook <- slowdown %>%
-    filter(Platform == 'ChromeBook') %>%
-    mutate(ChromeBook = Slowdown) %>% 
-    select(Language, Benchmark, ChromeBook)
-  
-  edge <- slowdown %>%
-    filter(Platform == 'MicrosoftEdge') %>%
-    mutate(Edge = Slowdown) %>% 
-    select(Language, Benchmark, Edge)
-  
-  ret <- chrome %>%
-    inner_join(safari) %>%
-    inner_join(firefox) %>% 
-    inner_join(chromebook) %>%
-    inner_join(edge)
-  
-  return(ret)
+  all_data <- read_csv(filename) %>%
+    filter(Language %in% all_languages) %>%
+    filter(Platform == "native" | Transform == "original") %>%
+    filter(Platform == "chrome" | Platform == "firefox" | Platform == "native") %>%
+    mutate(Platform  = fct_recode(Platform,
+                                  "Native" = "native",
+                                  "Chrome" = "chrome",
+                                  "Firefox" = "firefox"),
+           Language = fct_recode(Language,
+                                 "Python (PyJS)" = "python_pyjs",
+                                 "Clojure (ClojureScript)" = "clojurescript",
+                                 "Scala (ScalaJS)" = "scala",
+                                 "C++ (Emscripten)" = "c++",
+                                 "Java (JSweet)" = "java",
+                                 "Scheme (scheme2js)" = "scheme",
+                                 "Dart (dart2js)" = "dart_dart2js",
+                                 "OCaml (BuckleScript)" = "ocaml")) %>%
+    mutate(Platform = fct_relevel(Platform, "Native", "Chrome", "Firefox")) %>%
+    mutate(Platform = droplevels(Platform), Language = droplevels(Language)) %>%
+    select(Language, Platform, RunningTime, Benchmark)
+  return (all_data)
 }
 
-a <- calc_slowdown("ocaml")
-b <- calc_slowdown("c++")
-c <- calc_slowdown("dart_dart2js")
-d <- calc_slowdown("java")
-e <- calc_slowdown("scheme")
-f <- calc_slowdown("scala")
-g <- calc_slowdown("clojurescript")
+all_data <- read_data("../results.csv")
 
-k <- rbind(a, b, c, d, e, f, g)
+native_avgtimes <- all_data %>%
+  filter(Platform == "Native") %>%
+  group_by(Benchmark) %>%
+  summarise(AvgOriginalTime = mean(RunningTime)) %>%
+  ungroup()
+  
+slowdowns <- all_data %>%
+  filter(Platform != "Native") %>%
+  inner_join(native_avgtimes) %>%
+  mutate(Slowdown = RunningTime / AvgOriginalTime) %>%
+  select(Platform, Language, Slowdown)
 
-tbl <- xtable(format.data.frame(k, digits=2, scientific=FALSE),
-	      align=c('|l','|l','|r','|r','|r', '|r', '|r', '|r|'),
-	      label='tbl:native',
-	      caption='Slowdown of benchmarks when compiled to JavaScript, with respect to native running time')
+graphic <- ggplot(slowdowns, aes(x=Slowdown, color=Language,linetype=Platform)) + 
+  stat_ecdf() +
+  labs(y = "% of trials", x = "Slowdown") +
+  mytheme()
 
-print.xtable(tbl, 
-	     file="native.tex", 
-	     include.rownames = F, size='\\small',
-	     floating.environment = 'figure*',
-	     sanitize.text.function = function (x) {return(gsub("_","-",x))},
-	     sanitize.rownames.function = NULL,
-             scalebox = 0.75,
-	     sanitize.colnames.function = function(x) {
-		x
-	     })
+ggsave("native_slowdowns.pdf", graphic, width=5, height=3, units="in")
