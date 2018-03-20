@@ -34,6 +34,7 @@ function serve(db: Database, port: number) {
 
   // Serve stopify.bundle.js and benchmark.html, which go in the IFRAME
   app.use(express.static(path.join(__dirname, '../../../dist')));
+  app.use(express.static(path.join(__dirname, '../../../../stopify-continuations/dist')));
 
   // Serve the benchmark running page
   app.use(express.static(path.join(__dirname, '../www')));

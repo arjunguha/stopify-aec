@@ -190,7 +190,7 @@ export function benchmarkCompiledFilename(benchmark: Common) {
   const { lang, bench, transform, newMethod, esMode, jsArgs,
     getters, EVAL } = benchmark;
 
-  return `${lang}-${bench}-${transform}-${newMethod}-${esMode}-${jsArgs}-${getters}-${EVAL}.js`;
+  return `${lang}-${bench}-${transform}-${newMethod}-${esMode}-${jsArgs}-${getters}-${EVAL}.js`.replace('octane/', '');
 }
 
 export function benchmarkRunOpts(benchmark: Benchmark | VarianceBench): string[] {

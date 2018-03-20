@@ -343,8 +343,9 @@ function benchmarksFor(lang: string, bench: string) {
 function createTimingTable() {
 
   const benchmarkFiles = langs
-    .map(l => glob.sync(path.resolve(__dirname, `../../${l}/js-build/*.js`)))
-    .reduce((arr1, arr2) => arr1.concat(arr2));
+    .map(l => glob.sync(path.resolve(__dirname, `../../${l}/js-build/**/*.js`),
+      { ignore: '**/base.js' }))
+    .reduce((arr1, arr2) => arr1.concat(arr2))
 
   for (const path of benchmarkFiles) {
     const m = /^.*\/([^/]*)\/js-build\/([^.]*)\.js$/.exec(path);
