@@ -90,7 +90,12 @@ function compileJSOctane(benchmark: common.Benchmark): void {
   const baseSource = path.resolve(__dirname,
     '../../javascript/js-build/octane/base.js');
   const baseCompiled = path.resolve(__dirname, '../../tmp/base.js');
-  if (!fs.existsSync(baseCompiled)) {
+  if (benchmark.transform === 'original') {
+    spawnSync('cp', [baseSource, baseCompiled], {
+      stdio: 'inherit',
+      cwd: path.resolve(__dirname, '../../..')
+    })
+  } else {
     spawnSync('./bin/compile', [
       ...args,
       baseSource,
