@@ -55,13 +55,19 @@ function compileJSKrakenImaging(benchmark: common.Benchmark): void {
       return;
     }
 
-    spawnSync('webpack', [benchmarkFilename, compiledFilename], {
-      stdio: 'inherit',
-      cwd: path.resolve(__dirname, '../../..')
-    })
-
     const args = ['-t', benchmark.transform];
-    args.push(compiledFilename, compiledFilename);
+    args.push(benchmarkFilename, compiledFilename);
+    if (benchmark.transform !== 'original') {
+      args.push(...[
+        '--new', benchmark.newMethod!,
+        '--es', 'es5',
+        '--js-args', 'full',
+        '--hofs', 'fill',
+        '--getters',
+        '--eval',
+      ]);
+    }
+
     try {
       console.error(`Running ./bin/compile ${args.join(' ')} ...`);
       spawnSync('./bin/compile', args, {
@@ -73,6 +79,21 @@ function compileJSKrakenImaging(benchmark: common.Benchmark): void {
       console.error(exn);
       assert.fail(`Exception running ./bin/compile ${args.join(' ')}`);
     }
+
+  const dataSource = path.resolve(__dirname,
+    '../../javascript/js-build/kraken-imaging.data');
+  const dataCompiled = path.resolve(__dirname, '../../tmp/kraken-imaging.data');
+  if (!fs.existsSync('../../' + dataCompiled)) {
+    spawnSync('cp', [dataSource, dataCompiled], {
+      stdio: 'inherit',
+      cwd: path.resolve(__dirname, '../../..')
+    })
+  }
+
+    spawnSync('webpack', [compiledFilename, compiledFilename], {
+      stdio: 'inherit',
+      cwd: path.resolve(__dirname, '../../..')
+    })
 
     return;
 }
@@ -183,8 +204,7 @@ export function compileBenchmark(benchmark: common.Benchmark) {
     case 'skulpt':
       return compileSkulpt(benchmark);
     case 'javascript':
-      if (benchmark.bench.startsWith('kraken-imaging-') &&
-        transform === 'original') {
+      if (benchmark.bench.startsWith('kraken-imaging-')) {
         return compileJSKrakenImaging(benchmark);
       } else if (benchmark.bench.startsWith('octane/')) {
         return compileJSOctane(benchmark);
